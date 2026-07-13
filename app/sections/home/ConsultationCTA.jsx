@@ -1,0 +1,215 @@
+'use client';
+
+import { useState } from 'react';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
+import Image from 'next/image';
+import Link from 'next/link';
+import { motion } from 'framer-motion';
+import { H2, Text } from '../../components/atoms/Typography';
+import Button from '../../components/atoms/Button';
+import Icon from '../../components/atoms/Icon';
+
+// Placeholder image – replace with your own
+import consultationImage from '@/assets/images/diet.webp'; // adjust path
+
+const validationSchema = Yup.object({
+  name: Yup.string()
+    .required('Name is required')
+    .min(2, 'Name must be at least 2 characters'),
+  email: Yup.string()
+    .email('Invalid email address')
+    .required('Email is required'),
+  goal: Yup.string()
+    .required('Please select your primary goal'),
+  message: Yup.string()
+    .max(500, 'Message must be less than 500 characters'),
+});
+
+export default function ConsultationCTA() {
+  const [submitted, setSubmitted] = useState(false);
+
+  const formik = useFormik({
+    initialValues: {
+      name: '',
+      email: '',
+      goal: '',
+      message: '',
+    },
+    validationSchema,
+    onSubmit: (values, { resetForm }) => {
+      // In production, send this data to your API
+      console.log('Consultation request:', values);
+      setSubmitted(true);
+      resetForm();
+      // Optionally redirect to a booking page
+      // router.push('/consultation');
+    },
+  });
+
+  return (
+    <section className="relative py-20 md:py-28 overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+          {/* Left side: Image & headline */}
+          <motion.div
+            initial={{ opacity: 0, x: -30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.7 }}
+            viewport={{ once: true }}
+            className="order-2 lg:order-1"
+          >
+            <div className="relative w-full max-w-md mx-auto aspect-square rounded-2xl overflow-hidden shadow-2xl ring-1 ring-yellow-400/10">
+              <Image
+                src={consultationImage}
+                alt="Nutrition consultation"
+                fill
+                unoptimized
+                className="object-cover"
+              />
+              {/* subtle glow overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-yellow-400/10 pointer-events-none" />
+            </div>
+
+            <div className="mt-8 text-center lg:text-left">
+              <H2 className="text-3xl sm:text-4xl lg:text-5xl">
+                Not sure what supplements are right for you?
+              </H2>
+              <Text size="lg" className="mt-4 max-w-lg">
+                Let our nutrition experts build a personalized diet plan based
+                on your body goals.
+              </Text>
+            </div>
+          </motion.div>
+
+          {/* Right side: Form */}
+          <motion.div
+            initial={{ opacity: 0, x: 30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.7, delay: 0.2 }}
+            viewport={{ once: true }}
+            className="order-1 lg:order-2"
+          >
+            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 sm:p-8 shadow-xl transition-all hover:border-yellow-400/30">
+              {submitted ? (
+                <div className="text-center py-8">
+                  <Icon name="check-circle" className="w-16 h-16 text-yellow-400 mx-auto" />
+                  <h3 className="text-2xl font-bold text-white mt-4">Request Sent!</h3>
+                  <Text className="mt-2">
+                    Our team will contact you within 24 hours to schedule your consultation.
+                  </Text>
+                  <Button
+                    variant="primary"
+                    className="mt-6"
+                    onClick={() => setSubmitted(false)}
+                  >
+                    Send Another Request
+                  </Button>
+                </div>
+              ) : (
+                <form onSubmit={formik.handleSubmit} className="space-y-5">
+                  <div>
+                    <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-1">
+                      Full Name *
+                    </label>
+                    <input
+                      id="name"
+                      type="text"
+                      {...formik.getFieldProps('name')}
+                      className={`w-full px-4 py-3 rounded-xl bg-black/40 border ${
+                        formik.touched.name && formik.errors.name
+                          ? 'border-red-500'
+                          : 'border-white/10'
+                      } text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-400/50 transition`}
+                      placeholder="John Doe"
+                    />
+                    {formik.touched.name && formik.errors.name && (
+                      <p className="mt-1 text-sm text-red-400">{formik.errors.name}</p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1">
+                      Email Address *
+                    </label>
+                    <input
+                      id="email"
+                      type="email"
+                      {...formik.getFieldProps('email')}
+                      className={`w-full px-4 py-3 rounded-xl bg-black/40 border ${
+                        formik.touched.email && formik.errors.email
+                          ? 'border-red-500'
+                          : 'border-white/10'
+                      } text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-400/50 transition`}
+                      placeholder="you@example.com"
+                    />
+                    {formik.touched.email && formik.errors.email && (
+                      <p className="mt-1 text-sm text-red-400">{formik.errors.email}</p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label htmlFor="goal" className="block text-sm font-medium text-gray-300 mb-1">
+                      Primary Goal *
+                    </label>
+                    <select
+                      id="goal"
+                      {...formik.getFieldProps('goal')}
+                      className={`w-full px-4 py-3 rounded-xl bg-black/40 border ${
+                        formik.touched.goal && formik.errors.goal
+                          ? 'border-red-500'
+                          : 'border-white/10'
+                      } text-white focus:outline-none focus:ring-2 focus:ring-yellow-400/50 transition appearance-none`}
+                    >
+                      <option value="" className="bg-black">Select your goal</option>
+                      <option value="build-muscle" className="bg-black">Build Muscle</option>
+                      <option value="lose-fat" className="bg-black">Lose Fat</option>
+                      <option value="weight-gain" className="bg-black">Weight Gain</option>
+                      <option value="healthy-lifestyle" className="bg-black">Healthy Lifestyle</option>
+                      <option value="endurance" className="bg-black">Endurance</option>
+                    </select>
+                    {formik.touched.goal && formik.errors.goal && (
+                      <p className="mt-1 text-sm text-red-400">{formik.errors.goal}</p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label htmlFor="message" className="block text-sm font-medium text-gray-300 mb-1">
+                      Additional Notes (optional)
+                    </label>
+                    <textarea
+                      id="message"
+                      rows="3"
+                      {...formik.getFieldProps('message')}
+                      className={`w-full px-4 py-3 rounded-xl bg-black/40 border ${
+                        formik.touched.message && formik.errors.message
+                          ? 'border-red-500'
+                          : 'border-white/10'
+                      } text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-400/50 transition resize-none`}
+                      placeholder="Any specific questions or preferences..."
+                    />
+                    {formik.touched.message && formik.errors.message && (
+                      <p className="mt-1 text-sm text-red-400">{formik.errors.message}</p>
+                    )}
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row gap-4 pt-2">
+                    <Button type="submit" variant="primary" size="lg" className="flex-1">
+                      <Icon name="sparkle" className="w-4 h-4 mr-2" />
+                      Book Consultation
+                    </Button>
+                    <Link href="/consultation" className="flex-1">
+                      <Button variant="outline" size="lg" className="w-full">
+                        Learn More
+                      </Button>
+                    </Link>
+                  </div>
+                </form>
+              )}
+            </div>
+          </motion.div>
+        </div>
+      </div>
+    </section>
+  );
+}

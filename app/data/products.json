@@ -1,0 +1,82 @@
+[
+  {
+    "id": "p1",
+    "name": "Whey Protein Isolate",
+    "category": "Protein Powders",
+    "price": 49.99,
+    "rating": 4.8,
+    "reviews": 342,
+    "image": "https://img.magnific.com/free-photo/protein-gym_23-2151980040.jpg?semt=ais_hybrid&w=740&q=80",
+    "description": "Pure whey isolate with 25g protein per serving, zero sugar."
+  },
+  {
+    "id": "p2",
+    "name": "Casein Protein",
+    "category": "Protein Powders",
+    "price": 44.99,
+    "rating": 4.7,
+    "reviews": 215,
+    "image": "https://img.magnific.com/free-photo/protein-gym_23-2151980040.jpg?semt=ais_hybrid&w=740&q=80",
+    "description": "Slow-release casein for overnight muscle recovery."
+  },
+  {
+    "id": "p3",
+    "name": "Protein Crunch Bar",
+    "category": "Protein Bars",
+    "price": 29.99,
+    "rating": 4.6,
+    "reviews": 189,
+    "image": "https://img.magnific.com/free-photo/protein-gym_23-2151980040.jpg?semt=ais_hybrid&w=740&q=80",
+    "description": "Crispy protein bar with 20g protein, low sugar, great taste."
+  },
+  {
+    "id": "p4",
+    "name": "Collagen Protein Bar",
+    "category": "Protein Bars",
+    "price": 32.99,
+    "rating": 4.5,
+    "reviews": 124,
+    "image": "https://img.magnific.com/free-photo/protein-gym_23-2151980040.jpg?semt=ais_hybrid&w=740&q=80",
+    "description": "Protein bar with collagen peptides for joint and skin health."
+  },
+  {
+    "id": "p5",
+    "name": "Whey Protein Shake",
+    "category": "Protein Shakes",
+    "price": 39.99,
+    "rating": 4.4,
+    "reviews": 278,
+    "image": "https://img.magnific.com/free-photo/protein-gym_23-2151980040.jpg?semt=ais_hybrid&w=740&q=80",
+    "description": "Ready-to-drink whey protein shake, delicious and convenient."
+  },
+  {
+    "id": "p6",
+    "name": "Vegan Protein Shake",
+    "category": "Protein Shakes",
+    "price": 42.99,
+    "rating": 4.3,
+    "reviews": 95,
+    "image": "https://img.magnific.com/free-photo/protein-gym_23-2151980040.jpg?semt=ais_hybrid&w=740&q=80",
+    "description": "Plant-based protein shake with pea and rice protein blend."
+  },
+  {
+    "id": "p7",
+    "name": "Creatine Monohydrate",
+    "category": "Creatine",
+    "price": 27.99,
+    "rating": 4.9,
+    "reviews": 512,
+    "image": "https://img.magnific.com/free-photo/protein-gym_23-2151980040.jpg?semt=ais_hybrid&w=740&q=80",
+    "description": "Pure micronized creatine monohydrate for strength and power."
+  },
+  {
+    "id": "p8",
+    "name": "Creatine + HMB",
+    "category": "Creatine",
+    "price": 34.99,
+    "rating": 4.6,
+    "reviews": 167,
+    "image": "https://img.magnific.com/free-photo/protein-gym_23-2151980040.jpg?semt=ais_hybrid&w=740&q=80",
+    "description": "Advanced creatine formula with HMB for muscle preservation."
+  }
+]
