@@ -8,6 +8,7 @@ import Button from '../../components/atoms/Button';
 import Icon from '../../components/atoms/Icon';
 import Tag from '../../components/atoms/Tag';
 import Placeholder from '../../assets/images/hero-placeholder.png';
+import Link from 'next/link';
 
 const floatingCards = [
   { label: 'Protein Powder', icon: 'scoop', delay: 0 },
@@ -129,12 +130,16 @@ export default function Hero() {
               transition={{ duration: 0.7, delay: 0.4 }}
               className="mt-8 flex flex-wrap gap-4"
             >
-              <Button variant="primary" size="lg">
-                Shop Supplements
-              </Button>
-              <Button variant="outline" size="lg">
-                Book Consultation
-              </Button>
+       <Link href="/shop">
+    <Button variant="primary" size="lg">
+      Shop Supplements
+    </Button>
+  </Link>
+  <Link href="/consultation">
+    <Button variant="outline" size="lg">
+      Book Consultation
+    </Button>
+  </Link>
             </motion.div>
 
             <motion.div

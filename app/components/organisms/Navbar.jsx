@@ -1,4 +1,3 @@
-// components/organisms/Navbar.jsx
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -85,9 +84,11 @@ export default function Navbar() {
                   <Icon name="cart" className="w-5 h-5" />
                 </button>
               </Badge>
-              <Button variant="primary" icon={<Icon name="login" className="w-4 h-4" />}>
-                Login
-              </Button>
+              <Link href="/login">
+                <Button variant="primary" icon={<Icon name="login" className="w-4 h-4" />}>
+                  Login
+                </Button>
+              </Link>
             </div>
 
             {/* Compact controls below lg: search + menu only */}
@@ -155,14 +156,16 @@ export default function Navbar() {
                   </Badge>
                 </div>
 
-                <Button
-                  variant="primary"
-                  icon={<Icon name="login" className="w-4 h-4" />}
-                  fullWidth
-                  className="mt-6"
-                >
-                  Login
-                </Button>
+                <Link href="/login" onClick={() => setMobileOpen(false)}>
+                  <Button
+                    variant="primary"
+                    icon={<Icon name="login" className="w-4 h-4" />}
+                    fullWidth
+                    className="mt-6"
+                  >
+                    Login
+                  </Button>
+                </Link>
               </div>
             </motion.div>
           </>

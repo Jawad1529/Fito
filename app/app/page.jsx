@@ -7,6 +7,7 @@ import WhyChooseFito from '@/sections/home/WhyChooseFito';
 import ConsultationCTA from '@/sections/home/ConsultationCTA';
 import TransformationStories from '@/sections/home/TransformationStories';
 import LatestArticles from '@/sections/home/LatestArticles';
+import NewsLetterCTA from '@/sections/home/NewsLetter';
 
 export default function HomePage() {
   return (
@@ -20,6 +21,7 @@ export default function HomePage() {
    <ConsultationCTA/>
    <TransformationStories />
    <LatestArticles />
+   <NewsLetterCTA/>
     </>
   );
 }
