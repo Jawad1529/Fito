@@ -30,8 +30,8 @@ export default function Certificates() {
       </div>
 
       {/* fade the track out at both edges instead of a hard cut */}
-      <div className="pointer-events-none absolute inset-y-0 left-0 w-16 sm:w-24 bg-gradient-to-r from-black to-transparent z-10" />
-      <div className="pointer-events-none absolute inset-y-0 right-0 w-16 sm:w-24 bg-gradient-to-l from-black to-transparent z-10" />
+      <div className="pointer-events-none absolute inset-y-0 left-0 w-16 sm:w-24  z-10" />
+      <div className="pointer-events-none absolute inset-y-0 right-0 w-16 sm:w-24 z-10" />
 
       <div className="group overflow-hidden">
         <div className="flex w-max animate-marquee gap-12 px-6 group-hover:[animation-play-state:paused]">

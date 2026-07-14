@@ -1,253 +1,369 @@
 // sections/home/Hero.jsx
 'use client';
 
-import { useRef } from 'react';
-import { motion, useInView, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import { useRef, useState, useEffect } from 'react';
+import { motion, AnimatePresence, useInView, useReducedMotion } from 'framer-motion';
 import Image from 'next/image';
+import Link from 'next/link';
 import Button from '../../components/atoms/Button';
 import Icon from '../../components/atoms/Icon';
 import Tag from '../../components/atoms/Tag';
-import Placeholder from '../../assets/images/hero-placeholder.png';
-import Link from 'next/link';
+import fatLoss from '../../assets/images/fat-loss.png'; // consultation / coaching panel
 
-const floatingCards = [
-  { label: 'Protein Powder', icon: 'scoop', delay: 0 },
-  { label: 'Protein Bars', icon: 'bar', delay: 0.2 },
-  { label: 'Protein Shake', icon: 'shaker', delay: 0.4 },
-  { label: 'Creatine', icon: 'bolt', delay: 0.6 },
+// Replace with a real product shot when available — kept as a styled
+// placeholder so the composition can be swapped in without touching layout.
+const supplementImage =
+  'https://thumbs.dreamstime.com/b/jar-chocolate-protein-scoop-falling-powder-isolated-black-background-clipping-path-concept-fitness-supplement-191764428.jpg';
+
+// ---------------------------------------------------------------------
+// Local icons (self-contained so the hero never depends on an external
+// icon set having the exact names this design needs).
+// ---------------------------------------------------------------------
+function ShieldIcon({ className }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
+      <path
+        d="M12 3l7 3v5c0 4.5-3 8.5-7 10-4-1.5-7-5.5-7-10V6l7-3z"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M9 12.4l2 2 4-4.4"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function FlaskIcon({ className }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
+      <path
+        d="M10 3h4M10 3v5.4L5.6 17a2 2 0 001.8 3h9.2a2 2 0 001.8-3L14 8.4V3"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path d="M8 15h8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function UsersIcon({ className }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
+      <circle cx="9" cy="8" r="3" stroke="currentColor" strokeWidth="1.5" />
+      <path d="M3.5 19c0-3 2.5-5 5.5-5s5.5 2 5.5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <circle cx="17.5" cy="9" r="2.3" stroke="currentColor" strokeWidth="1.5" />
+      <path d="M16 14c2.4.4 4 2 4 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function StarIcon({ className }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
+      <path d="M12 2.5l2.9 6.1 6.6.7-5 4.6 1.4 6.6L12 17l-5.9 3.5 1.4-6.6-5-4.6 6.6-.7L12 2.5z" />
+    </svg>
+  );
+}
+
+const trustSignals = [
+  { Icon: ShieldIcon, label: 'Certified Experts' },
+  { Icon: FlaskIcon, label: 'Lab-Tested Formulas' },
+  { Icon: UsersIcon, label: 'Clients Coached', stat: '10,000+' },
+  { Icon: StarIcon, label: 'Avg. Rating', stat: '4.9/5' },
 ];
 
-const trustItems = ['Certified Nutrition Experts', 'Genuine Products', 'Fast Delivery'];
+// The goals your coaches and formulas are actually built around —
+// real content standing in for decoration.
+const goals = ['Fat Loss', 'Muscle Gain', 'PCOS Management', 'Weight Gain', 'Peak Performance'];
 
-const stats = [
-  { value: '500+', label: 'Diet Plans' },
-  { value: '10K+', label: 'Happy Customers' },
-  { value: '4.9★', label: 'Customer Rating' },
+const processSteps = [
+  { n: '01', label: 'Consult', desc: 'Talk to a certified coach' },
+  { n: '02', label: 'Personalize', desc: 'Get your plan and your stack' },
+  { n: '03', label: 'Deliver', desc: 'Track results, adjust fast' },
 ];
 
-const cardPositions = [
-  { top: '10%', right: '-8%' },
-  { top: '30%', left: '-8%' },
-  { top: '50%', right: '-8%' },
-  { top: '70%', left: '-8%' },
-];
+// Cycles through `goals` on an interval; pauses entirely when the user
+// has requested reduced motion, showing a single static label instead.
+function GoalRotator({ reduceMotion }) {
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    if (reduceMotion) return;
+    const id = setInterval(() => setIndex((i) => (i + 1) % goals.length), 2200);
+    return () => clearInterval(id);
+  }, [reduceMotion]);
+
+  return (
+    <motion.div variants={fadeUp} className="mt-5 flex items-center gap-2.5">
+      <span className="text-gray-400 uppercase tracking-[0.14em] text-xs font-mono">
+        Plans built for
+      </span>
+      <span className="relative inline-block h-5 min-w-[160px] overflow-hidden">
+        {reduceMotion ? (
+          <span className="absolute left-0 top-0 text-amber-300 font-semibold text-sm">
+            {goals[0]}
+          </span>
+        ) : (
+          <AnimatePresence mode="wait">
+            <motion.span
+              key={goals[index]}
+              initial={{ y: 14, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: -14, opacity: 0 }}
+              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+              className="absolute left-0 top-0 text-amber-300 font-semibold text-sm"
+            >
+              {goals[index]}
+            </motion.span>
+          </AnimatePresence>
+        )}
+      </span>
+    </motion.div>
+  );
+}
+
+// ---------------------------------------------------------------------
+// Motion
+// ---------------------------------------------------------------------
+const container = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.12, delayChildren: 0.15 } },
+};
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 18 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.65, ease: [0.16, 1, 0.3, 1] } },
+};
 
 export default function Hero() {
   const sectionRef = useRef(null);
   const isInView = useInView(sectionRef, { once: true, amount: 0.2 });
-
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-  const springX = useSpring(mouseX, { stiffness: 300, damping: 30 });
-  const springY = useSpring(mouseY, { stiffness: 300, damping: 30 });
-  const rotateX = useTransform(springY, [-1, 1], [5, -5]);
-  const rotateY = useTransform(springX, [-1, 1], [-5, 5]);
-
-  const handleMouseMove = (e) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width - 0.5;
-    const y = (e.clientY - rect.top) / rect.height - 0.5;
-    mouseX.set(x);
-    mouseY.set(y);
-  };
+  const reduceMotion = useReducedMotion();
 
   return (
     <section
       ref={sectionRef}
-      className="relative min-h-screen overflow-hidden flex items-center"
-      onMouseMove={handleMouseMove}
+      aria-label="Introduction: nutrition coaching and premium supplements"
+      className="relative min-h-screen overflow-hidden flex items-center "
     >
-      {/* Background gradients — subtle ambient drift for a less static feel */}
-      <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/10 via-black/0 to-yellow-600/5 pointer-events-none" />
-      <motion.div
-        animate={{
-          x: [0, 30, -20, 0],
-          y: [0, -20, 20, 0],
-        }}
-        transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut' }}
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-yellow-400/20 rounded-full blur-3xl pointer-events-none"
-      />
-      <motion.div
-        animate={{
-          x: [0, -25, 15, 0],
-          y: [0, 15, -15, 0],
-        }}
-        transition={{ duration: 14, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
-        className="absolute top-[20%] right-[10%] w-[300px] h-[300px] bg-yellow-500/10 rounded-full blur-3xl pointer-events-none"
-      />
+      {/* Background.jsx supplies the gradient, glows, and grid app-wide */}
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 w-full">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          {/* Left Side Content */}
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 lg:py-20 w-full">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-12 items-center">
+          {/* ---------------------------------------------------------- */}
+          {/* Left — message, proof, and two equally-weighted CTAs       */}
+          {/* ---------------------------------------------------------- */}
           <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.7, ease: 'easeOut' }}
+            variants={container}
+            initial="hidden"
+            animate={isInView ? 'show' : 'hidden'}
           >
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.5 }}
-            >
-              <Tag variant="outline" className="mb-5">
+            <motion.div variants={fadeUp}>
+              <Tag variant="outline" className="mb-6">
                 <Icon name="bolt" className="w-3.5 h-3.5" />
-                Premium Sports Nutrition
+                Two Disciplines. One Standard.
               </Tag>
             </motion.div>
 
-            <motion.h1
-              initial={{ opacity: 0, y: 30 }}
-              animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.7, delay: 0.1 }}
-              className="text-4xl sm:text-5xl md:text-6xl font-bold text-white leading-tight"
-            >
-              Fuel Your Goals.
-              <br />
-              <span className="relative inline-block text-yellow-400">
-                Transform Your Body.
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white leading-[1.05] tracking-tight">
+              <span className="block overflow-hidden">
                 <motion.span
-                  initial={{ scaleX: 0 }}
-                  animate={isInView ? { scaleX: 1 } : {}}
-                  transition={{ duration: 0.8, delay: 0.6, ease: 'easeOut' }}
-                  className="absolute left-0 -bottom-2 h-1 w-full origin-left rounded-full bg-gradient-to-r from-yellow-400 to-yellow-400/0"
-                />
+                  className="block"
+                  initial={reduceMotion ? { opacity: 0 } : { y: '110%' }}
+                  animate={isInView ? (reduceMotion ? { opacity: 1 } : { y: '0%' }) : {}}
+                  transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1], delay: 0.25 }}
+                >
+                  Expert Coaching.
+                </motion.span>
               </span>
-            </motion.h1>
+              <span className="block overflow-hidden">
+                <motion.span
+                  className="block text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-yellow-400 to-amber-500"
+                  initial={reduceMotion ? { opacity: 0 } : { y: '110%' }}
+                  animate={isInView ? (reduceMotion ? { opacity: 1 } : { y: '0%' }) : {}}
+                  transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1], delay: 0.4 }}
+                >
+                  Elite-Grade Fuel.
+                </motion.span>
+              </span>
+            </h1>
 
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.7, delay: 0.2 }}
-              className="mt-4 text-lg text-gray-300 max-w-md"
-            >
-              Premium supplements and personalized diet consultation designed to
-              help you achieve your fitness goals.
+            <motion.p variants={fadeUp} className="mt-5 text-lg text-gray-300 max-w-md">
+              A certified nutrition coach in your corner, and lab-tested
+              supplements in your pantry — built by the same team, held to
+              the same standard.
             </motion.p>
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.7, delay: 0.4 }}
-              className="mt-8 flex flex-wrap gap-4"
-            >
-       <Link href="/shop">
-    <Button variant="primary" size="lg">
-      Shop Supplements
-    </Button>
-  </Link>
-  <Link href="/consultation">
-    <Button variant="outline" size="lg">
-      Book Consultation
-    </Button>
-  </Link>
+            <GoalRotator reduceMotion={reduceMotion} />
+
+            <motion.div variants={fadeUp} className="mt-9 flex flex-col sm:flex-row gap-4">
+              <Link href="/consultation" className="sm:flex-1">
+                <Button
+                  variant="primary"
+                  size="lg"
+                  className="w-full justify-center min-w-[200px] bg-gradient-to-r from-amber-400 to-yellow-500 text-black font-semibold border border-transparent hover:brightness-110"
+                >
+                  Book a Consultation
+                </Button>
+              </Link>
+              <Link href="/shop" className="sm:flex-1">
+                <Button
+                  variant="primary"
+                  size="lg"
+                  className="w-full justify-center min-w-[200px] bg-transparent text-amber-300 font-semibold border border-amber-400/40 hover:bg-amber-400/10"
+                >
+                  Shop Supplements
+                </Button>
+              </Link>
+            </motion.div>
+
+            <motion.div variants={fadeUp} className="mt-12">
+              <div className="relative flex items-start justify-between gap-4">
+                <motion.div
+                  initial={{ scaleX: 0 }}
+                  animate={isInView ? { scaleX: 1 } : {}}
+                  transition={{ duration: 0.9, delay: 0.9, ease: 'easeOut' }}
+                  style={{ transformOrigin: 'left' }}
+                  className="absolute top-[13px] left-[13px] right-[13px] h-px bg-gradient-to-r from-amber-400/50 via-white/10 to-transparent hidden sm:block"
+                />
+                {processSteps.map((step, i) => (
+                  <motion.div
+                    key={step.n}
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={isInView ? { opacity: 1, y: 0 } : {}}
+                    transition={{ duration: 0.5, delay: 0.95 + i * 0.15 }}
+                    className="relative flex-1 min-w-0"
+                  >
+                    <div className="w-7 h-7 rounded-full bg-[#0c0c0d] border border-amber-400/40 flex items-center justify-center text-[11px] font-mono text-amber-300 relative z-10">
+                      {step.n}
+                    </div>
+                    <div className="mt-3 text-sm font-semibold text-white">{step.label}</div>
+                    <div className="text-xs text-gray-400 mt-0.5 pr-2">{step.desc}</div>
+                  </motion.div>
+                ))}
+              </div>
             </motion.div>
 
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={isInView ? { opacity: 1 } : {}}
-              transition={{ duration: 0.7, delay: 0.6 }}
-              className="mt-8 flex flex-col sm:flex-row sm:items-center gap-3 text-gray-300 text-sm"
+              variants={fadeUp}
+              className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-4 border-t border-white/10 pt-6"
             >
-              {trustItems.map((item, idx) => (
-                <span key={idx} className="flex items-center gap-1.5">
-                  <Icon name="check" className="w-4 h-4 text-yellow-400" />
-                  {item}
-                  {idx < trustItems.length - 1 && (
-                    <span className="hidden sm:inline mx-2 text-white/20">|</span>
-                  )}
-                </span>
-              ))}
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.7, delay: 0.7 }}
-              className="mt-10 flex flex-wrap gap-8"
-            >
-              {stats.map((stat) => (
-                <div key={stat.label}>
-                  <div className="text-2xl font-bold text-white">{stat.value}</div>
-                  <div className="text-sm text-gray-400">{stat.label}</div>
+              {trustSignals.map(({ Icon: SignalIcon, label, stat }) => (
+                <div key={label} className="flex items-center gap-2.5">
+                  <span className="flex items-center justify-center w-8 h-8 rounded-full bg-amber-400/10 text-amber-400 shrink-0">
+                    <SignalIcon className="w-4 h-4" />
+                  </span>
+                  <span className="text-sm text-gray-300">
+                    {stat && (
+                      <span className="text-white font-semibold font-mono mr-1.5">
+                        {stat}
+                      </span>
+                    )}
+                    {label}
+                  </span>
                 </div>
               ))}
             </motion.div>
           </motion.div>
 
-          {/* Right Side – Illustration + Floating Cards */}
+          {/* ---------------------------------------------------------- */}
+          {/* Right — the diptych: coaching + supplements, one seam      */}
+          {/* ---------------------------------------------------------- */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={isInView ? { opacity: 1, scale: 1 } : {}}
-            transition={{ duration: 0.8, delay: 0.3 }}
-            style={{ perspective: 1000 }}
-            className="relative flex justify-center items-center"
+            initial={{ opacity: 0 }}
+            animate={isInView ? { opacity: 1 } : {}}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="relative w-full max-w-[420px] mx-auto lg:max-w-none"
           >
+            {/* Top panel — coaching */}
             <motion.div
-              style={{ rotateX, rotateY, transformStyle: 'preserve-3d' }}
-              className="relative w-full max-w-md mx-auto"
+              initial={reduceMotion ? { opacity: 0 } : { opacity: 0, x: 56 }}
+              animate={isInView ? { opacity: 1, x: 0 } : {}}
+              transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1], delay: 0.35 }}
+              className="relative aspect-[4/3] w-[86%] ml-auto rounded-[28px] overflow-hidden ring-1 ring-white/10 shadow-2xl shadow-black/50"
             >
-              {/* Main Illustration — group-hover drives the zoom + shine sweep */}
-              <div className="group relative aspect-square rounded-2xl overflow-hidden shadow-2xl ring-1 ring-yellow-400/10">
-                <motion.div
-                  className="absolute inset-0"
-                  whileHover={{ scale: 1.05 }}
-                  transition={{ duration: 0.6, ease: 'easeOut' }}
-                >
-                  <Image
-                    src={Placeholder}
-                    alt="Hero Illustration"
-                    fill
-                    unoptimized
-                    className="object-cover"
-                  />
-                </motion.div>
+              <Image
+                src="https://img.magnific.com/premium-photo/silhouette-woman-athletic-wear-with-red-blue-highlights-her-arms-against-black-background_1388397-2604.jpg?semt=ais_hybrid&w=740&q=80"
+                alt="Certified nutrition coach reviewing a personalized plan with a client"
+                fill
+                unoptimized
+                className="object-cover"
+                priority
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-black/10" />
+            </motion.div>
 
-                {/* base gradient overlay — deepens slightly on hover */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent transition-all duration-500 group-hover:from-black/35 pointer-events-none" />
+            {/* Seam — where the two disciplines meet */}
+            <div className="relative h-0 flex items-center justify-center z-20">
+              <motion.div
+                initial={{ scaleX: 0 }}
+                animate={isInView ? { scaleX: 1 } : {}}
+                transition={{ duration: 0.7, delay: 1.05, ease: 'easeOut' }}
+                style={{ transformOrigin: 'center' }}
+                className="absolute w-[68%] h-px bg-gradient-to-r from-transparent via-amber-400/80 to-transparent"
+              />
+              <motion.div
+                initial={{ opacity: 0, scale: 0.85 }}
+                animate={isInView ? { opacity: 1, scale: 1 } : {}}
+                transition={{ duration: 0.5, delay: 1.2 }}
+                className="relative z-10 bg-[#0c0c0d] border border-amber-400/30 rounded-full px-4 py-1.5 text-[10px] sm:text-[11px] tracking-[0.18em] uppercase text-amber-300 font-mono whitespace-nowrap"
+              >
+                One Standard
+              </motion.div>
+            </div>
 
-                {/* diagonal shine sweep */}
-                <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                  <div className="absolute -inset-y-10 -left-1/2 w-1/3 -rotate-12 bg-gradient-to-r from-transparent via-yellow-100/25 to-transparent -translate-x-[150%] group-hover:translate-x-[420%] transition-transform duration-1000 ease-out" />
-                </div>
-              </div>
+            {/* Bottom panel — supplements */}
+            <motion.div
+              initial={reduceMotion ? { opacity: 0 } : { opacity: 0, x: -56 }}
+              animate={isInView ? { opacity: 1, x: 0 } : {}}
+              transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1], delay: 0.35 }}
+              className="relative aspect-[4/3] w-[86%] -mt-8 rounded-[28px] overflow-hidden ring-1 ring-white/10 shadow-2xl shadow-black/50"
+            >
+              <Image
+                src={supplementImage}
+                alt="Premium lab-tested protein and supplement products"
+                fill
+                unoptimized
+                className="object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/0 to-black/10" />
+            </motion.div>
 
-              {/* Floating Cards – entrance + gentle float */}
-              {floatingCards.map((card, index) => {
-                const pos = cardPositions[index];
-                return (
-                  <motion.div
-                    key={card.label}
-                    initial={{ opacity: 0, y: 30, scale: 0.85 }}
-                    animate={
-                      isInView
-                        ? {
-                            opacity: 1,
-                            scale: 1,
-                            y: [0, -8, 0],
-                            transition: {
-                              duration: 0.6,
-                              delay: 0.8 + card.delay,
-                              y: {
-                                duration: 3 + index * 0.5,
-                                repeat: Infinity,
-                                ease: 'easeInOut',
-                                delay: index * 0.3,
-                              },
-                            },
-                          }
-                        : {}
-                    }
-                    whileHover={{ scale: 1.06, borderColor: 'rgba(250, 204, 21, 0.4)' }}
-                    className="absolute bg-black/70 backdrop-blur-sm border border-white/10 rounded-xl pl-2.5 pr-4 py-2 shadow-lg flex items-center gap-2.5 text-white text-sm font-medium transition-colors"
-                    style={pos}
-                  >
-                    <span className="flex items-center justify-center w-7 h-7 rounded-lg bg-yellow-400/10 text-yellow-400 shrink-0">
-                      <Icon name={card.icon} className="w-4 h-4" />
-                    </span>
-                    <span>{card.label}</span>
-                  </motion.div>
-                );
-              })}
+            {/* Annotations — captions, not badges */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.6, delay: 1.4 }}
+              className="absolute top-[9%] left-0 flex items-center gap-2 bg-[#0c0c0d]/90 backdrop-blur-sm border border-white/10 rounded-full pl-1.5 pr-3.5 py-1.5 shadow-lg"
+            >
+              <span className="w-6 h-6 rounded-full bg-amber-400/15 flex items-center justify-center text-amber-300 shrink-0">
+                <ShieldIcon className="w-3.5 h-3.5" />
+              </span>
+              <span className="text-xs text-white/90 font-medium whitespace-nowrap">
+                1:1 Certified Coaching
+              </span>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.6, delay: 1.55 }}
+              className="absolute bottom-[6%] right-0 flex items-center gap-2 bg-[#0c0c0d]/90 backdrop-blur-sm border border-white/10 rounded-full pl-1.5 pr-3.5 py-1.5 shadow-lg"
+            >
+              <span className="w-6 h-6 rounded-full bg-amber-400/15 flex items-center justify-center text-amber-300 shrink-0">
+                <FlaskIcon className="w-3.5 h-3.5" />
+              </span>
+              <span className="text-xs text-white/90 font-medium whitespace-nowrap">
+                Third-Party Lab Tested
+              </span>
             </motion.div>
           </motion.div>
         </div>
