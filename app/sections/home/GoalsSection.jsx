@@ -79,26 +79,26 @@ export default function     GoalsSection() {
               onClick={() => handleGoalClick(goal.id)}
               className={`
                 relative cursor-pointer group
-                bg-white/5 backdrop-blur-sm
+                bg-overlay backdrop-blur-sm
                 border rounded-2xl p-6 text-center
                 transition-all duration-300
                 ${
                   selectedGoal === goal.id
-                    ? 'border-yellow-400 bg-yellow-400/10 shadow-lg shadow-yellow-400/10'
-                    : 'border-white/10 hover:border-yellow-400/30 hover:bg-white/10'
+                    ? 'border-primary bg-primary/10 shadow-lg shadow-primary/10'
+                    : 'border-border-light hover:border-primary/30 hover:bg-overlay-strong'
                 }
               `}
             >
               <div className="flex justify-center mb-4">
-                <div className="w-14 h-14 rounded-full bg-yellow-400/10 flex items-center justify-center text-yellow-400 group-hover:bg-yellow-400/20 transition-colors">
+                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary/20 transition-colors">
                   <Icon name={goal.icon} className="w-7 h-7" />
                 </div>
               </div>
-              <h3 className="text-lg font-semibold text-white">{goal.title}</h3>
-              <p className="mt-2 text-sm text-gray-400 leading-relaxed">
+              <h3 className="text-lg font-semibold text-text">{goal.title}</h3>
+              <p className="mt-2 text-sm text-text-muted leading-relaxed">
                 {goal.description}
               </p>
-              <div className="mt-4 text-yellow-400 text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="mt-4 text-primary text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity">
                 Explore Products →
               </div>
             </motion.div>
@@ -113,7 +113,7 @@ export default function     GoalsSection() {
           >
             <Text>
               Showing recommendations for{' '}
-              <span className="text-yellow-400 font-semibold">
+              <span className="text-primary font-semibold">
                 {goals.find((g) => g.id === selectedGoal)?.title}
               </span>
             </Text>

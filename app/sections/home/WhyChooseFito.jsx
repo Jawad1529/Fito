@@ -35,7 +35,7 @@ const FeatureIcon = ({ name }) => {
       strokeWidth="1.5"
       strokeLinecap="round"
       strokeLinejoin="round"
-      className="w-7 h-7 text-yellow-400"
+      className="w-7 h-7 text-primary"
     >
       {icons[name] || icons['shield-check']}
     </svg>
@@ -107,15 +107,15 @@ export default function WhyChooseFito() {
               transition={{ duration: 0.5, delay: index * 0.08 }}
               viewport={{ once: true }}
               whileHover={{ y: -6, scale: 1.02 }}
-              className="group relative bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 transition-all duration-300 hover:border-yellow-400/30 hover:bg-white/10 hover:shadow-lg hover:shadow-yellow-400/5"
+              className="group relative bg-overlay backdrop-blur-sm border border-border-light rounded-2xl p-6 transition-all duration-300 hover:border-primary/30 hover:bg-overlay-strong hover:shadow-lg hover:shadow-primary/5"
             >
               <div className="flex items-start gap-4">
-                <div className="flex-shrink-0 w-12 h-12 rounded-full bg-yellow-400/10 flex items-center justify-center group-hover:bg-yellow-400/20 transition-colors">
+                <div className="flex-shrink-0 w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
                   <FeatureIcon name={feature.icon} />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-white">{feature.title}</h3>
-                  <p className="mt-1 text-sm text-gray-400 leading-relaxed">
+                  <h3 className="text-lg font-semibold text-text">{feature.title}</h3>
+                  <p className="mt-1 text-sm text-text-muted leading-relaxed">
                     {feature.description}
                   </p>
                 </div>

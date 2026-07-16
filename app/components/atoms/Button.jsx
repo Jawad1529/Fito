@@ -5,9 +5,9 @@ import Link from 'next/link';
 import Spinner from './Spinner';
 
 const VARIANTS = {
-  primary: 'bg-yellow-400 border border-yellow-400 text-black hover:bg-yellow-300',
-  outline: 'bg-transparent border border-white/30 text-white hover:bg-white/10',
-  ghost: 'bg-transparent border border-transparent text-white/70 hover:text-white',
+  primary: 'bg-primary border border-primary text-text-inverse hover:bg-primary-hover',
+  outline: 'bg-transparent border border-border text-text hover:bg-overlay-strong',
+  ghost: 'bg-transparent border border-transparent text-text-secondary hover:text-text',
 };
 
 const SIZES = {

@@ -1,8 +1,8 @@
 // components/atoms/Tag.jsx
 const VARIANTS = {
-  solid: 'bg-yellow-400 text-black',
-  outline: 'border border-yellow-400/60 text-yellow-400 bg-transparent',
-  muted: 'bg-white/10 text-white/70',
+  solid: 'bg-primary text-text-inverse',
+  outline: 'border border-primary/60 text-primary bg-transparent',
+  muted: 'bg-overlay-strong text-text-secondary',
 };
 
 // variant: 'solid' | 'outline' | 'muted'

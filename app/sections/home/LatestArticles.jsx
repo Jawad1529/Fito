@@ -70,7 +70,7 @@ export default function LatestArticles() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
               viewport={{ once: true }}
-              className="group bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl overflow-hidden transition-all duration-500 hover:border-yellow-400/30 hover:shadow-xl hover:shadow-yellow-400/5 hover:-translate-y-2 flex flex-col"
+              className="group bg-overlay backdrop-blur-sm border border-border-light rounded-2xl overflow-hidden transition-all duration-500 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-2 flex flex-col"
             >
               {/* Image */}
               <div className="relative w-full aspect-[16/9] overflow-hidden">
@@ -81,14 +81,14 @@ export default function LatestArticles() {
                   unoptimized
                   className="object-cover transition-transform duration-700 group-hover:scale-105"
                 />
-                <div className="absolute top-3 left-3 bg-yellow-400/90 text-black text-xs font-semibold px-3 py-1.5 rounded-full">
+                <div className="absolute top-3 left-3 bg-primary/90 text-text-inverse text-xs font-semibold px-3 py-1.5 rounded-full">
                   {article.category}
                 </div>
               </div>
 
               {/* Content */}
               <div className="p-5 flex flex-col flex-1">
-                <div className="flex items-center text-xs text-gray-400 gap-3 mb-2">
+                <div className="flex items-center text-xs text-text-muted gap-3 mb-2">
                   <span>{article.author}</span>
                   <span>•</span>
                   <span>{article.date}</span>
@@ -96,20 +96,20 @@ export default function LatestArticles() {
                   <span>{article.readTime}</span>
                 </div>
 
-                <h3 className="text-xl font-bold text-white leading-tight mb-2 group-hover:text-yellow-400 transition-colors">
+                <h3 className="text-xl font-bold text-text leading-tight mb-2 group-hover:text-primary transition-colors">
                   <Link href={`/blog/${article.slug}`} className="hover:underline">
                     {article.title}
                   </Link>
                 </h3>
 
-                <p className="text-sm text-gray-300 flex-1 leading-relaxed">
+                <p className="text-sm text-text-secondary flex-1 leading-relaxed">
                   {article.excerpt}
                 </p>
 
-                <div className="mt-4 pt-3 border-t border-white/5">
+                <div className="mt-4 pt-3 border-t border-border-light">
                   <Link
                     href={`/blog/${article.slug}`}
-                    className="inline-flex items-center text-sm font-medium text-yellow-400 hover:text-yellow-300 transition-colors group-hover:gap-2 gap-1.5"
+                    className="inline-flex items-center text-sm font-medium text-primary hover:text-primary-hover transition-colors group-hover:gap-2 gap-1.5"
                   >
                     Read Full Article
                     <span className="transition-transform group-hover:translate-x-1">→</span>
@@ -130,7 +130,7 @@ export default function LatestArticles() {
         >
           <Link
             href="/blog"
-            className="inline-flex items-center gap-2 text-gray-300 hover:text-white transition-colors border border-white/10 hover:border-yellow-400/30 px-6 py-3 rounded-xl hover:bg-yellow-400/5 group"
+            className="inline-flex items-center gap-2 text-text-secondary hover:text-text transition-colors border border-border-light hover:border-primary/30 px-6 py-3 rounded-xl hover:bg-primary/5 group"
           >
             View All Articles
             <Icon name="arrow-right" className="w-4 h-4 group-hover:translate-x-1 transition-transform" />

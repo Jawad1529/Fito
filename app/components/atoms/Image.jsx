@@ -21,7 +21,7 @@ export default function Image({
 
   return (
     <div className={`relative overflow-hidden ${rounded} ${fill ? 'w-full h-full' : ''}`}>
-      {!loaded && <div className={`absolute inset-0 bg-white/5 animate-pulse ${rounded}`} />}
+      {!loaded && <div className={`absolute inset-0 bg-overlay animate-pulse ${rounded}`} />}
       <NextImage
         src={src}
         alt={alt}

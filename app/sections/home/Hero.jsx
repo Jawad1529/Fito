@@ -103,12 +103,12 @@ function GoalRotator({ reduceMotion }) {
 
   return (
     <motion.div variants={fadeUp} className="mt-5 flex items-center gap-2.5">
-      <span className="text-gray-400 uppercase tracking-[0.14em] text-xs font-mono">
+      <span className="text-text-muted uppercase tracking-[0.14em] text-xs font-mono">
         Plans built for
       </span>
       <span className="relative inline-block h-5 min-w-[160px] overflow-hidden">
         {reduceMotion ? (
-          <span className="absolute left-0 top-0 text-amber-300 font-semibold text-sm">
+          <span className="absolute left-0 top-0 text-warning font-semibold text-sm">
             {goals[0]}
           </span>
         ) : (
@@ -119,7 +119,7 @@ function GoalRotator({ reduceMotion }) {
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: -14, opacity: 0 }}
               transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-              className="absolute left-0 top-0 text-amber-300 font-semibold text-sm"
+              className="absolute left-0 top-0 text-warning font-semibold text-sm"
             >
               {goals[index]}
             </motion.span>
@@ -152,7 +152,7 @@ export default function Hero() {
     <section
       ref={sectionRef}
       aria-label="Introduction: nutrition coaching and premium supplements"
-      className="relative min-h-screen overflow-hidden flex items-center "
+      className="relative min-h-screen overflow-hidden flex items-center"
     >
       {/* Background.jsx supplies the gradient, glows, and grid app-wide */}
 
@@ -173,7 +173,7 @@ export default function Hero() {
               </Tag>
             </motion.div>
 
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white leading-[1.05] tracking-tight">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-text leading-[1.05] tracking-tight">
               <span className="block overflow-hidden">
                 <motion.span
                   className="block"
@@ -186,7 +186,7 @@ export default function Hero() {
               </span>
               <span className="block overflow-hidden">
                 <motion.span
-                  className="block text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-yellow-400 to-amber-500"
+                  className="block bg-gradient-text text-transparent bg-clip-text"
                   initial={reduceMotion ? { opacity: 0 } : { y: '110%' }}
                   animate={isInView ? (reduceMotion ? { opacity: 1 } : { y: '0%' }) : {}}
                   transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1], delay: 0.4 }}
@@ -196,7 +196,7 @@ export default function Hero() {
               </span>
             </h1>
 
-            <motion.p variants={fadeUp} className="mt-5 text-lg text-gray-300 max-w-md">
+            <motion.p variants={fadeUp} className="mt-5 text-lg text-text-secondary max-w-md">
               A certified nutrition coach in your corner, and lab-tested
               supplements in your pantry — built by the same team, held to
               the same standard.
@@ -209,7 +209,7 @@ export default function Hero() {
                 <Button
                   variant="primary"
                   size="lg"
-                  className="w-full justify-center min-w-[200px] bg-gradient-to-r from-amber-400 to-yellow-500 text-black font-semibold border border-transparent hover:brightness-110"
+                  className="w-full justify-center min-w-[200px] bg-gradient-primary text-text font-semibold border border-transparent hover:brightness-110"
                 >
                   Book a Consultation
                 </Button>
@@ -218,7 +218,7 @@ export default function Hero() {
                 <Button
                   variant="primary"
                   size="lg"
-                  className="w-full justify-center min-w-[200px] bg-transparent text-amber-300 font-semibold border border-amber-400/40 hover:bg-amber-400/10"
+                  className="w-full justify-center min-w-[200px] bg-transparent text-primary font-semibold border border-primary/40 hover:bg-primary/10"
                 >
                   Shop Supplements
                 </Button>
@@ -232,7 +232,7 @@ export default function Hero() {
                   animate={isInView ? { scaleX: 1 } : {}}
                   transition={{ duration: 0.9, delay: 0.9, ease: 'easeOut' }}
                   style={{ transformOrigin: 'left' }}
-                  className="absolute top-[13px] left-[13px] right-[13px] h-px bg-gradient-to-r from-amber-400/50 via-white/10 to-transparent hidden sm:block"
+                  className="absolute top-[13px] left-[13px] right-[13px] h-px bg-gradient-to-r from-primary/50 via-text/10 to-transparent hidden sm:block"
                 />
                 {processSteps.map((step, i) => (
                   <motion.div
@@ -242,11 +242,11 @@ export default function Hero() {
                     transition={{ duration: 0.5, delay: 0.95 + i * 0.15 }}
                     className="relative flex-1 min-w-0"
                   >
-                    <div className="w-7 h-7 rounded-full bg-[#0c0c0d] border border-amber-400/40 flex items-center justify-center text-[11px] font-mono text-amber-300 relative z-10">
+                    <div className="w-7 h-7 rounded-full bg-background-secondary border border-primary/40 flex items-center justify-center text-[11px] font-mono text-primary relative z-10">
                       {step.n}
                     </div>
-                    <div className="mt-3 text-sm font-semibold text-white">{step.label}</div>
-                    <div className="text-xs text-gray-400 mt-0.5 pr-2">{step.desc}</div>
+                    <div className="mt-3 text-sm font-semibold text-text">{step.label}</div>
+                    <div className="text-xs text-text-muted mt-0.5 pr-2">{step.desc}</div>
                   </motion.div>
                 ))}
               </div>
@@ -254,16 +254,16 @@ export default function Hero() {
 
             <motion.div
               variants={fadeUp}
-              className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-4 border-t border-white/10 pt-6"
+              className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-4 border-t border-border-light pt-6"
             >
               {trustSignals.map(({ Icon: SignalIcon, label, stat }) => (
                 <div key={label} className="flex items-center gap-2.5">
-                  <span className="flex items-center justify-center w-8 h-8 rounded-full bg-amber-400/10 text-amber-400 shrink-0">
+                  <span className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary shrink-0">
                     <SignalIcon className="w-4 h-4" />
                   </span>
-                  <span className="text-sm text-gray-300">
+                  <span className="text-sm text-text-secondary">
                     {stat && (
-                      <span className="text-white font-semibold font-mono mr-1.5">
+                      <span className="text-text font-semibold font-mono mr-1.5">
                         {stat}
                       </span>
                     )}
@@ -288,7 +288,7 @@ export default function Hero() {
               initial={reduceMotion ? { opacity: 0 } : { opacity: 0, x: 56 }}
               animate={isInView ? { opacity: 1, x: 0 } : {}}
               transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1], delay: 0.35 }}
-              className="relative aspect-[4/3] w-[86%] ml-auto rounded-[28px] overflow-hidden ring-1 ring-white/10 shadow-2xl shadow-black/50"
+              className="relative aspect-[4/3] w-[86%] ml-auto rounded-[28px] overflow-hidden ring-1 ring-border-light shadow-2xl shadow-scrim"
             >
               <Image
                 src="https://img.magnific.com/premium-photo/silhouette-woman-athletic-wear-with-red-blue-highlights-her-arms-against-black-background_1388397-2604.jpg?semt=ais_hybrid&w=740&q=80"
@@ -298,7 +298,7 @@ export default function Hero() {
                 className="object-cover"
                 priority
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-black/10" />
+              <div className="absolute inset-0 bg-gradient-to-t from-scrim via-transparent to-overlay" />
             </motion.div>
 
             {/* Seam — where the two disciplines meet */}
@@ -308,13 +308,13 @@ export default function Hero() {
                 animate={isInView ? { scaleX: 1 } : {}}
                 transition={{ duration: 0.7, delay: 1.05, ease: 'easeOut' }}
                 style={{ transformOrigin: 'center' }}
-                className="absolute w-[68%] h-px bg-gradient-to-r from-transparent via-amber-400/80 to-transparent"
+                className="absolute w-[68%] h-px bg-gradient-to-r from-transparent via-primary/80 to-transparent"
               />
               <motion.div
                 initial={{ opacity: 0, scale: 0.85 }}
                 animate={isInView ? { opacity: 1, scale: 1 } : {}}
                 transition={{ duration: 0.5, delay: 1.2 }}
-                className="relative z-10 bg-[#0c0c0d] border border-amber-400/30 rounded-full px-4 py-1.5 text-[10px] sm:text-[11px] tracking-[0.18em] uppercase text-amber-300 font-mono whitespace-nowrap"
+                className="relative z-10 bg-background-secondary border border-primary/30 rounded-full px-4 py-1.5 text-[10px] sm:text-[11px] tracking-[0.18em] uppercase text-primary font-mono whitespace-nowrap"
               >
                 One Standard
               </motion.div>
@@ -325,7 +325,7 @@ export default function Hero() {
               initial={reduceMotion ? { opacity: 0 } : { opacity: 0, x: -56 }}
               animate={isInView ? { opacity: 1, x: 0 } : {}}
               transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1], delay: 0.35 }}
-              className="relative aspect-[4/3] w-[86%] -mt-8 rounded-[28px] overflow-hidden ring-1 ring-white/10 shadow-2xl shadow-black/50"
+              className="relative aspect-[4/3] w-[86%] -mt-8 rounded-[28px] overflow-hidden ring-1 ring-border-light shadow-2xl shadow-scrim"
             >
               <Image
                 src={supplementImage}
@@ -334,7 +334,7 @@ export default function Hero() {
                 unoptimized
                 className="object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/0 to-black/10" />
+              <div className="absolute inset-0 bg-gradient-to-b from-scrim via-transparent to-overlay" />
             </motion.div>
 
             {/* Annotations — captions, not badges */}
@@ -342,12 +342,12 @@ export default function Hero() {
               initial={{ opacity: 0, y: 10 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.6, delay: 1.4 }}
-              className="absolute top-[9%] left-0 flex items-center gap-2 bg-[#0c0c0d]/90 backdrop-blur-sm border border-white/10 rounded-full pl-1.5 pr-3.5 py-1.5 shadow-lg"
+              className="absolute top-[9%] left-0 flex items-center gap-2 bg-background-secondary/90 backdrop-blur-sm border border-border-light rounded-full pl-1.5 pr-3.5 py-1.5 shadow-lg"
             >
-              <span className="w-6 h-6 rounded-full bg-amber-400/15 flex items-center justify-center text-amber-300 shrink-0">
+              <span className="w-6 h-6 rounded-full bg-primary/15 flex items-center justify-center text-primary shrink-0">
                 <ShieldIcon className="w-3.5 h-3.5" />
               </span>
-              <span className="text-xs text-white/90 font-medium whitespace-nowrap">
+              <span className="text-xs text-text/90 font-medium whitespace-nowrap">
                 1:1 Certified Coaching
               </span>
             </motion.div>
@@ -356,12 +356,12 @@ export default function Hero() {
               initial={{ opacity: 0, y: -10 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.6, delay: 1.55 }}
-              className="absolute bottom-[6%] right-0 flex items-center gap-2 bg-[#0c0c0d]/90 backdrop-blur-sm border border-white/10 rounded-full pl-1.5 pr-3.5 py-1.5 shadow-lg"
+              className="absolute bottom-[6%] right-0 flex items-center gap-2 bg-background-secondary/90 backdrop-blur-sm border border-border-light rounded-full pl-1.5 pr-3.5 py-1.5 shadow-lg"
             >
-              <span className="w-6 h-6 rounded-full bg-amber-400/15 flex items-center justify-center text-amber-300 shrink-0">
+              <span className="w-6 h-6 rounded-full bg-primary/15 flex items-center justify-center text-primary shrink-0">
                 <FlaskIcon className="w-3.5 h-3.5" />
               </span>
-              <span className="text-xs text-white/90 font-medium whitespace-nowrap">
+              <span className="text-xs text-text/90 font-medium whitespace-nowrap">
                 Third-Party Lab Tested
               </span>
             </motion.div>

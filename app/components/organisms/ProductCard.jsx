@@ -25,7 +25,7 @@ const Stars = ({ rating }) => {
 
 const Star = ({ filled = false, half = false }) => (
   <svg
-    className={`w-4 h-4 ${filled ? 'text-yellow-400' : half ? 'text-yellow-400' : 'text-gray-600'}`}
+    className={`w-4 h-4 ${filled ? 'text-primary' : half ? 'text-primary' : 'text-text-muted'}`}
     fill={filled ? 'currentColor' : half ? 'url(#halfGrad)' : 'none'}
     stroke="currentColor"
     strokeWidth="1.5"
@@ -59,10 +59,10 @@ export default function ProductCard({
       transition={{ duration: 0.5, delay: index * 0.1 }}
       viewport={{ once: true }}
       whileHover={{ y: -8 }}
-      className="group relative bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-4 transition-all duration-300 hover:border-yellow-400/30 hover:bg-white/10 flex flex-col"
+      className="group relative bg-overlay backdrop-blur-sm border border-border-light rounded-2xl p-4 transition-all duration-300 hover:border-primary/30 hover:bg-overlay-strong flex flex-col"
     >
       {/* Image */}
-      <div className="relative w-full aspect-square rounded-xl overflow-hidden bg-white/5 mb-4">
+      <div className="relative w-full aspect-square rounded-xl overflow-hidden bg-overlay mb-4">
         <Image
           src={product.image}
           alt={product.name}
@@ -75,35 +75,35 @@ export default function ProductCard({
       {/* Wishlist button */}
       <button
         onClick={() => onToggleWishlist(product.id)}
-        className="absolute top-4 right-4 w-9 h-9 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center transition-colors hover:bg-yellow-400/20 border border-white/10"
+        className="absolute top-4 right-4 w-9 h-9 rounded-full bg-scrim backdrop-blur-sm flex items-center justify-center transition-colors hover:bg-primary/20 border border-border-light"
         aria-label="Add to wishlist"
       >
         <Icon
           name="heart"
-          className={`w-4 h-4 ${isWishlisted ? 'text-yellow-400 fill-yellow-400' : 'text-white/70'}`}
+          className={`w-4 h-4 ${isWishlisted ? 'text-primary fill-primary' : 'text-text-secondary'}`}
         />
       </button>
 
       {/* Product info */}
       <div className="flex flex-col flex-1">
         <div className="flex items-start justify-between">
-          <h3 className="text-white font-semibold text-lg leading-tight">
+          <h3 className="text-text font-semibold text-lg leading-tight">
             {product.name}
           </h3>
         </div>
-        <span className="text-sm text-gray-400 mb-1">{product.category}</span>
+        <span className="text-sm text-text-muted mb-1">{product.category}</span>
 
         <div className="flex items-center gap-2 mt-1">
           <Stars rating={product.rating} />
-          <span className="text-sm text-gray-400">({product.reviews})</span>
+          <span className="text-sm text-text-muted">({product.reviews})</span>
         </div>
 
-        <p className="text-sm text-gray-400 mt-2 flex-1 line-clamp-2">
+        <p className="text-sm text-text-muted mt-2 flex-1 line-clamp-2">
           {product.description}
         </p>
 
         <div className="mt-4 flex items-center justify-between">
-          <span className="text-xl font-bold text-white">
+          <span className="text-xl font-bold text-text">
             PKR {product.price.toFixed(2)}
           </span>
           <Button

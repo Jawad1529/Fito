@@ -10,9 +10,8 @@ export default function MainLayout({ children }) {
   const isAuthRoute = pathname.startsWith('/login') || pathname.startsWith('/register') || pathname.startsWith('/forgot-password');
 
   if (isAuthRoute) {
-    
     return (
-      <div className="min-h-screen flex flex-col bg-black text-white antialiased selection:bg-yellow-400 selection:text-black relative">
+      <div className="min-h-screen flex flex-col bg-background text-text antialiased relative">
         <Background />
         <main className="flex-1">{children}</main>
       </div>
@@ -20,7 +19,7 @@ export default function MainLayout({ children }) {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-black text-white antialiased selection:bg-yellow-400 selection:text-black relative">
+    <div className="min-h-screen flex flex-col bg-background text-text antialiased relative">
       <Background />
       <Navbar />
       <main className="flex-1">{children}</main>

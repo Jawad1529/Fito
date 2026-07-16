@@ -1,23 +1,22 @@
-// components/atoms/Input.jsx
-export default function Input({ label, error, icon, className = '', id, ...rest }) {
+export default function Input({ id, label, icon, error, className = '', ...rest }) {
   return (
-    <div className="w-full">
+    <div className={className}>
       {label && (
-        <label htmlFor={id} className="block text-sm text-white/70 mb-1.5">
+        <label htmlFor={id} className="block text-sm text-text-secondary mb-1.5">
           {label}
         </label>
       )}
       <div className="relative">
-        {icon && <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40">{icon}</span>}
+        {icon && <span className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted">{icon}</span>}
         <input
           id={id}
-          className={`w-full rounded-md bg-white/5 border text-white placeholder:text-white/30 text-sm py-2.5 outline-none transition-colors ${
-            error ? 'border-red-500' : 'border-white/10 focus:border-yellow-400'
-          } ${icon ? 'pl-10 pr-3' : 'px-3'} ${className}`}
+          className={`w-full rounded-md bg-overlay border text-text placeholder:text-text-muted text-sm py-2.5 outline-none transition-colors ${
+            error ? 'border-danger' : 'border-border-light focus:border-primary'
+          } ${icon ? 'pl-10 pr-4' : 'px-4'}`}
           {...rest}
         />
       </div>
-      {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
+      {error && <p className="mt-1 text-xs text-danger">{error}</p>}
     </div>
   );
 }

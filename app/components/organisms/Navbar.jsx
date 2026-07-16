@@ -41,13 +41,13 @@ export default function Navbar() {
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6 }}
         className={`fixed top-0 left-0 w-full z-50 transition-colors duration-300 ${
-          isScrolled ? 'bg-black/80 backdrop-blur-md shadow-lg' : 'bg-transparent'
+          isScrolled ? 'bg-background/80 backdrop-blur-md shadow-lg' : 'bg-transparent'
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
-            <Link href="/" className="text-2xl font-bold text-white tracking-tight shrink-0">
+            <Link href="/" className="text-2xl font-bold text-text tracking-tight shrink-0">
               Fito
             </Link>
 
@@ -57,11 +57,11 @@ export default function Navbar() {
                 <Link
                   key={link.label}
                   href={link.href}
-                  className="relative text-white/80 hover:text-white px-3 py-2 text-sm font-medium transition-colors group"
+                  className="relative text-text/80 hover:text-text px-3 py-2 text-sm font-medium transition-colors group"
                 >
                   {link.label}
                   <span
-                    className={`absolute left-0 right-0 bottom-0 h-0.5 bg-yellow-400 origin-left transition-transform ${
+                    className={`absolute left-0 right-0 bottom-0 h-0.5 bg-primary origin-left transition-transform ${
                       link.label === 'Home' ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
                     }`}
                   />
@@ -71,16 +71,16 @@ export default function Navbar() {
 
             {/* Right side */}
             <div className="hidden lg:flex items-center space-x-5">
-              <button aria-label="Search" className="text-white/70 hover:text-white transition-colors">
+              <button aria-label="Search" className="text-text-secondary hover:text-text transition-colors">
                 <Icon name="search" className="w-5 h-5" />
               </button>
               <Badge count={3}>
-                <button aria-label="Notifications" className="text-white/70 hover:text-white transition-colors">
+                <button aria-label="Notifications" className="text-text-secondary hover:text-text transition-colors">
                   <Icon name="bell" className="w-5 h-5" />
                 </button>
               </Badge>
               <Badge count={2}>
-                <button aria-label="Cart" className="text-white/70 hover:text-white transition-colors">
+                <button aria-label="Cart" className="text-text-secondary hover:text-text transition-colors">
                   <Icon name="cart" className="w-5 h-5" />
                 </button>
               </Badge>
@@ -93,10 +93,10 @@ export default function Navbar() {
 
             {/* Compact controls below lg: search + menu only */}
             <div className="flex lg:hidden items-center space-x-4">
-              <button aria-label="Search" className="text-white/70 hover:text-white transition-colors">
+              <button aria-label="Search" className="text-text-secondary hover:text-text transition-colors">
                 <Icon name="search" className="w-5 h-5" />
               </button>
-              <button aria-label="Open menu" className="text-white" onClick={() => setMobileOpen(true)}>
+              <button aria-label="Open menu" className="text-text" onClick={() => setMobileOpen(true)}>
                 <Icon name="menu" className="w-6 h-6" />
               </button>
             </div>
@@ -113,7 +113,7 @@ export default function Navbar() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="fixed inset-0 z-50 bg-black/60 lg:hidden"
+              className="fixed inset-0 z-50 bg-scrim lg:hidden"
               onClick={() => setMobileOpen(false)}
             />
             <motion.div
@@ -121,11 +121,11 @@ export default function Navbar() {
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'tween', duration: 0.3 }}
-              className="fixed top-0 right-0 z-50 h-full w-[280px] max-w-[85vw] bg-black lg:hidden"
+              className="fixed top-0 right-0 z-50 h-full w-[280px] max-w-[85vw] bg-background lg:hidden"
             >
               <div className="flex flex-col h-full p-6">
                 <div className="flex justify-end mb-6">
-                  <button aria-label="Close menu" onClick={() => setMobileOpen(false)} className="text-white">
+                  <button aria-label="Close menu" onClick={() => setMobileOpen(false)} className="text-text">
                     <Icon name="close" className="w-6 h-6" />
                   </button>
                 </div>
@@ -136,7 +136,7 @@ export default function Navbar() {
                       key={link.label}
                       href={link.href}
                       onClick={() => setMobileOpen(false)}
-                      className="text-white/80 hover:text-white text-lg font-medium transition-colors border-b border-white/10 py-3"
+                      className="text-text/80 hover:text-text text-lg font-medium transition-colors border-b border-border-light py-3"
                     >
                       {link.label}
                     </Link>
@@ -145,12 +145,12 @@ export default function Navbar() {
 
                 <div className="flex items-center space-x-5 pt-5">
                   <Badge count={3}>
-                    <button aria-label="Notifications" className="text-white/70 hover:text-white">
+                    <button aria-label="Notifications" className="text-text-secondary hover:text-text">
                       <Icon name="bell" className="w-5 h-5" />
                     </button>
                   </Badge>
                   <Badge count={2}>
-                    <button aria-label="Cart" className="text-white/70 hover:text-white">
+                    <button aria-label="Cart" className="text-text-secondary hover:text-text">
                       <Icon name="cart" className="w-5 h-5" />
                     </button>
                   </Badge>

@@ -29,22 +29,22 @@ export default function ForgotPasswordPage() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <div className="text-center  mb-8">
-        <h1 className="text-3xl font-bold text-white">Reset Password</h1>
-        <p className="text-gray-400 mt-2">We'll send you a link to reset your password</p>
+      <div className="text-center mb-8">
+        <h1 className="text-3xl font-bold text-text">Reset Password</h1>
+        <p className="text-text-muted mt-2">We'll send you a link to reset your password</p>
       </div>
 
       {submitted ? (
         <div className="text-center py-6">
-          <div className="w-16 h-16 bg-yellow-400/20 rounded-full flex items-center justify-center mx-auto mb-4">
-            <MailOutlined className="text-3xl text-yellow-400" />
+          <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
+            <MailOutlined className="text-3xl text-primary" />
           </div>
-          <h3 className="text-xl text-white font-semibold">Check your inbox</h3>
-          <p className="text-gray-400 mt-2">
+          <h3 className="text-xl text-text font-semibold">Check your inbox</h3>
+          <p className="text-text-muted mt-2">
             We've sent a password reset link to your email address.
           </p>
           <div className="mt-6">
-            <Link href="/login" className="text-yellow-400 hover:text-yellow-300 font-medium">
+            <Link href="/login" className="text-primary hover:text-primary-hover font-medium">
               Back to login
             </Link>
           </div>
@@ -65,7 +65,7 @@ export default function ForgotPasswordPage() {
               { type: 'email', message: 'Please enter a valid email' },
             ]}
           >
-            <Input prefix={<MailOutlined className="text-gray-400" />} placeholder="Email address" />
+            <Input prefix={<MailOutlined className="text-text-muted" />} placeholder="Email address" />
           </Form.Item>
 
           <Button type="primary" htmlType="submit" block loading={loading}>
@@ -73,7 +73,7 @@ export default function ForgotPasswordPage() {
           </Button>
 
           <div className="text-center mt-4">
-            <Link href="/login" className="text-gray-400 hover:text-gray-300 text-sm">
+            <Link href="/login" className="text-text-muted hover:text-text-secondary text-sm">
               ← Back to login
             </Link>
           </div>

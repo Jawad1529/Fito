@@ -11,7 +11,7 @@ function getInitials(name = '') {
   return name.split(' ').map((p) => p[0]).join('').slice(0, 2).toUpperCase();
 }
 
-// Pass `src` for a photo, or just `name` to fall back to initials on a yellow chip
+// Pass `src` for a photo, or just `name` to fall back to initials on a primary chip
 export default function Avatar({ src, name = '', size = 'md', className = '' }) {
   const sizeClasses = SIZES[size] || SIZES.md;
 
@@ -25,7 +25,7 @@ export default function Avatar({ src, name = '', size = 'md', className = '' }) 
 
   return (
     <div
-      className={`flex items-center justify-center rounded-full bg-yellow-400 text-black font-semibold shrink-0 ${sizeClasses} ${className}`}
+      className={`flex items-center justify-center rounded-full bg-primary text-text-inverse font-semibold shrink-0 ${sizeClasses} ${className}`}
     >
       {getInitials(name) || '?'}
     </div>

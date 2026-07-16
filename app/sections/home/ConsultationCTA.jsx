@@ -59,7 +59,7 @@ export default function ConsultationCTA() {
             viewport={{ once: true }}
             className="order-2 lg:order-1"
           >
-            <div className="relative w-full max-w-md mx-auto aspect-square rounded-2xl overflow-hidden shadow-2xl ring-1 ring-yellow-400/10">
+            <div className="relative w-full max-w-md mx-auto aspect-square rounded-2xl overflow-hidden shadow-2xl ring-1 ring-primary/10">
               <Image
                 src={consultationImage}
                 alt="Nutrition consultation"
@@ -68,7 +68,7 @@ export default function ConsultationCTA() {
                 className="object-cover"
               />
               {/* subtle glow overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-yellow-400/10 pointer-events-none" />
+              <div className="absolute inset-0 bg-gradient-to-t from-scrim via-transparent to-primary/10 pointer-events-none" />
             </div>
 
             <div className="mt-8 text-center lg:text-left">
@@ -90,11 +90,11 @@ export default function ConsultationCTA() {
             viewport={{ once: true }}
             className="order-1 lg:order-2"
           >
-            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 sm:p-8 shadow-xl transition-all hover:border-yellow-400/30">
+            <div className="bg-overlay backdrop-blur-sm border border-border-light rounded-2xl p-6 sm:p-8 shadow-xl transition-all hover:border-primary/30">
               {submitted ? (
                 <div className="text-center py-8">
-                  <Icon name="check-circle" className="w-16 h-16 text-yellow-400 mx-auto" />
-                  <h3 className="text-2xl font-bold text-white mt-4">Request Sent!</h3>
+                  <Icon name="check-circle" className="w-16 h-16 text-primary mx-auto" />
+                  <h3 className="text-2xl font-bold text-text mt-4">Request Sent!</h3>
                   <Text className="mt-2">
                     Our team will contact you within 24 hours to schedule your consultation.
                   </Text>
@@ -109,87 +109,87 @@ export default function ConsultationCTA() {
               ) : (
                 <form onSubmit={formik.handleSubmit} className="space-y-5">
                   <div>
-                    <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-1">
+                    <label htmlFor="name" className="block text-sm font-medium text-text-secondary mb-1">
                       Full Name *
                     </label>
                     <input
                       id="name"
                       type="text"
                       {...formik.getFieldProps('name')}
-                      className={`w-full px-4 py-3 rounded-xl bg-black/40 border ${
+                      className={`w-full px-4 py-3 rounded-xl bg-overlay-strong border ${
                         formik.touched.name && formik.errors.name
-                          ? 'border-red-500'
-                          : 'border-white/10'
-                      } text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-400/50 transition`}
+                          ? 'border-danger'
+                          : 'border-border-light'
+                      } text-text placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary/50 transition`}
                       placeholder="John Doe"
                     />
                     {formik.touched.name && formik.errors.name && (
-                      <p className="mt-1 text-sm text-red-400">{formik.errors.name}</p>
+                      <p className="mt-1 text-sm text-danger">{formik.errors.name}</p>
                     )}
                   </div>
 
                   <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1">
+                    <label htmlFor="email" className="block text-sm font-medium text-text-secondary mb-1">
                       Email Address *
                     </label>
                     <input
                       id="email"
                       type="email"
                       {...formik.getFieldProps('email')}
-                      className={`w-full px-4 py-3 rounded-xl bg-black/40 border ${
+                      className={`w-full px-4 py-3 rounded-xl bg-overlay-strong border ${
                         formik.touched.email && formik.errors.email
-                          ? 'border-red-500'
-                          : 'border-white/10'
-                      } text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-400/50 transition`}
+                          ? 'border-danger'
+                          : 'border-border-light'
+                      } text-text placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary/50 transition`}
                       placeholder="you@example.com"
                     />
                     {formik.touched.email && formik.errors.email && (
-                      <p className="mt-1 text-sm text-red-400">{formik.errors.email}</p>
+                      <p className="mt-1 text-sm text-danger">{formik.errors.email}</p>
                     )}
                   </div>
 
                   <div>
-                    <label htmlFor="goal" className="block text-sm font-medium text-gray-300 mb-1">
+                    <label htmlFor="goal" className="block text-sm font-medium text-text-secondary mb-1">
                       Primary Goal *
                     </label>
                     <select
                       id="goal"
                       {...formik.getFieldProps('goal')}
-                      className={`w-full px-4 py-3 rounded-xl bg-black/40 border ${
+                      className={`w-full px-4 py-3 rounded-xl bg-overlay-strong border ${
                         formik.touched.goal && formik.errors.goal
-                          ? 'border-red-500'
-                          : 'border-white/10'
-                      } text-white focus:outline-none focus:ring-2 focus:ring-yellow-400/50 transition appearance-none`}
+                          ? 'border-danger'
+                          : 'border-border-light'
+                      } text-text focus:outline-none focus:ring-2 focus:ring-primary/50 transition appearance-none`}
                     >
-                      <option value="" className="bg-black">Select your goal</option>
-                      <option value="build-muscle" className="bg-black">Build Muscle</option>
-                      <option value="lose-fat" className="bg-black">Lose Fat</option>
-                      <option value="weight-gain" className="bg-black">Weight Gain</option>
-                      <option value="healthy-lifestyle" className="bg-black">Healthy Lifestyle</option>
-                      <option value="endurance" className="bg-black">Endurance</option>
+                      <option value="" className="bg-background">Select your goal</option>
+                      <option value="build-muscle" className="bg-background">Build Muscle</option>
+                      <option value="lose-fat" className="bg-background">Lose Fat</option>
+                      <option value="weight-gain" className="bg-background">Weight Gain</option>
+                      <option value="healthy-lifestyle" className="bg-background">Healthy Lifestyle</option>
+                      <option value="endurance" className="bg-background">Endurance</option>
                     </select>
                     {formik.touched.goal && formik.errors.goal && (
-                      <p className="mt-1 text-sm text-red-400">{formik.errors.goal}</p>
+                      <p className="mt-1 text-sm text-danger">{formik.errors.goal}</p>
                     )}
                   </div>
 
                   <div>
-                    <label htmlFor="message" className="block text-sm font-medium text-gray-300 mb-1">
+                    <label htmlFor="message" className="block text-sm font-medium text-text-secondary mb-1">
                       Additional Notes (optional)
                     </label>
                     <textarea
                       id="message"
                       rows="3"
                       {...formik.getFieldProps('message')}
-                      className={`w-full px-4 py-3 rounded-xl bg-black/40 border ${
+                      className={`w-full px-4 py-3 rounded-xl bg-overlay-strong border ${
                         formik.touched.message && formik.errors.message
-                          ? 'border-red-500'
-                          : 'border-white/10'
-                      } text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-400/50 transition resize-none`}
+                          ? 'border-danger'
+                          : 'border-border-light'
+                      } text-text placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary/50 transition resize-none`}
                       placeholder="Any specific questions or preferences..."
                     />
                     {formik.touched.message && formik.errors.message && (
-                      <p className="mt-1 text-sm text-red-400">{formik.errors.message}</p>
+                      <p className="mt-1 text-sm text-danger">{formik.errors.message}</p>
                     )}
                   </div>
 

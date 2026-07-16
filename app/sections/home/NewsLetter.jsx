@@ -55,11 +55,11 @@ export default function Newsletter() {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7 }}
           viewport={{ once: true }}
-          className="relative bg-gradient-to-br from-yellow-400/5 via-transparent to-yellow-400/5 rounded-3xl border border-yellow-400/10 p-8 sm:p-12 text-center overflow-hidden"
+          className="relative bg-gradient-brand rounded-3xl border border-primary/10 p-8 sm:p-12 text-center overflow-hidden"
         >
           {/* Decorative glow */}
-          <div className="absolute -top-24 -right-24 w-64 h-64 bg-yellow-400/10 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-yellow-400/5 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute -top-24 -right-24 w-64 h-64 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
 
           <div className="relative z-10">
             <motion.div
@@ -67,9 +67,9 @@ export default function Newsletter() {
               whileInView={{ scale: 1 }}
               transition={{ duration: 0.5, delay: 0.2 }}
               viewport={{ once: true }}
-              className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-yellow-400/10 mb-6"
+              className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-6"
             >
-              <Icon name="mail" className="w-8 h-8 text-yellow-400" />
+              <Icon name="mail" className="w-8 h-8 text-primary" />
             </motion.div>
 
             <H2 className="text-3xl sm:text-4xl">Stay Updated</H2>
@@ -81,13 +81,13 @@ export default function Newsletter() {
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="mt-8 p-6 bg-yellow-400/10 rounded-2xl border border-yellow-400/20"
+                className="mt-8 p-6 bg-primary/10 rounded-2xl border border-primary/20"
               >
-                <Icon name="check-circle" className="w-12 h-12 text-yellow-400 mx-auto" />
-                <Text className="mt-3 text-lg font-medium text-white">
+                <Icon name="check-circle" className="w-12 h-12 text-primary mx-auto" />
+                <Text className="mt-3 text-lg font-medium text-text">
                   You're subscribed! 🎉
                 </Text>
-                <Text className="text-gray-400 text-sm">
+                <Text className="text-text-muted text-sm">
                   Check your inbox for exclusive updates from Fito.
                 </Text>
                 <Button
@@ -110,13 +110,13 @@ export default function Newsletter() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Enter your email"
-                    className={`w-full px-5 py-3 rounded-xl bg-black/40 border ${
-                      error ? 'border-red-500' : 'border-white/10'
-                    } text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-400/50 transition`}
+                    className={`w-full px-5 py-3 rounded-xl bg-overlay-strong border ${
+                      error ? 'border-danger' : 'border-border-light'
+                    } text-text placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary/50 transition`}
                     disabled={isLoading}
                   />
                   {error && (
-                    <p className="mt-1.5 text-sm text-red-400 text-left">{error}</p>
+                    <p className="mt-1.5 text-sm text-danger text-left">{error}</p>
                   )}
                 </div>
                 <Button
@@ -128,7 +128,7 @@ export default function Newsletter() {
                 >
                   {isLoading ? (
                     <span className="flex items-center gap-2">
-                      <span className="animate-spin inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full" />
+                      <span className="animate-spin inline-block w-4 h-4 border-2 border-text/30 border-t-text rounded-full" />
                       Subscribing...
                     </span>
                   ) : (
@@ -139,7 +139,7 @@ export default function Newsletter() {
             )}
 
             {!isSubscribed && (
-              <Text className="mt-4 text-xs text-gray-500">
+              <Text className="mt-4 text-xs text-text-muted">
                 No spam. Unsubscribe anytime.
               </Text>
             )}

@@ -43,13 +43,13 @@ const socialLinks = [
 function FooterColumn({ title, links }) {
   return (
     <div>
-      <Caption className="text-white/50">{title}</Caption>
+      <Caption className="text-text-muted">{title}</Caption>
       <ul className="mt-4 space-y-2.5">
         {links.map((link) => (
           <li key={link.label}>
             <Link
               href={link.href}
-              className="text-sm text-gray-400 hover:text-white transition-colors"
+              className="text-sm text-text-muted hover:text-text transition-colors"
             >
               {link.label}
             </Link>
@@ -67,14 +67,14 @@ export default function Footer() {
   };
 
   return (
-    <footer className="bg-black z-20 border-t border-white/10 style={{ backgroundColor: '#000000' }}">
+    <footer className="bg-background z-20 border-t border-border-light">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-10">
           {/* Brand */}
           <div className="col-span-2">
             <Link
               href="/"
-              className="text-2xl font-bold text-white tracking-tight"
+              className="text-2xl font-bold text-text tracking-tight"
             >
               Fito
             </Link>
@@ -92,7 +92,7 @@ export default function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={social.name}
-                  className="flex items-center justify-center w-9 h-9 rounded-full border border-white/10 text-white/60 hover:text-black hover:bg-yellow-400 hover:border-yellow-400 transition-colors"
+                  className="flex items-center justify-center w-9 h-9 rounded-full border border-border-light text-text-secondary hover:text-text-inverse hover:bg-primary hover:border-primary transition-colors"
                 >
                   <Icon name={social.name} className="w-4 h-4" />
                 </a>
@@ -106,7 +106,7 @@ export default function Footer() {
 
           {/* Newsletter */}
           <div className="col-span-2 sm:col-span-3 lg:col-span-1">
-            <Caption className="text-white/50">
+            <Caption className="text-text-muted">
               Stay in the loop
             </Caption>
 
@@ -139,7 +139,7 @@ export default function Footer() {
 
         <Divider className="mt-12 mb-6" />
 
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-500">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-text-muted">
           <p>© {new Date().getFullYear()} Fito. All rights reserved.</p>
 
           <div className="flex items-center gap-6">
@@ -147,7 +147,7 @@ export default function Footer() {
               <Link
                 key={link.label}
                 href={link.href}
-                className="hover:text-white transition-colors"
+                className="hover:text-text transition-colors"
               >
                 {link.label}
               </Link>
