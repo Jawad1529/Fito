@@ -2,10 +2,11 @@
 
 import { motion } from 'framer-motion';
 import Image from 'next/image';
+import Link from 'next/link';
 import Button from '../atoms/Button';
 import Icon from '../atoms/Icon';
 
-// Helper to render stars
+// Full Stars component (restored from your original)
 const Stars = ({ rating }) => {
   const fullStars = Math.floor(rating);
   const halfStar = rating % 1 >= 0.5 ? 1 : 0;
@@ -51,71 +52,80 @@ export default function ProductCard({
   onAddToCart,
   index = 0,
 }) {
+  // Prevent navigation when clicking on interactive elements
+  const handleButtonClick = (e, callback) => {
+    e.stopPropagation();
+    callback(product.id);
+  };
+
   return (
-    <motion.div
-      key={product.id}
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: index * 0.1 }}
-      viewport={{ once: true }}
-      whileHover={{ y: -8 }}
-      className="group relative bg-overlay backdrop-blur-sm border border-border-light rounded-2xl p-4 transition-all duration-300 hover:border-primary/30 hover:bg-overlay-strong flex flex-col"
-    >
-      {/* Image */}
-      <div className="relative w-full aspect-square rounded-xl overflow-hidden bg-overlay mb-4">
-        <Image
-          src={product.image}
-          alt={product.name}
-          fill
-          unoptimized
-          className="object-cover transition-transform duration-500 group-hover:scale-105"
-        />
-      </div>
-
-      {/* Wishlist button */}
-      <button
-        onClick={() => onToggleWishlist(product.id)}
-        className="absolute top-4 right-4 w-9 h-9 rounded-full bg-scrim backdrop-blur-sm flex items-center justify-center transition-colors hover:bg-primary/20 border border-border-light"
-        aria-label="Add to wishlist"
+    <Link href={`/product/${product.id}`} passHref>
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: index * 0.1 }}
+        viewport={{ once: true }}
+        whileHover={{ y: -8 }}
+        className="group relative bg-overlay backdrop-blur-sm border border-border-light rounded-2xl p-4 transition-all duration-300 hover:border-primary/30 hover:bg-overlay-strong flex flex-col cursor-pointer"
       >
-        <Icon
-          name="heart"
-          className={`w-4 h-4 ${isWishlisted ? 'text-primary fill-primary' : 'text-text-secondary'}`}
-        />
-      </button>
-
-      {/* Product info */}
-      <div className="flex flex-col flex-1">
-        <div className="flex items-start justify-between">
-          <h3 className="text-text font-semibold text-lg leading-tight">
-            {product.name}
-          </h3>
-        </div>
-        <span className="text-sm text-text-muted mb-1">{product.category}</span>
-
-        <div className="flex items-center gap-2 mt-1">
-          <Stars rating={product.rating} />
-          <span className="text-sm text-text-muted">({product.reviews})</span>
+        {/* Image */}
+        <div className="relative w-full aspect-square rounded-xl overflow-hidden bg-overlay mb-4">
+          <Image
+            src={product.image}
+            alt={product.name}
+            fill
+            unoptimized
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
+          />
         </div>
 
-        <p className="text-sm text-text-muted mt-2 flex-1 line-clamp-2">
-          {product.description}
-        </p>
+        {/* Wishlist button – stops propagation */}
+        <button
+          onClick={(e) => handleButtonClick(e, onToggleWishlist)}
+          className="absolute top-4 right-4 w-9 h-9 rounded-full bg-scrim backdrop-blur-sm flex items-center justify-center transition-colors hover:bg-primary/20 border border-border-light z-10"
+          aria-label="Add to wishlist"
+        >
+          <Icon
+            name="heart"
+            className={`w-4 h-4 ${isWishlisted ? 'text-primary fill-primary' : 'text-text-secondary'}`}
+          />
+        </button>
 
-        <div className="mt-4 flex items-center justify-between">
-          <span className="text-xl font-bold text-text">
-            PKR {product.price.toFixed(2)}
-          </span>
-          <Button
-            variant={isInCart ? 'secondary' : 'primary'}
-            size="sm"
-            onClick={() => onAddToCart(product.id)}
-            className="rounded-full px-4 py-1.5 text-xs"
-          >
-            {isInCart ? 'In Cart' : 'Quick Add'}
-          </Button>
+        {/* Product info */}
+        <div className="flex flex-col flex-1">
+          <div className="flex items-start justify-between">
+            <h3 className="text-text font-semibold text-lg leading-tight">
+              {product.name}
+            </h3>
+          </div>
+          <span className="text-sm text-text-muted mb-1">{product.category}</span>
+
+          {/* Rating with stars – now fully functional */}
+          <div className="flex items-center gap-2 mt-1">
+            <Stars rating={product.rating} />
+            <span className="text-sm text-text-muted">({product.reviews})</span>
+          </div>
+
+          <p className="text-sm text-text-muted mt-2 flex-1 line-clamp-2">
+            {product.description}
+          </p>
+
+          <div className="mt-4 flex items-center justify-between">
+            <span className="text-xl font-bold text-text">
+              PKR {product.price.toFixed(2)}
+            </span>
+            {/* Quick Add button – stops propagation */}
+            <Button
+              variant={isInCart ? 'secondary' : 'primary'}
+              size="sm"
+              onClick={(e) => handleButtonClick(e, onAddToCart)}
+              className="rounded-full px-4 py-1.5 text-xs"
+            >
+              {isInCart ? 'In Cart' : 'Quick Add'}
+            </Button>
+          </div>
         </div>
-      </div>
-    </motion.div>
+      </motion.div>
+    </Link>
   );
 }

@@ -1,5 +1,5 @@
 import { ConfigProvider } from 'antd';
-import ConsultationFlow from '@/components/organisms/ConsultationFlow';
+import ConsultationFlow from '@/components/organisms/consultations/ConsultationFlow';
 import FeaturedProducts from '../../../components/organisms/FeaturedProducts';
 
 // Ant Design dark theme overrides

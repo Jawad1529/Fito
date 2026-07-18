@@ -2,10 +2,10 @@
 
 :root {
   /* Brand */
-  --primary: #DC2626;
-  --primary-hover: #B91C1C;
-  --primary-active: #991B1B;
-  --secondary: #1E1E1E;
+  --primary: #CF4842;
+  --primary-hover: #A34840;
+  --primary-active: #8A3B35;
+  --secondary: #201D1C;
 
   /* Backgrounds */
   --background: #0F0F0F;
@@ -14,7 +14,7 @@
   --card: #262626;
 
   /* Text */
-  --text: #FFFFFF;
+  --text: #FBE3E0;
   --text-secondary: #D1D5DB;
   --text-muted: #9CA3AF;
   --text-inverse: #FFFFFF;
@@ -36,15 +36,21 @@
   --scrim: color-mix(in srgb, var(--background) 60%, transparent);
 
   /* Gradients */
+/* Gradients */
   --gradient-brand: linear-gradient(135deg, var(--background), var(--primary));
   --gradient-primary: linear-gradient(to right, var(--primary), var(--primary-hover));
-  --gradient-text: linear-gradient(to right, var(--primary-hover), var(--primary), var(--primary-active));
+
+  /* Pinkish-white fading into theme red — same hue family throughout */
+  --gradient-text: linear-gradient(to right, #FBE3E0, var(--primary));
 }
 
 @theme inline {
   --color-primary: var(--primary);
   --color-primary-hover: var(--primary-hover);
   --color-primary-active: var(--primary-active);
+  --color-primary-light: var(--primary-light);
+  --color-accent-gold: var(--accent-gold);
+  --color-accent-cream: var(--accent-cream);
   --color-secondary: var(--secondary);
   --color-background: var(--background);
   --color-background-secondary: var(--background-secondary);
@@ -89,11 +95,138 @@ body {
 
 .bg-gradient-text {
   background-image: var(--gradient-text);
+  background-size: 200% auto;
+  animation: gradient-shimmer 4s ease-in-out infinite;
 }
 
+@keyframes gradient-shimmer {
+  0%, 100% {
+    background-position: 0% center;
+  }
+  50% {
+    background-position: 100% center;
+  }
+}
 .bg-grid-pattern {
   background-image:
     linear-gradient(color-mix(in srgb, var(--primary) 60%, transparent) 1px, transparent 1px),
     linear-gradient(90deg, color-mix(in srgb, var(--primary) 60%, transparent) 1px, transparent 1px);
   background-size: 56px 56px;
+}
+
+
+/* ── Ant Design theme overrides ── */
+.ant-btn-primary {
+  background: var(--primary) !important;
+  border-color: var(--primary) !important;
+}
+.ant-btn-primary:hover {
+  background: var(--primary-hover) !important;
+  border-color: var(--primary-hover) !important;
+}
+.ant-btn-primary:active {
+  background: var(--primary-active) !important;
+  border-color: var(--primary-active) !important;
+}
+
+/* Inputs, selects, pickers */
+.ant-input,
+.ant-input-number,
+.ant-select-selector,
+.ant-picker {
+  background: var(--surface) !important;
+  border-color: var(--border) !important;
+  color: var(--text) !important;
+  border-radius: 12px !important;
+}
+.ant-input:focus,
+.ant-input-number:focus,
+.ant-select-selector:focus,
+.ant-picker:focus {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 30%, transparent) !important;
+}
+.ant-input::placeholder {
+  color: var(--text-muted) !important;
+}
+.ant-select-selection-placeholder {
+  color: var(--text-muted) !important;
+}
+
+/* Slider */
+.ant-slider-track {
+  background: var(--primary) !important;
+}
+.ant-slider-handle {
+  border-color: var(--primary) !important;
+}
+.ant-slider-handle:focus {
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary) 30%, transparent) !important;
+}
+
+/* Steps */
+.ant-steps-item-title {
+  color: var(--text-secondary) !important;
+}
+.ant-steps-item-process .ant-steps-item-title {
+  color: var(--text) !important;
+}
+.ant-steps-item-finish .ant-steps-item-title {
+  color: var(--primary) !important;
+}
+.ant-steps-item-finish .ant-steps-item-icon {
+  background-color: var(--primary) !important;
+  border-color: var(--primary) !important;
+}
+
+/* Timeline */
+.ant-timeline-item-content {
+  color: var(--text-secondary) !important;
+}
+
+/* Modal */
+.ant-modal-content {
+  background: var(--background) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 24px !important;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.8) !important;
+}
+
+/* Upload */
+.ant-upload-list-picture-card .ant-upload-list-item {
+  background: var(--surface) !important;
+  border-color: var(--border) !important;
+}
+.ant-upload.ant-upload-select-picture-card {
+  background: var(--surface) !important;
+  border-color: var(--border) !important;
+}
+.ant-upload.ant-upload-select-picture-card:hover {
+  border-color: var(--primary) !important;
+}
+
+/* Badge */
+.ant-badge-status-text {
+  color: var(--text-secondary) !important;
+}
+
+/* Divider */
+.ant-divider {
+  border-color: var(--border) !important;
+}
+
+/* Card (used in dashboard) */
+.ant-card {
+  background: var(--surface) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 16px !important;
+}
+.ant-card-head {
+  border-bottom: 1px solid var(--border) !important;
+}
+.ant-card-head-title {
+  color: var(--text) !important;
+}
+.ant-card-body {
+  color: var(--text-secondary) !important;
 }

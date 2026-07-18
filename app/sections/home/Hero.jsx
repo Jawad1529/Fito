@@ -10,31 +10,20 @@ import Icon from '../../components/atoms/Icon';
 import Tag from '../../components/atoms/Tag';
 import fatLoss from '../../assets/images/fat-loss.png'; // consultation / coaching panel
 
-// Replace with a real product shot when available — kept as a styled
-// placeholder so the composition can be swapped in without touching layout.
+// Replace with a real product shot when available.
 const supplementImage =
   'https://thumbs.dreamstime.com/b/jar-chocolate-protein-scoop-falling-powder-isolated-black-background-clipping-path-concept-fitness-supplement-191764428.jpg';
+const coachingImage =
+  'https://img.magnific.com/premium-photo/silhouette-woman-athletic-wear-with-red-blue-highlights-her-arms-against-black-background_1388397-2604.jpg?semt=ais_hybrid&w=740&q=80';
 
 // ---------------------------------------------------------------------
-// Local icons (self-contained so the hero never depends on an external
-// icon set having the exact names this design needs).
+// Local icons — self-contained, currentColor, no external dependency
 // ---------------------------------------------------------------------
 function ShieldIcon({ className }) {
   return (
     <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
-      <path
-        d="M12 3l7 3v5c0 4.5-3 8.5-7 10-4-1.5-7-5.5-7-10V6l7-3z"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M9 12.4l2 2 4-4.4"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+      <path d="M12 3l7 3v5c0 4.5-3 8.5-7 10-4-1.5-7-5.5-7-10V6l7-3z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
+      <path d="M9 12.4l2 2 4-4.4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
@@ -42,13 +31,7 @@ function ShieldIcon({ className }) {
 function FlaskIcon({ className }) {
   return (
     <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
-      <path
-        d="M10 3h4M10 3v5.4L5.6 17a2 2 0 001.8 3h9.2a2 2 0 001.8-3L14 8.4V3"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+      <path d="M10 3h4M10 3v5.4L5.6 17a2 2 0 001.8 3h9.2a2 2 0 001.8-3L14 8.4V3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
       <path d="M8 15h8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
     </svg>
   );
@@ -80,8 +63,6 @@ const trustSignals = [
   { Icon: StarIcon, label: 'Avg. Rating', stat: '4.9/5' },
 ];
 
-// The goals your coaches and formulas are actually built around —
-// real content standing in for decoration.
 const goals = ['Fat Loss', 'Muscle Gain', 'PCOS Management', 'Weight Gain', 'Peak Performance'];
 
 const processSteps = [
@@ -90,8 +71,6 @@ const processSteps = [
   { n: '03', label: 'Deliver', desc: 'Track results, adjust fast' },
 ];
 
-// Cycles through `goals` on an interval; pauses entirely when the user
-// has requested reduced motion, showing a single static label instead.
 function GoalRotator({ reduceMotion }) {
   const [index, setIndex] = useState(0);
 
@@ -108,7 +87,7 @@ function GoalRotator({ reduceMotion }) {
       </span>
       <span className="relative inline-block h-5 min-w-[160px] overflow-hidden">
         {reduceMotion ? (
-          <span className="absolute left-0 top-0 text-warning font-semibold text-sm">
+          <span className="absolute left-0 top-0 text-primary font-semibold text-sm">
             {goals[0]}
           </span>
         ) : (
@@ -119,7 +98,7 @@ function GoalRotator({ reduceMotion }) {
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: -14, opacity: 0 }}
               transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-              className="absolute left-0 top-0 text-warning font-semibold text-sm"
+              className="absolute left-0 top-0 text-primary font-semibold text-sm"
             >
               {goals[index]}
             </motion.span>
@@ -143,6 +122,8 @@ const fadeUp = {
   show: { opacity: 1, y: 0, transition: { duration: 0.65, ease: [0.16, 1, 0.3, 1] } },
 };
 
+const glowShadow = { boxShadow: '0 25px 60px -20px color-mix(in srgb, var(--primary) 35%, transparent)' };
+
 export default function Hero() {
   const sectionRef = useRef(null);
   const isInView = useInView(sectionRef, { once: true, amount: 0.2 });
@@ -161,11 +142,7 @@ export default function Hero() {
           {/* ---------------------------------------------------------- */}
           {/* Left — message, proof, and two equally-weighted CTAs       */}
           {/* ---------------------------------------------------------- */}
-          <motion.div
-            variants={container}
-            initial="hidden"
-            animate={isInView ? 'show' : 'hidden'}
-          >
+          <motion.div variants={container} initial="hidden" animate={isInView ? 'show' : 'hidden'}>
             <motion.div variants={fadeUp}>
               <Tag variant="outline" className="mb-6">
                 <Icon name="bolt" className="w-3.5 h-3.5" />
@@ -186,7 +163,9 @@ export default function Hero() {
               </span>
               <span className="block overflow-hidden">
                 <motion.span
-                  className="block bg-gradient-text text-transparent bg-clip-text"
+                  className={`block bg-clip-text text-transparent ${
+                    reduceMotion ? 'bg-gradient-to-r from-text to-primary' : 'bg-gradient-text'
+                  }`}
                   initial={reduceMotion ? { opacity: 0 } : { y: '110%' }}
                   animate={isInView ? (reduceMotion ? { opacity: 1 } : { y: '0%' }) : {}}
                   transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1], delay: 0.4 }}
@@ -209,7 +188,7 @@ export default function Hero() {
                 <Button
                   variant="primary"
                   size="lg"
-                  className="w-full justify-center min-w-[200px] bg-gradient-primary text-text font-semibold border border-transparent hover:brightness-110"
+                  className="w-full justify-center min-w-[200px] bg-primary hover:bg-primary-hover active:bg-primary-active text-text-inverse font-semibold border border-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
                 >
                   Book a Consultation
                 </Button>
@@ -218,7 +197,7 @@ export default function Hero() {
                 <Button
                   variant="primary"
                   size="lg"
-                  className="w-full justify-center min-w-[200px] bg-transparent text-primary font-semibold border border-primary/40 hover:bg-primary/10"
+                  className="w-full justify-center min-w-[200px] bg-transparent text-primary font-semibold border border-primary/40 hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
                 >
                   Shop Supplements
                 </Button>
@@ -232,7 +211,7 @@ export default function Hero() {
                   animate={isInView ? { scaleX: 1 } : {}}
                   transition={{ duration: 0.9, delay: 0.9, ease: 'easeOut' }}
                   style={{ transformOrigin: 'left' }}
-                  className="absolute top-[13px] left-[13px] right-[13px] h-px bg-gradient-to-r from-primary/50 via-text/10 to-transparent hidden sm:block"
+                  className="absolute top-[13px] left-[13px] right-[13px] h-px bg-gradient-to-r from-primary/50 via-border to-transparent hidden sm:block"
                 />
                 {processSteps.map((step, i) => (
                   <motion.div
@@ -242,7 +221,7 @@ export default function Hero() {
                     transition={{ duration: 0.5, delay: 0.95 + i * 0.15 }}
                     className="relative flex-1 min-w-0"
                   >
-                    <div className="w-7 h-7 rounded-full bg-background-secondary border border-primary/40 flex items-center justify-center text-[11px] font-mono text-primary relative z-10">
+                    <div className="w-7 h-7 rounded-full bg-card border border-primary/40 flex items-center justify-center text-[11px] font-mono text-primary relative z-10">
                       {step.n}
                     </div>
                     <div className="mt-3 text-sm font-semibold text-text">{step.label}</div>
@@ -262,11 +241,7 @@ export default function Hero() {
                     <SignalIcon className="w-4 h-4" />
                   </span>
                   <span className="text-sm text-text-secondary">
-                    {stat && (
-                      <span className="text-text font-semibold font-mono mr-1.5">
-                        {stat}
-                      </span>
-                    )}
+                    {stat && <span className="text-text font-semibold font-mono mr-1.5">{stat}</span>}
                     {label}
                   </span>
                 </div>
@@ -288,17 +263,18 @@ export default function Hero() {
               initial={reduceMotion ? { opacity: 0 } : { opacity: 0, x: 56 }}
               animate={isInView ? { opacity: 1, x: 0 } : {}}
               transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1], delay: 0.35 }}
-              className="relative aspect-[4/3] w-[86%] ml-auto rounded-[28px] overflow-hidden ring-1 ring-border-light shadow-2xl shadow-scrim"
+              style={glowShadow}
+              className="relative aspect-[4/3] w-[86%] ml-auto rounded-[28px] overflow-hidden ring-1 ring-border-light"
             >
               <Image
-                src="https://img.magnific.com/premium-photo/silhouette-woman-athletic-wear-with-red-blue-highlights-her-arms-against-black-background_1388397-2604.jpg?semt=ais_hybrid&w=740&q=80"
+                src={coachingImage}
                 alt="Certified nutrition coach reviewing a personalized plan with a client"
                 fill
                 unoptimized
                 className="object-cover"
                 priority
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-scrim via-transparent to-overlay" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-black/10" />
             </motion.div>
 
             {/* Seam — where the two disciplines meet */}
@@ -314,7 +290,7 @@ export default function Hero() {
                 initial={{ opacity: 0, scale: 0.85 }}
                 animate={isInView ? { opacity: 1, scale: 1 } : {}}
                 transition={{ duration: 0.5, delay: 1.2 }}
-                className="relative z-10 bg-background-secondary border border-primary/30 rounded-full px-4 py-1.5 text-[10px] sm:text-[11px] tracking-[0.18em] uppercase text-primary font-mono whitespace-nowrap"
+                className="relative z-10 bg-card border border-primary/30 rounded-full px-4 py-1.5 text-[10px] sm:text-[11px] tracking-[0.18em] uppercase text-primary font-mono whitespace-nowrap"
               >
                 One Standard
               </motion.div>
@@ -325,7 +301,8 @@ export default function Hero() {
               initial={reduceMotion ? { opacity: 0 } : { opacity: 0, x: -56 }}
               animate={isInView ? { opacity: 1, x: 0 } : {}}
               transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1], delay: 0.35 }}
-              className="relative aspect-[4/3] w-[86%] -mt-8 rounded-[28px] overflow-hidden ring-1 ring-border-light shadow-2xl shadow-scrim"
+              style={glowShadow}
+              className="relative aspect-[4/3] w-[86%] -mt-8 rounded-[28px] overflow-hidden ring-1 ring-border-light"
             >
               <Image
                 src={supplementImage}
@@ -334,7 +311,7 @@ export default function Hero() {
                 unoptimized
                 className="object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-b from-scrim via-transparent to-overlay" />
+              <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/0 to-black/10" />
             </motion.div>
 
             {/* Annotations — captions, not badges */}
@@ -342,12 +319,12 @@ export default function Hero() {
               initial={{ opacity: 0, y: 10 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.6, delay: 1.4 }}
-              className="absolute top-[9%] left-0 flex items-center gap-2 bg-background-secondary/90 backdrop-blur-sm border border-border-light rounded-full pl-1.5 pr-3.5 py-1.5 shadow-lg"
+              className="absolute top-[9%] left-0 flex items-center gap-2 bg-card/90 backdrop-blur-sm border border-border-light rounded-full pl-1.5 pr-3.5 py-1.5 shadow-lg"
             >
               <span className="w-6 h-6 rounded-full bg-primary/15 flex items-center justify-center text-primary shrink-0">
                 <ShieldIcon className="w-3.5 h-3.5" />
               </span>
-              <span className="text-xs text-text/90 font-medium whitespace-nowrap">
+              <span className="text-xs text-text font-medium whitespace-nowrap">
                 1:1 Certified Coaching
               </span>
             </motion.div>
@@ -356,12 +333,12 @@ export default function Hero() {
               initial={{ opacity: 0, y: -10 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.6, delay: 1.55 }}
-              className="absolute bottom-[6%] right-0 flex items-center gap-2 bg-background-secondary/90 backdrop-blur-sm border border-border-light rounded-full pl-1.5 pr-3.5 py-1.5 shadow-lg"
+              className="absolute bottom-[6%] right-0 flex items-center gap-2 bg-card/90 backdrop-blur-sm border border-border-light rounded-full pl-1.5 pr-3.5 py-1.5 shadow-lg"
             >
               <span className="w-6 h-6 rounded-full bg-primary/15 flex items-center justify-center text-primary shrink-0">
                 <FlaskIcon className="w-3.5 h-3.5" />
               </span>
-              <span className="text-xs text-text/90 font-medium whitespace-nowrap">
+              <span className="text-xs text-text font-medium whitespace-nowrap">
                 Third-Party Lab Tested
               </span>
             </motion.div>
