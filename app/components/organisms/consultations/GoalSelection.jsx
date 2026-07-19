@@ -1,9 +1,9 @@
 'use client';
 
-import { Card, Typography } from 'antd';
 import { CheckCircleFilled } from '@ant-design/icons';
 
-const { Title, Paragraph } = Typography;
+import Card from '../../atoms/Card';
+import { H2, H3, Text } from '../../atoms/Typography';
 
 export default function GoalSelection({
   goals,
@@ -14,13 +14,13 @@ export default function GoalSelection({
     <div>
 
       <div className="text-center mb-10">
-        <Title level={2} className="!text-white !mb-2">
+        <H2 className="mb-2">
           What would you like help with?
-        </Title>
+        </H2>
 
-        <Paragraph className="!text-gray-400 !text-base">
+        <Text muted>
           Choose your primary goal so we can personalize your consultation.
-        </Paragraph>
+        </Text>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -33,29 +33,23 @@ export default function GoalSelection({
             <Card
               key={goal.id}
               hoverable
+              padding={28}
               onClick={() => onSelect(goal.id)}
               className={`
                 relative
-                cursor-pointer
-                rounded-2xl
-                transition-all
-                duration-300
                 overflow-hidden
                 border
 
                 ${
                   isSelected
-                    ? 'border-yellow-400 bg-yellow-400/10'
-                    : 'border-white/10 bg-white/5 hover:border-yellow-400/40'
+                    ? 'border-primary bg-primary/10'
+                    : 'border-border bg-surface hover:border-primary/40'
                 }
               `}
-              bodyStyle={{
-                padding: 28,
-              }}
             >
               {isSelected && (
                 <CheckCircleFilled
-                  className="absolute top-5 right-5 text-yellow-400 text-xl"
+                  className="absolute top-5 right-5 text-primary text-xl"
                 />
               )}
 
@@ -63,16 +57,13 @@ export default function GoalSelection({
                 {goal.icon}
               </div>
 
-              <Title
-                level={3}
-                className="!text-white !mb-3"
-              >
+              <H3 className="mb-3">
                 {goal.title}
-              </Title>
+              </H3>
 
-              <Paragraph className="!text-gray-400 !mb-0">
+              <Text muted>
                 {goal.shortDescription}
-              </Paragraph>
+              </Text>
 
             </Card>
           );

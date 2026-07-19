@@ -70,14 +70,38 @@ export default function useConsultation() {
     try {
       setIsSubmitting(true);
 
-      const payload = {
-        ...formData,
+      const uploads = formData.uploads || {};
+
+      const record = {
+        id:
+          typeof crypto !== "undefined" && crypto.randomUUID
+            ? crypto.randomUUID()
+            : `${Date.now()}`,
+        status: "pending",
+        submittedAt: new Date().toISOString(),
         goal: selectedGoal,
+        personalInfo: {
+          fullName: formData.fullName,
+          email: formData.email,
+          phone: formData.phone,
+          dob: formData.dob,
+          gender: formData.gender,
+          activityLevel: formData.activityLevel,
+          height: formData.height,
+          weight: formData.weight,
+        },
+        goalData: formData.goalData,
+        uploads: {
+          bodyPhotos: (uploads.bodyPhotos || []).length,
+          reports: (uploads.reports || []).length,
+          paymentScreenshot: (uploads.paymentScreenshot || []).length,
+        },
+        transactionId: formData.transactionId,
       };
 
-      console.log(payload);
-
-      // await consultationService.submit(payload);
+      // await consultationService.submit(record);
+      localStorage.setItem("fito_consultation", JSON.stringify(record));
+      localStorage.removeItem("fito_conversation");
 
       return true;
     } catch (error) {

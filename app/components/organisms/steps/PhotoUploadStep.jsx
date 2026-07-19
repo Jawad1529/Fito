@@ -1,9 +1,11 @@
 'use client';
 
-import { Upload, Card, Typography, Alert } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 
-const { Title, Paragraph, Text } = Typography;
+import Card from '../../atoms/Card';
+import { H3, H5, Text } from '../../atoms/Typography';
+import Alert from '../../atoms/Alert';
+import Upload from '../../atoms/Upload';
 
 export default function PhotoUploadStep({
   formData,
@@ -11,37 +13,36 @@ export default function PhotoUploadStep({
 }) {
   const uploads = formData.uploads || {};
 
-  const updatePhotos = ({ fileList }) => {
+  const updatePhotos = (files) => {
     updateField("uploads", {
       ...uploads,
-      bodyPhotos: fileList,
+      bodyPhotos: files,
     });
   };
 
-  const updateReports = ({ fileList }) => {
+  const updateReports = (files) => {
     updateField("uploads", {
       ...uploads,
-      reports: fileList,
+      reports: files,
     });
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6!">
 
       <div>
-        <Title level={3} className="!text-white">
+        <H3>
           Upload Your Photos
-        </Title>
+        </H3>
 
-        <Paragraph className="!text-gray-400">
+        <Text muted>
           These photos help our nutritionists assess your current physique and
           provide more accurate recommendations.
-        </Paragraph>
+        </Text>
       </div>
 
       <Alert
         type="info"
-        showIcon
         message="Photo Guidelines"
         description={
           <ul className="list-disc pl-5 mt-2">
@@ -53,48 +54,43 @@ export default function PhotoUploadStep({
         }
       />
 
-      <Card className="bg-white/5 border-white/10">
+      <Card className="bg-surface border border-border">
 
-        <Title level={5}>Body Photos</Title>
+        <H5>Body Photos</H5>
 
-        <Text className="block text-gray-400 mb-4">
+        <Text muted className="block mb-4">
           Upload Front, Side and Back photos.
         </Text>
 
         <Upload
-          listType="picture-card"
-          beforeUpload={() => false}
+          picture
           multiple
-          fileList={uploads.bodyPhotos}
+          accept="image/*"
+          value={uploads.bodyPhotos || []}
           onChange={updatePhotos}
         >
-          <div>
-            <PlusOutlined />
-            <div className="mt-2">Upload</div>
-          </div>
+          <PlusOutlined />
+          <div className="mt-1 text-xs">Upload</div>
         </Upload>
 
       </Card>
 
-      <Card className="bg-white/5 border-white/10">
+      <Card className="bg-surface border border-border">
 
-        <Title level={5}>
+        <H5 className="mb-2">
           Medical Reports (Optional)
-        </Title>
+        </H5>
 
-        <Paragraph className="text-gray-400">
+        <Text muted className="block mb-4">
           Upload blood work, hormone reports or any medical reports if available.
-        </Paragraph>
+        </Text>
 
         <Upload
-          beforeUpload={() => false}
           multiple
-          fileList={uploads.reports}
+          value={uploads.reports || []}
           onChange={updateReports}
         >
-          <button className="px-4 py-2 rounded-lg border border-white/20 text-white hover:bg-white/10">
-            Upload Reports
-          </button>
+          Upload Reports
         </Upload>
 
       </Card>

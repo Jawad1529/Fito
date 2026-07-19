@@ -1,11 +1,12 @@
 'use client';
 
-import { Button } from 'antd';
 import {
   ArrowLeftOutlined,
   ArrowRightOutlined,
   CheckOutlined,
 } from '@ant-design/icons';
+
+import Button from '../../atoms/Button';
 
 export default function NavigationButtons({
   currentStep,
@@ -19,44 +20,48 @@ export default function NavigationButtons({
   const isLastStep = currentStep === totalSteps - 1;
 
   return (
-    <div className="mt-10 flex items-center justify-between border-t border-white/10 pt-6">
+    <div className="mt-10 border-t border-border pt-6">
 
-      <Button
-        size="large"
-        disabled={isFirstStep}
-        icon={<ArrowLeftOutlined />}
-        onClick={onPrevious}
-      >
-        Previous
-      </Button>
+      <div className="flex items-center justify-between gap-3">
 
-      <div className="text-gray-400 text-sm">
-        Step {currentStep + 1} of {totalSteps}
+        <Button
+          variant="outline"
+          size="lg"
+          disabled={isFirstStep}
+          icon={<ArrowLeftOutlined />}
+          onClick={onPrevious}
+        >
+          <span className="hidden sm:inline">Previous</span>
+        </Button>
+
+        {isLastStep ? (
+          <Button
+            variant="primary"
+            size="lg"
+            loading={isSubmitting}
+            disabled={!canProceed}
+            icon={<CheckOutlined />}
+            onClick={onNext}
+          >
+            Submit Consultation
+          </Button>
+        ) : (
+          <Button
+            variant="primary"
+            size="lg"
+            disabled={!canProceed}
+            icon={<ArrowRightOutlined />}
+            iconPosition="right"
+            onClick={onNext}
+          >
+            Continue
+          </Button>
+        )}
       </div>
 
-      {isLastStep ? (
-        <Button
-          type="primary"
-          size="large"
-          loading={isSubmitting}
-          disabled={!canProceed}
-          icon={<CheckOutlined />}
-          onClick={onNext}
-        >
-          Submit Consultation
-        </Button>
-      ) : (
-        <Button
-          type="primary"
-          size="large"
-          disabled={!canProceed}
-          icon={<ArrowRightOutlined />}
-          iconPosition="end"
-          onClick={onNext}
-        >
-          Continue
-        </Button>
-      )}
+      <div className="text-text-muted text-xs sm:text-sm text-center mt-4">
+        Step {currentStep + 1} of {totalSteps}
+      </div>
     </div>
   );
 }

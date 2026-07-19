@@ -1,22 +1,21 @@
 'use client';
 
-import {
-  Card,
-  Typography,
-  Row,
-  Col,
-  Select,
-  Slider,
-  Input,
-  DatePicker,
-  Checkbox,
-  Radio,
-} from 'antd';
+import Card from '../../atoms/Card';
+import { H4 } from '../../atoms/Typography';
+import Select from '../../atoms/Select';
+import Slider from '../../atoms/Slider';
+import Input from '../../atoms/Input';
+import DatePicker from '../../atoms/DatePicker';
+import Checkbox from '../../atoms/Checkbox';
+import Radio from '../../atoms/Radio';
+import TextArea from '../../atoms/TextArea';
 
-import dayjs from 'dayjs';
-
-const { Title, Text } = Typography;
-const { TextArea } = Input;
+const Field = ({ label, children }) => (
+  <div className="flex flex-col gap-2">
+    <label className="text-sm text-text-secondary font-medium">{label}</label>
+    {children}
+  </div>
+);
 
 export default function PCOSForm({
   formData,
@@ -25,21 +24,19 @@ export default function PCOSForm({
   const goalData = formData.goalData || {};
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6!">
 
       {/* Medical Information */}
 
-      <Card className="bg-white/5 border-white/10">
+      <Card className="bg-surface border border-border">
 
-        <Title level={4}>
+        <H4 className="mb-5">
           Medical Information
-        </Title>
+        </H4>
 
-        <Row gutter={[20,20]}>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 
-          <Col xs={24} md={12}>
-            <Text>Have you been diagnosed with PCOS?</Text>
-
+          <Field label="Have you been diagnosed with PCOS?">
             <Radio.Group
               value={goalData.diagnosed}
               onChange={(e)=>
@@ -50,18 +47,11 @@ export default function PCOSForm({
               <Radio value="no">No</Radio>
               <Radio value="unsure">Not Sure</Radio>
             </Radio.Group>
-          </Col>
+          </Field>
 
-          <Col xs={24} md={12}>
-            <Text>Diagnosis Date</Text>
-
+          <Field label="Diagnosis Date">
             <DatePicker
-              className="w-full"
-              value={
-                goalData.diagnosisDate
-                  ? dayjs(goalData.diagnosisDate)
-                  : null
-              }
+              value={goalData.diagnosisDate}
               onChange={(date)=>
                 updateGoalData(
                   "diagnosisDate",
@@ -69,34 +59,34 @@ export default function PCOSForm({
                 )
               }
             />
-          </Col>
+          </Field>
 
-          <Col span={24}>
-            <Text>Current Medication</Text>
+          <div className="md:col-span-2">
+            <Field label="Current Medication">
+              <Input
+                value={goalData.medication}
+                onChange={(e)=>
+                  updateGoalData(
+                    "medication",
+                    e.target.value
+                  )
+                }
+                placeholder="Metformin, Inositol, etc."
+              />
+            </Field>
+          </div>
 
-            <Input
-              value={goalData.medication}
-              onChange={(e)=>
-                updateGoalData(
-                  "medication",
-                  e.target.value
-                )
-              }
-              placeholder="Metformin, Inositol, etc."
-            />
-          </Col>
-
-        </Row>
+        </div>
 
       </Card>
 
       {/* Symptoms */}
 
-      <Card className="bg-white/5 border-white/10">
+      <Card className="bg-surface border border-border">
 
-        <Title level={4}>
+        <H4 className="mb-5">
           Symptoms
-        </Title>
+        </H4>
 
         <Checkbox.Group
           className="flex flex-col gap-3"
@@ -120,19 +110,16 @@ export default function PCOSForm({
 
       {/* Menstrual Cycle */}
 
-      <Card className="bg-white/5 border-white/10">
+      <Card className="bg-surface border border-border">
 
-        <Title level={4}>
+        <H4 className="mb-5">
           Menstrual Cycle
-        </Title>
+        </H4>
 
-        <Row gutter={[20,20]}>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 
-          <Col xs={24} md={12}>
-            <Text>Cycle Regularity</Text>
-
+          <Field label="Cycle Regularity">
             <Select
-              className="w-full"
               value={goalData.cycle}
               onChange={(value)=>
                 updateGoalData("cycle", value)
@@ -152,18 +139,11 @@ export default function PCOSForm({
                 }
               ]}
             />
-          </Col>
+          </Field>
 
-          <Col xs={24} md={12}>
-            <Text>Last Period</Text>
-
+          <Field label="Last Period">
             <DatePicker
-              className="w-full"
-              value={
-                goalData.lastPeriod
-                  ? dayjs(goalData.lastPeriod)
-                  : null
-              }
+              value={goalData.lastPeriod}
               onChange={(date)=>
                 updateGoalData(
                   "lastPeriod",
@@ -171,28 +151,23 @@ export default function PCOSForm({
                 )
               }
             />
-          </Col>
+          </Field>
 
-        </Row>
+        </div>
 
       </Card>
 
       {/* Lifestyle */}
 
-      <Card className="bg-white/5 border-white/10">
+      <Card className="bg-surface border border-border">
 
-        <Title level={4}>
+        <H4 className="mb-5">
           Lifestyle
-        </Title>
+        </H4>
 
-        <Row gutter={[20,20]}>
+        <div className="grid grid-cols-1 gap-5">
 
-          <Col span={24}>
-
-            <Text>
-              Exercise Days / Week
-            </Text>
-
+          <Field label="Exercise Days / Week">
             <Slider
               min={0}
               max={7}
@@ -201,15 +176,9 @@ export default function PCOSForm({
                 updateGoalData("exercise", value)
               }
             />
+          </Field>
 
-          </Col>
-
-          <Col span={24}>
-
-            <Text>
-              Sleep (Hours)
-            </Text>
-
+          <Field label="Sleep (Hours)">
             <Slider
               min={3}
               max={12}
@@ -218,15 +187,9 @@ export default function PCOSForm({
                 updateGoalData("sleep", value)
               }
             />
+          </Field>
 
-          </Col>
-
-          <Col span={24}>
-
-            <Text>
-              Stress Level
-            </Text>
-
+          <Field label="Stress Level">
             <Slider
               min={1}
               max={10}
@@ -235,20 +198,19 @@ export default function PCOSForm({
                 updateGoalData("stress", value)
               }
             />
+          </Field>
 
-          </Col>
-
-        </Row>
+        </div>
 
       </Card>
 
       {/* Goals */}
 
-      <Card className="bg-white/5 border-white/10">
+      <Card className="bg-surface border border-border">
 
-        <Title level={4}>
+        <H4 className="mb-5">
           Consultation Goals
-        </Title>
+        </H4>
 
         <Checkbox.Group
           className="flex flex-col gap-3"
@@ -269,15 +231,15 @@ export default function PCOSForm({
 
       {/* Notes */}
 
-      <Card className="bg-white/5 border-white/10">
+      <Card className="bg-surface border border-border">
 
-        <Title level={4}>
+        <H4 className="mb-5">
           Additional Notes
-        </Title>
+        </H4>
 
         <TextArea
           rows={5}
-          value={goalData.notes}
+          value={goalData.notes || ''}
           onChange={(e)=>
             updateGoalData(
               "notes",

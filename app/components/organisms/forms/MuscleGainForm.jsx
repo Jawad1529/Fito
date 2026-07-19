@@ -1,19 +1,19 @@
 'use client';
 
-import {
-  Card,
-  Typography,
-  Row,
-  Col,
-  Select,
-  Slider,
-  Input,
-  InputNumber,
-  Radio,
-} from 'antd';
+import Card from '../../atoms/Card';
+import { H4 } from '../../atoms/Typography';
+import InputNumber from '../../atoms/InputNumber';
+import Select from '../../atoms/Select';
+import Slider from '../../atoms/Slider';
+import Radio from '../../atoms/Radio';
+import TextArea from '../../atoms/TextArea';
 
-const { Title, Text } = Typography;
-const { TextArea } = Input;
+const Field = ({ label, children }) => (
+  <div className="flex flex-col gap-2">
+    <label className="text-sm text-text-secondary font-medium">{label}</label>
+    {children}
+  </div>
+);
 
 export default function MuscleGainForm({
   formData,
@@ -22,30 +22,24 @@ export default function MuscleGainForm({
   const goalData = formData.goalData || {};
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6!">
 
       {/* Goal */}
-      <Card className="bg-white/5 border-white/10">
-        <Title level={4}>Muscle Building Goal</Title>
+      <Card className="bg-surface border border-border">
+        <H4 className="mb-5">Muscle Building Goal</H4>
 
-        <Row gutter={[20, 20]}>
-          <Col xs={24} md={12}>
-            <Text>Target Weight (kg)</Text>
-
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <Field label="Target Weight (kg)">
             <InputNumber
-              className="w-full"
               value={goalData.targetWeight}
               onChange={(value) =>
                 updateGoalData("targetWeight", value)
               }
             />
-          </Col>
+          </Field>
 
-          <Col xs={24} md={12}>
-            <Text>Primary Goal</Text>
-
+          <Field label="Primary Goal">
             <Radio.Group
-              className="w-full"
               value={goalData.primaryGoal}
               onChange={(e) =>
                 updateGoalData("primaryGoal", e.target.value)
@@ -55,21 +49,18 @@ export default function MuscleGainForm({
               <Radio value="strength">Strength</Radio>
               <Radio value="bulk">Bulk Up</Radio>
             </Radio.Group>
-          </Col>
-        </Row>
+          </Field>
+        </div>
       </Card>
 
       {/* Training */}
-      <Card className="bg-white/5 border-white/10">
-        <Title level={4}>Training</Title>
+      <Card className="bg-surface border border-border">
+        <H4 className="mb-5">Training</H4>
 
-        <Row gutter={[20,20]}>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 
-          <Col xs={24} md={12}>
-            <Text>Training Experience</Text>
-
+          <Field label="Training Experience">
             <Select
-              className="w-full"
               value={goalData.trainingExperience}
               onChange={(value)=>
                 updateGoalData("trainingExperience", value)
@@ -80,11 +71,9 @@ export default function MuscleGainForm({
                 { label: "Advanced", value: "advanced" },
               ]}
             />
-          </Col>
+          </Field>
 
-          <Col xs={24} md={12}>
-            <Text>Workout Days / Week</Text>
-
+          <Field label="Workout Days / Week">
             <Slider
               min={1}
               max={7}
@@ -93,40 +82,36 @@ export default function MuscleGainForm({
                 updateGoalData("workoutDays", value)
               }
             />
-          </Col>
+          </Field>
 
-          <Col span={24}>
-            <Text>Do you have gym access?</Text>
+          <div className="md:col-span-2">
+            <Field label="Do you have gym access?">
+              <Select
+                value={goalData.gymAccess}
+                onChange={(value)=>
+                  updateGoalData("gymAccess", value)
+                }
+                options={[
+                  { label: "Yes", value: "yes" },
+                  { label: "No", value: "no" },
+                  { label: "Home Gym", value: "home" },
+                ]}
+              />
+            </Field>
+          </div>
 
-            <Select
-              className="w-full"
-              value={goalData.gymAccess}
-              onChange={(value)=>
-                updateGoalData("gymAccess", value)
-              }
-              options={[
-                { label: "Yes", value: "yes" },
-                { label: "No", value: "no" },
-                { label: "Home Gym", value: "home" },
-              ]}
-            />
-          </Col>
-
-        </Row>
+        </div>
       </Card>
 
       {/* Nutrition */}
-      <Card className="bg-white/5 border-white/10">
+      <Card className="bg-surface border border-border">
 
-        <Title level={4}>Nutrition</Title>
+        <H4 className="mb-5">Nutrition</H4>
 
-        <Row gutter={[20,20]}>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 
-          <Col xs={24} md={12}>
-            <Text>Meals Per Day</Text>
-
+          <Field label="Meals Per Day">
             <Select
-              className="w-full"
               value={goalData.mealsPerDay}
               onChange={(value)=>
                 updateGoalData("mealsPerDay", value)
@@ -138,48 +123,43 @@ export default function MuscleGainForm({
                 { label: "5+", value: 5 },
               ]}
             />
-          </Col>
+          </Field>
 
-          <Col xs={24} md={12}>
-            <Text>Protein Intake (g/day)</Text>
-
+          <Field label="Protein Intake (g/day)">
             <InputNumber
-              className="w-full"
               value={goalData.protein}
               onChange={(value)=>
                 updateGoalData("protein", value)
               }
             />
-          </Col>
+          </Field>
 
-          <Col span={24}>
-            <Text>Water Intake (Litres)</Text>
+          <div className="md:col-span-2">
+            <Field label="Water Intake (Litres)">
+              <Slider
+                min={1}
+                max={6}
+                step={0.5}
+                value={goalData.water}
+                onChange={(value)=>
+                  updateGoalData("water", value)
+                }
+              />
+            </Field>
+          </div>
 
-            <Slider
-              min={1}
-              max={6}
-              step={0.5}
-              value={goalData.water}
-              onChange={(value)=>
-                updateGoalData("water", value)
-              }
-            />
-          </Col>
-
-        </Row>
+        </div>
 
       </Card>
 
       {/* Recovery */}
-      <Card className="bg-white/5 border-white/10">
+      <Card className="bg-surface border border-border">
 
-        <Title level={4}>Recovery</Title>
+        <H4 className="mb-5">Recovery</H4>
 
-        <Row gutter={[20,20]}>
+        <div className="grid grid-cols-1 gap-5">
 
-          <Col span={24}>
-            <Text>Sleep (Hours)</Text>
-
+          <Field label="Sleep (Hours)">
             <Slider
               min={3}
               max={12}
@@ -188,14 +168,12 @@ export default function MuscleGainForm({
                 updateGoalData("sleep", value)
               }
             />
-          </Col>
+          </Field>
 
-          <Col span={24}>
-            <Text>Any Previous Injuries?</Text>
-
+          <Field label="Any Previous Injuries?">
             <TextArea
               rows={4}
-              value={goalData.injuries}
+              value={goalData.injuries || ''}
               onChange={(e)=>
                 updateGoalData(
                   "injuries",
@@ -204,9 +182,9 @@ export default function MuscleGainForm({
               }
               placeholder="Optional"
             />
-          </Col>
+          </Field>
 
-        </Row>
+        </div>
 
       </Card>
 

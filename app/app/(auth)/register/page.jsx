@@ -3,9 +3,14 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Form, Input, Button, Checkbox, Divider, message } from 'antd';
-import { UserOutlined, MailOutlined, LockOutlined, GoogleOutlined, FacebookOutlined } from '@ant-design/icons';
+import { Form, message } from 'antd';
+import { UserOutlined, MailOutlined, LockOutlined } from '@ant-design/icons';
 import { motion } from 'framer-motion';
+
+import Input from '@/components/atoms/Input';
+import Button from '@/components/atoms/Button';
+import Checkbox from '@/components/atoms/Checkbox';
+import Divider from '@/components/atoms/Divider';
 
 export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
@@ -40,14 +45,13 @@ export default function RegisterPage() {
         layout="vertical"
         onFinish={onFinish}
         autoComplete="off"
-        size="large"
         requiredMark={false}
       >
         <Form.Item
           name="name"
           rules={[{ required: true, message: 'Please enter your full name' }]}
         >
-          <Input prefix={<UserOutlined className="text-text-muted" />} placeholder="Full name" />
+          <Input icon={<UserOutlined />} placeholder="Full name" />
         </Form.Item>
 
         <Form.Item
@@ -57,7 +61,7 @@ export default function RegisterPage() {
             { type: 'email', message: 'Please enter a valid email' },
           ]}
         >
-          <Input prefix={<MailOutlined className="text-text-muted" />} placeholder="Email address" />
+          <Input icon={<MailOutlined />} placeholder="Email address" />
         </Form.Item>
 
         <Form.Item
@@ -67,7 +71,7 @@ export default function RegisterPage() {
             { min: 8, message: 'Password must be at least 8 characters' },
           ]}
         >
-          <Input.Password prefix={<LockOutlined className="text-text-muted" />} placeholder="Password" />
+          <Input type="password" icon={<LockOutlined />} placeholder="Password" />
         </Form.Item>
 
         <Form.Item
@@ -85,7 +89,7 @@ export default function RegisterPage() {
             }),
           ]}
         >
-          <Input.Password prefix={<LockOutlined className="text-text-muted" />} placeholder="Confirm password" />
+          <Input type="password" icon={<LockOutlined />} placeholder="Confirm password" />
         </Form.Item>
 
         <Form.Item
@@ -98,17 +102,17 @@ export default function RegisterPage() {
             },
           ]}
         >
-          <Checkbox className="text-text-secondary">
+          <Checkbox>
             I agree to the <Link href="/terms" className="text-primary hover:text-primary-hover">Terms of Service</Link> and{' '}
             <Link href="/privacy" className="text-primary hover:text-primary-hover">Privacy Policy</Link>
           </Checkbox>
         </Form.Item>
 
-        <Button type="primary" htmlType="submit" block loading={loading}>
+        <Button type="submit" size="lg" fullWidth loading={loading}>
           Create Account
         </Button>
 
-        <Divider className="border-border-light my-6">
+        <Divider className="my-6">
           <span className="text-text-muted text-sm">or sign up with</span>
         </Divider>
 

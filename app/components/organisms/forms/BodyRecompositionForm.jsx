@@ -1,19 +1,19 @@
 'use client';
 
-import {
-  Card,
-  Typography,
-  Row,
-  Col,
-  Select,
-  Slider,
-  InputNumber,
-  Input,
-  Checkbox,
-} from 'antd';
+import Card from '../../atoms/Card';
+import { H4 } from '../../atoms/Typography';
+import InputNumber from '../../atoms/InputNumber';
+import Select from '../../atoms/Select';
+import Slider from '../../atoms/Slider';
+import Checkbox from '../../atoms/Checkbox';
+import TextArea from '../../atoms/TextArea';
 
-const { Title, Text } = Typography;
-const { TextArea } = Input;
+const Field = ({ label, children }) => (
+  <div className="flex flex-col gap-2">
+    <label className="text-sm text-text-secondary font-medium">{label}</label>
+    {children}
+  </div>
+);
 
 export default function BodyRecompositionForm({
   formData,
@@ -22,30 +22,24 @@ export default function BodyRecompositionForm({
   const goalData = formData.goalData || {};
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6!">
 
       {/* Goals */}
-      <Card className="bg-white/5 border-white/10">
-        <Title level={4}>Body Goals</Title>
+      <Card className="bg-surface border border-border">
+        <H4 className="mb-5">Body Goals</H4>
 
-        <Row gutter={[20, 20]}>
-          <Col xs={24} md={12}>
-            <Text>Target Weight (kg)</Text>
-
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <Field label="Target Weight (kg)">
             <InputNumber
-              className="w-full"
               value={goalData.targetWeight}
               onChange={(value) =>
                 updateGoalData("targetWeight", value)
               }
             />
-          </Col>
+          </Field>
 
-          <Col xs={24} md={12}>
-            <Text>Estimated Body Fat % (Optional)</Text>
-
+          <Field label="Estimated Body Fat % (Optional)">
             <InputNumber
-              className="w-full"
               min={5}
               max={60}
               value={goalData.bodyFat}
@@ -53,31 +47,28 @@ export default function BodyRecompositionForm({
                 updateGoalData("bodyFat", value)
               }
             />
-          </Col>
+          </Field>
 
-          <Col span={24}>
-            <Text>Waist Circumference (cm)</Text>
-
-            <InputNumber
-              className="w-full"
-              value={goalData.waist}
-              onChange={(value) =>
-                updateGoalData("waist", value)
-              }
-            />
-          </Col>
-        </Row>
+          <div className="md:col-span-2">
+            <Field label="Waist Circumference (cm)">
+              <InputNumber
+                value={goalData.waist}
+                onChange={(value) =>
+                  updateGoalData("waist", value)
+                }
+              />
+            </Field>
+          </div>
+        </div>
       </Card>
 
       {/* Training */}
-      <Card className="bg-white/5 border-white/10">
-        <Title level={4}>Training</Title>
+      <Card className="bg-surface border border-border">
+        <H4 className="mb-5">Training</H4>
 
-        <Row gutter={[20, 20]}>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 
-          <Col xs={24} md={12}>
-            <Text>Workout Days / Week</Text>
-
+          <Field label="Workout Days / Week">
             <Slider
               min={1}
               max={7}
@@ -86,11 +77,9 @@ export default function BodyRecompositionForm({
                 updateGoalData("workoutDays", value)
               }
             />
-          </Col>
+          </Field>
 
-          <Col xs={24} md={12}>
-            <Text>Cardio Sessions / Week</Text>
-
+          <Field label="Cardio Sessions / Week">
             <Slider
               min={0}
               max={7}
@@ -99,39 +88,35 @@ export default function BodyRecompositionForm({
                 updateGoalData("cardioDays", value)
               }
             />
-          </Col>
+          </Field>
 
-          <Col span={24}>
-            <Text>Training Experience</Text>
+          <div className="md:col-span-2">
+            <Field label="Training Experience">
+              <Select
+                value={goalData.experience}
+                onChange={(value) =>
+                  updateGoalData("experience", value)
+                }
+                options={[
+                  { label: "Beginner", value: "beginner" },
+                  { label: "Intermediate", value: "intermediate" },
+                  { label: "Advanced", value: "advanced" },
+                ]}
+              />
+            </Field>
+          </div>
 
-            <Select
-              className="w-full"
-              value={goalData.experience}
-              onChange={(value) =>
-                updateGoalData("experience", value)
-              }
-              options={[
-                { label: "Beginner", value: "beginner" },
-                { label: "Intermediate", value: "intermediate" },
-                { label: "Advanced", value: "advanced" },
-              ]}
-            />
-          </Col>
-
-        </Row>
+        </div>
       </Card>
 
       {/* Nutrition */}
-      <Card className="bg-white/5 border-white/10">
-        <Title level={4}>Nutrition</Title>
+      <Card className="bg-surface border border-border">
+        <H4 className="mb-5">Nutrition</H4>
 
-        <Row gutter={[20, 20]}>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 
-          <Col xs={24} md={12}>
-            <Text>Meals Per Day</Text>
-
+          <Field label="Meals Per Day">
             <Select
-              className="w-full"
               value={goalData.meals}
               onChange={(value) =>
                 updateGoalData("meals", value)
@@ -143,51 +128,46 @@ export default function BodyRecompositionForm({
                 { label: "5+", value: 5 },
               ]}
             />
-          </Col>
+          </Field>
 
-          <Col xs={24} md={12}>
-            <Text>Protein Intake (g/day)</Text>
-
+          <Field label="Protein Intake (g/day)">
             <InputNumber
-              className="w-full"
               value={goalData.protein}
               onChange={(value) =>
                 updateGoalData("protein", value)
               }
             />
-          </Col>
+          </Field>
 
-          <Col span={24}>
-            <Text>Current Challenges</Text>
+          <div className="md:col-span-2">
+            <Field label="Current Challenges">
+              <Checkbox.Group
+                className="flex flex-col gap-3"
+                value={goalData.challenges}
+                onChange={(value) =>
+                  updateGoalData("challenges", value)
+                }
+                options={[
+                  "Hard to lose fat",
+                  "Hard to build muscle",
+                  "Inconsistent workouts",
+                  "Poor diet",
+                  "Lack of motivation",
+                ]}
+              />
+            </Field>
+          </div>
 
-            <Checkbox.Group
-              className="flex flex-col gap-3 mt-3"
-              value={goalData.challenges}
-              onChange={(value) =>
-                updateGoalData("challenges", value)
-              }
-              options={[
-                "Hard to lose fat",
-                "Hard to build muscle",
-                "Inconsistent workouts",
-                "Poor diet",
-                "Lack of motivation",
-              ]}
-            />
-          </Col>
-
-        </Row>
+        </div>
       </Card>
 
       {/* Lifestyle */}
-      <Card className="bg-white/5 border-white/10">
-        <Title level={4}>Lifestyle</Title>
+      <Card className="bg-surface border border-border">
+        <H4 className="mb-5">Lifestyle</H4>
 
-        <Row gutter={[20, 20]}>
+        <div className="grid grid-cols-1 gap-5">
 
-          <Col span={24}>
-            <Text>Sleep (Hours)</Text>
-
+          <Field label="Sleep (Hours)">
             <Slider
               min={3}
               max={12}
@@ -196,22 +176,20 @@ export default function BodyRecompositionForm({
                 updateGoalData("sleep", value)
               }
             />
-          </Col>
+          </Field>
 
-          <Col span={24}>
-            <Text>Additional Notes</Text>
-
+          <Field label="Additional Notes">
             <TextArea
               rows={4}
-              value={goalData.notes}
+              value={goalData.notes || ''}
               onChange={(e) =>
                 updateGoalData("notes", e.target.value)
               }
               placeholder="Anything you'd like us to know?"
             />
-          </Col>
+          </Field>
 
-        </Row>
+        </div>
       </Card>
 
     </div>

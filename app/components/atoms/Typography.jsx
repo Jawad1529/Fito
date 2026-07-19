@@ -22,6 +22,10 @@ export function H4({ children, className = '' }) {
   return <h4 className={`text-xl font-semibold text-text ${className}`}>{children}</h4>;
 }
 
+export function H5({ children, className = '' }) {
+  return <h5 className={`text-base font-semibold text-text ${className}`}>{children}</h5>;
+}
+
 export function Text({ children, className = '', muted = false }) {
   return <p className={`text-base ${muted ? 'text-text-muted' : 'text-text-secondary'} ${className}`}>{children}</p>;
 }

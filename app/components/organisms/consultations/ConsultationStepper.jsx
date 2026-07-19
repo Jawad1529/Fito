@@ -32,15 +32,17 @@ export default function ConsultationStepper({
 
               <div
                 className={`
-                  w-10 h-10 rounded-full
+                  w-8 h-8 sm:w-10 sm:h-10 rounded-full
                   flex items-center justify-center
+                  text-sm sm:text-base
                   border
+                  shrink-0
                   transition-all
 
                   ${
                     completed || active
-                    ? "bg-yellow-400 text-black border-yellow-400"
-                    : "bg-white/5 text-gray-400 border-white/20"
+                    ? "bg-primary text-text-inverse border-primary"
+                    : "bg-overlay text-text-muted border-border-light"
                   }
                 `}
               >
@@ -55,12 +57,12 @@ export default function ConsultationStepper({
               {index !== steps.length - 1 && (
                 <div
                   className={`
-                    h-[2px] flex-1 mx-2
+                    h-[2px] flex-1 mx-1.5 sm:mx-2
 
                     ${
                       index < currentStep
-                      ? "bg-yellow-400"
-                      : "bg-white/20"
+                      ? "bg-primary"
+                      : "bg-overlay-medium"
                     }
                   `}
                 />
@@ -73,14 +75,14 @@ export default function ConsultationStepper({
       </div>
 
 
-      <div className="flex justify-between mt-3">
+      <div className="hidden sm:flex justify-between mt-3">
 
         {steps.map((step)=>(
           <span
             key={step}
             className="
               text-xs
-              text-gray-400
+              text-text-muted
               text-center
               flex-1
             "
@@ -89,6 +91,15 @@ export default function ConsultationStepper({
           </span>
         ))}
 
+      </div>
+
+      <div className="sm:hidden mt-3 text-center">
+        <span className="text-xs font-medium text-primary">
+          {steps[currentStep]}
+        </span>
+        <span className="text-xs text-text-muted">
+          {" "}· Step {currentStep + 1} of {steps.length}
+        </span>
       </div>
 
     </div>

@@ -2,6 +2,7 @@ import FatLossForm from "../components/organisms/forms/FatLossForm";
 import MuscleGainForm from "../components/organisms/forms/MuscleGainForm";
 import BodyRecompositionForm from "../components/organisms/forms/BodyRecompositionForm";
 import PCOSForm from "../components/organisms/forms/PCOSForm";
+import MotherWellnessForm from "../components/organisms/forms/MotherWellnessForm";
 
 export const CONSULTATION_GOALS = [
   {
@@ -35,5 +36,13 @@ export const CONSULTATION_GOALS = [
     icon: "🌸",
     color: "#EC4899",
     component: PCOSForm,
+  },
+  {
+    id: "mother-wellness",
+    title: "Mother Wellness Program",
+    shortDescription: "Nutrition support for pregnancy, postpartum & breastfeeding.",
+    icon: "🤱",
+    color: "#8B5CF6",
+    component: MotherWellnessForm,
   },
 ];

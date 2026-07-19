@@ -1,19 +1,19 @@
 'use client';
 
-import {
-  Card,
-  Typography,
-  Row,
-  Col,
-  InputNumber,
-  Select,
-  Slider,
-  Checkbox,
-  Input,
-} from 'antd';
+import Card from '../../atoms/Card';
+import { H4 } from '../../atoms/Typography';
+import InputNumber from '../../atoms/InputNumber';
+import Select from '../../atoms/Select';
+import Slider from '../../atoms/Slider';
+import Checkbox from '../../atoms/Checkbox';
+import TextArea from '../../atoms/TextArea';
 
-const { Title, Text } = Typography;
-const { TextArea } = Input;
+const Field = ({ label, children }) => (
+  <div className="flex flex-col gap-2">
+    <label className="text-sm text-text-secondary font-medium">{label}</label>
+    {children}
+  </div>
+);
 
 export default function FatLossForm({
   formData,
@@ -23,69 +23,58 @@ export default function FatLossForm({
   const goalData = formData.goalData || {};
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6!">
 
       {/* Current Body */}
-      <Card className="bg-white/5 border-white/10">
+      <Card className="bg-surface border border-border">
 
-        <Title level={4}>Current Body</Title>
+        <H4 className="mb-5">Current Body</H4>
 
-        <Row gutter={[20,20]}>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 
-          <Col xs={24} md={12}>
-            <Text>Current Weight (kg)</Text>
-
+          <Field label="Current Weight (kg)">
             <InputNumber
-              className="w-full"
               value={goalData.currentWeight}
               onChange={(value)=>
                 updateGoalData("currentWeight", value)
               }
             />
-          </Col>
+          </Field>
 
-          <Col xs={24} md={12}>
-            <Text>Target Weight (kg)</Text>
-
+          <Field label="Target Weight (kg)">
             <InputNumber
-              className="w-full"
               value={goalData.targetWeight}
               onChange={(value)=>
                 updateGoalData("targetWeight", value)
               }
             />
-          </Col>
+          </Field>
 
-          <Col xs={24}>
-            <Text>Waist Size (cm)</Text>
+          <div className="md:col-span-2">
+            <Field label="Waist Size (cm)">
+              <InputNumber
+                value={goalData.waist}
+                onChange={(value)=>
+                  updateGoalData("waist", value)
+                }
+              />
+            </Field>
+          </div>
 
-            <InputNumber
-              className="w-full"
-              value={goalData.waist}
-              onChange={(value)=>
-                updateGoalData("waist", value)
-              }
-            />
-          </Col>
-
-        </Row>
+        </div>
 
       </Card>
 
       {/* Lifestyle */}
 
-      <Card className="bg-white/5 border-white/10">
+      <Card className="bg-surface border border-border">
 
-        <Title level={4}>Lifestyle</Title>
+        <H4 className="mb-5">Lifestyle</H4>
 
-        <Row gutter={[20,20]}>
+        <div className="grid grid-cols-1 gap-5">
 
-          <Col span={24}>
-
-            <Text>Daily Activity Level</Text>
-
+          <Field label="Daily Activity Level">
             <Select
-              className="w-full"
               value={goalData.activity}
               onChange={(value)=>
                 updateGoalData("activity", value)
@@ -109,15 +98,9 @@ export default function FatLossForm({
                 }
               ]}
             />
+          </Field>
 
-          </Col>
-
-          <Col span={24}>
-
-            <Text>
-              Sleep (Hours)
-            </Text>
-
+          <Field label="Sleep (Hours)">
             <Slider
               min={3}
               max={12}
@@ -126,15 +109,9 @@ export default function FatLossForm({
                 updateGoalData("sleep", value)
               }
             />
+          </Field>
 
-          </Col>
-
-          <Col span={24}>
-
-            <Text>
-              Water Intake (Litres)
-            </Text>
-
+          <Field label="Water Intake (Litres)">
             <Slider
               min={1}
               max={6}
@@ -144,29 +121,24 @@ export default function FatLossForm({
                 updateGoalData("water", value)
               }
             />
+          </Field>
 
-          </Col>
-
-        </Row>
+        </div>
 
       </Card>
 
       {/* Eating Habits */}
 
-      <Card className="bg-white/5 border-white/10">
+      <Card className="bg-surface border border-border">
 
-        <Title level={4}>
+        <H4 className="mb-5">
           Eating Habits
-        </Title>
+        </H4>
 
-        <Row gutter={[20,20]}>
+        <div className="grid grid-cols-1 gap-5">
 
-          <Col span={24}>
-
-            <Text>Meals Per Day</Text>
-
+          <Field label="Meals Per Day">
             <Select
-              className="w-full"
               value={goalData.meals}
               onChange={(value)=>
                 updateGoalData("meals", value)
@@ -178,15 +150,11 @@ export default function FatLossForm({
                 {label:"5+",value:5},
               ]}
             />
+          </Field>
 
-          </Col>
-
-          <Col span={24}>
-
-            <Text>Biggest Challenges</Text>
-
+          <Field label="Biggest Challenges">
             <Checkbox.Group
-              className="flex flex-col gap-3 mt-3"
+              className="flex flex-col gap-3"
               value={goalData.challenges}
               onChange={(value)=>
                 updateGoalData("challenges", value)
@@ -199,16 +167,12 @@ export default function FatLossForm({
                 "Frequent dining out",
               ]}
             />
+          </Field>
 
-          </Col>
-
-          <Col span={24}>
-
-            <Text>Previous Diets</Text>
-
+          <Field label="Previous Diets">
             <TextArea
               rows={4}
-              value={goalData.previousDiets}
+              value={goalData.previousDiets || ''}
               onChange={(e)=>
                 updateGoalData(
                   "previousDiets",
@@ -216,10 +180,9 @@ export default function FatLossForm({
                 )
               }
             />
+          </Field>
 
-          </Col>
-
-        </Row>
+        </div>
 
       </Card>
 

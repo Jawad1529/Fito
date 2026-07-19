@@ -1,5 +1,7 @@
 'use client';
 
+import { useRef, useEffect } from 'react';
+
 import useConsultation from '../../../hooks/useConsultation';
 import { CONSULTATION_GOALS } from '../../../utils/consultationConfig';
 
@@ -16,6 +18,9 @@ import ConsultationStepper from './ConsultationStepper';
 
 export default function ConsultationFlow() {
   const consultation = useConsultation();
+
+  const flowRef = useRef(null);
+  const isFirstRender = useRef(true);
 
   const {
     currentStep,
@@ -70,11 +75,31 @@ export default function ConsultationFlow() {
     <SuccessStep key="success" />,
   ];
 
-  const isLastStep = currentStep === steps.length - 1;
+  const isSuccessStep = currentStep === steps.length - 1;
+  // Payment is the last step with a Next/Submit button — Success is a
+  // read-only screen reached only after a successful submit.
+  const isFinalFormStep = currentStep === steps.length - 2;
+
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+
+    if (!flowRef.current) return;
+
+    const top =
+      flowRef.current.getBoundingClientRect().top +
+      window.scrollY -
+      96; // clear the fixed navbar
+
+    window.scrollTo({ top, behavior: 'smooth' });
+  }, [currentStep]);
 
   const handleNext = async () => {
-    if (isLastStep) {
-      await submitConsultation();
+    if (isFinalFormStep) {
+      const success = await submitConsultation();
+      if (success) next();
       return;
     }
 
@@ -82,21 +107,22 @@ export default function ConsultationFlow() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div ref={flowRef} className="max-w-4xl mx-auto">
 
       <ConsultationStepper
         currentStep={currentStep}
       />
 
-      <div className="mt-8 bg-white/5 border border-white/10 rounded-3xl p-8">
+      <div className="mt-8 bg-surface border border-border rounded-3xl p-5 sm:p-6 md:p-8">
 
         {steps[currentStep]}
 
       </div>
 
-      {currentStep !== steps.length - 1 && (
+      {!isSuccessStep && (
         <NavigationButtons
           currentStep={currentStep}
+          totalSteps={steps.length - 1}
           isSubmitting={isSubmitting}
           onNext={handleNext}
           onPrevious={previous}

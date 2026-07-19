@@ -1,18 +1,17 @@
 'use client';
 
-import {
-  Input,
-  Select,
-  DatePicker,
-  Slider,
-  Typography,
-  Row,
-  Col,
-} from 'antd';
+import Input from '../../atoms/Input';
+import Select from '../../atoms/Select';
+import DatePicker from '../../atoms/DatePicker';
+import Slider from '../../atoms/Slider';
+import { H3, H5, Text } from '../../atoms/Typography';
 
-import dayjs from 'dayjs';
-
-const { Title, Text } = Typography;
+const Field = ({ label, children }) => (
+  <div className="flex flex-col gap-2">
+    <label className="text-sm text-text-secondary font-medium">{label}</label>
+    {children}
+  </div>
+);
 
 export default function PersonalInfoStep({
   formData,
@@ -22,56 +21,43 @@ export default function PersonalInfoStep({
   return (
     <div>
 
-      <Title level={3} className="!text-white">
+      <H3 className="mb-2">
         Personal Information
-      </Title>
+      </H3>
 
-      <Text className="!text-gray-400 block mb-8">
+      <Text muted className="mb-8">
         Tell us a little about yourself.
       </Text>
 
-      <Row gutter={[20,20]}>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-        <Col xs={24} md={12}>
-          <Text className="text-gray-300">Full Name</Text>
-
+        <Field label="Full Name">
           <Input
             placeholder="John Doe"
             value={formData.fullName}
             onChange={(e)=>updateField("fullName",e.target.value)}
           />
-        </Col>
+        </Field>
 
-        <Col xs={24} md={12}>
-          <Text>Email</Text>
-
+        <Field label="Email">
           <Input
             placeholder="john@email.com"
             value={formData.email}
             onChange={(e)=>updateField("email",e.target.value)}
           />
-        </Col>
+        </Field>
 
-        <Col xs={24} md={12}>
-          <Text>Phone Number</Text>
-
+        <Field label="Phone Number">
           <Input
             placeholder="+92..."
             value={formData.phone}
             onChange={(e)=>updateField("phone",e.target.value)}
           />
-        </Col>
+        </Field>
 
-        <Col xs={24} md={12}>
-          <Text>Date of Birth</Text>
-
+        <Field label="Date of Birth">
           <DatePicker
-            className="w-full"
-            value={
-              formData.dob
-                ? dayjs(formData.dob)
-                : null
-            }
+            value={formData.dob}
             onChange={(date)=>
               updateField(
                 "dob",
@@ -79,13 +65,10 @@ export default function PersonalInfoStep({
               )
             }
           />
-        </Col>
+        </Field>
 
-        <Col xs={24} md={12}>
-          <Text>Gender</Text>
-
+        <Field label="Gender">
           <Select
-            className="w-full"
             value={formData.gender}
             onChange={(value)=>updateField("gender",value)}
             options={[
@@ -94,13 +77,10 @@ export default function PersonalInfoStep({
               {label:"Other",value:"other"},
             ]}
           />
-        </Col>
+        </Field>
 
-        <Col xs={24} md={12}>
-          <Text>Activity Level</Text>
-
+        <Field label="Activity Level">
           <Select
-            className="w-full"
             value={formData.activityLevel}
             onChange={(value)=>updateField("activityLevel",value)}
             options={[
@@ -122,61 +102,65 @@ export default function PersonalInfoStep({
               },
             ]}
           />
-        </Col>
+        </Field>
 
-      </Row>
+      </div>
 
       <div className="mt-10">
 
-        <Title level={5} className="!text-white">
+        <H5 className="mb-4">
           Height
-        </Title>
+        </H5>
 
-        <Slider
-          min={120}
-          max={220}
-          value={formData.height}
-          onChange={(value)=>updateField("height",value)}
-        />
+        <div className="flex flex-col gap-3">
+          <Slider
+            min={120}
+            max={220}
+            value={formData.height}
+            onChange={(value)=>updateField("height",value)}
+          />
 
-        <Input
-          type="number"
-          suffix="cm"
-          value={formData.height}
-          onChange={(e)=>
-            updateField(
-              "height",
-              Number(e.target.value)
-            )
-          }
-        />
+          <Input
+            type="number"
+            suffix="cm"
+            value={formData.height}
+            onChange={(e)=>
+              updateField(
+                "height",
+                Number(e.target.value)
+              )
+            }
+          />
+        </div>
 
       </div>
 
       <div className="mt-8">
 
-        <Title level={5} className="!text-white">
+        <H5 className="mb-4">
           Weight
-        </Title>
+        </H5>
 
-        <Slider
-          min={30}
-          max={200}
-          value={formData.weight}
-          onChange={(value)=>updateField("weight",value)}
-        />
+        <div className="flex flex-col gap-3">
+          <Slider
+            min={30}
+            max={200}
+            value={formData.weight}
+            onChange={(value)=>updateField("weight",value)}
+          />
 
-        <Input
-          type="number"
-          suffix="kg"
-          value={formData.weight}
-          onChange={(e)=>
-            updateField(
-              "weight",
-              Number(e.target.value)
-            )
-          }
-        />
+          <Input
+            type="number"
+            suffix="kg"
+            value={formData.weight}
+            onChange={(e)=>
+              updateField(
+                "weight",
+                Number(e.target.value)
+              )
+            }
+          />
+        </div>
 
       </div>
 

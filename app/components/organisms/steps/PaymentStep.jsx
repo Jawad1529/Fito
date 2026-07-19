@@ -1,19 +1,12 @@
 'use client';
 
-import {
-  Card,
-  Typography,
-  Upload,
-  Input,
-  Alert,
-} from 'antd';
+import { UploadOutlined, SafetyCertificateOutlined } from '@ant-design/icons';
 
-import {
-  UploadOutlined,
-  SafetyCertificateOutlined,
-} from '@ant-design/icons';
-
-const { Title, Paragraph, Text } = Typography;
+import Card from '../../atoms/Card';
+import { H3, H5, Text } from '../../atoms/Typography';
+import Alert from '../../atoms/Alert';
+import Input from '../../atoms/Input';
+import Upload from '../../atoms/Upload';
 
 export default function PaymentStep({
   formData,
@@ -21,79 +14,78 @@ export default function PaymentStep({
 }) {
   const uploads = formData.uploads || {};
 
-  const handlePaymentUpload = ({ fileList }) => {
+  const handlePaymentUpload = (files) => {
     updateField("uploads", {
       ...uploads,
-      paymentScreenshot: fileList,
+      paymentScreenshot: files,
     });
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6!">
 
       <div>
 
-        <Title level={3} className="!text-white">
+        <H3>
           Complete Your Payment
-        </Title>
+        </H3>
 
-        <Paragraph className="!text-gray-400">
+        <Text muted>
           Upload your payment proof to complete your consultation request.
-        </Paragraph>
+        </Text>
 
       </div>
 
       <Alert
         type="info"
-        showIcon
         icon={<SafetyCertificateOutlined />}
         message="Your payment is secure."
       />
 
-      <Card className="bg-white/5 border-white/10">
+      <Card className="bg-surface border border-border">
 
-        <Title level={5}>
+        <H5 className="mb-2">
           Consultation Fee
-        </Title>
+        </H5>
 
-        <div className="text-4xl font-bold text-yellow-400">
+        <div className="text-4xl font-bold text-primary">
           Rs. 2,500
         </div>
 
       </Card>
 
-      <Card className="bg-white/5 border-white/10">
+      <Card className="bg-surface border border-border">
 
-        <Title level={5}>
+        <H5 className="mb-3">
           Payment Details
-        </Title>
+        </H5>
 
         <div className="space-y-3">
 
           <div>
-            <Text>Bank Name</Text>
-            <div className="text-white font-medium">
+            <Text muted>Bank Name</Text>
+            <div className="text-text font-medium">
               Meezan Bank
             </div>
           </div>
 
           <div>
-            <Text>Account Title</Text>
-            <div className="text-white font-medium">
+            <Text muted>Account Title</Text>
+            <div className="text-text font-medium">
               Fito Nutrition
             </div>
           </div>
 
           <div>
-            <Text>Account Number</Text>
-            <div className="text-white font-medium">
+            <Text muted>Account Number</Text>
+            <div className="text-text font-medium">
               123456789012
             </div>
           </div>
 
           <div>
-            <Text>IBAN</Text>
-            <div className="text-white font-medium">
+            <Text muted>IBAN</Text>
+            <div className="text-text font-medium">
               PK00MEEZ000000000000000
             </div>
           </div>
@@ -102,11 +94,11 @@ export default function PaymentStep({
 
       </Card>
 
-      <Card className="bg-white/5 border-white/10">
+      <Card className="bg-surface border border-border">
 
-        <Title level={5}>
+        <H5 className="mb-3">
           Transaction ID (Optional)
-        </Title>
+        </H5>
 
         <Input
           placeholder="Enter transaction reference"
@@ -121,28 +113,18 @@ export default function PaymentStep({
 
       </Card>
 
-      <Card className="bg-white/5 border-white/10">
+      <Card className="bg-surface border border-border">
 
-        <Title level={5}>
+        <H5 className="mb-3">
           Upload Payment Screenshot
-        </Title>
+        </H5>
 
         <Upload
-          beforeUpload={() => false}
-          fileList={uploads.paymentScreenshot}
+          value={uploads.paymentScreenshot || []}
           onChange={handlePaymentUpload}
         >
-
-          <button className="px-5 py-3 rounded-xl border border-white/20 hover:bg-white/10 text-white">
-
-            <UploadOutlined />
-
-            <span className="ml-2">
-              Upload Screenshot
-            </span>
-
-          </button>
-
+          <UploadOutlined />
+          <span className="ml-2">Upload Screenshot</span>
         </Upload>
 
       </Card>

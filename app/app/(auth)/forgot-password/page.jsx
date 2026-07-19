@@ -2,9 +2,12 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Form, Input, Button, message } from 'antd';
+import { Form, message } from 'antd';
 import { MailOutlined } from '@ant-design/icons';
 import { motion } from 'framer-motion';
+
+import Input from '@/components/atoms/Input';
+import Button from '@/components/atoms/Button';
 
 export default function ForgotPasswordPage() {
   const [loading, setLoading] = useState(false);
@@ -55,7 +58,6 @@ export default function ForgotPasswordPage() {
           layout="vertical"
           onFinish={onFinish}
           autoComplete="off"
-          size="large"
           requiredMark={false}
         >
           <Form.Item
@@ -65,10 +67,10 @@ export default function ForgotPasswordPage() {
               { type: 'email', message: 'Please enter a valid email' },
             ]}
           >
-            <Input prefix={<MailOutlined className="text-text-muted" />} placeholder="Email address" />
+            <Input icon={<MailOutlined />} placeholder="Email address" />
           </Form.Item>
 
-          <Button type="primary" htmlType="submit" block loading={loading}>
+          <Button type="submit" size="lg" fullWidth loading={loading}>
             Send Reset Link
           </Button>
 

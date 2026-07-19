@@ -1,6 +1,6 @@
 'use client';
 
-import { Alert } from 'antd';
+import Alert from '../../atoms/Alert';
 
 export default function GoalSpecificStep({
   goal,
@@ -11,7 +11,6 @@ export default function GoalSpecificStep({
     return (
       <Alert
         type="warning"
-        showIcon
         message="Please select a consultation goal first."
       />
     );
