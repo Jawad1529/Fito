@@ -3,6 +3,7 @@
 import { usePathname } from 'next/navigation';
 import Navbar from '@/components/organisms/Navbar';
 import Footer from '@/components/organisms/Footer';
+import { CartProvider } from '@/context/CartContext';
 import Background from './Background';
 
 export default function MainLayout({ children }) {
@@ -11,19 +12,23 @@ export default function MainLayout({ children }) {
 
   if (isAuthRoute) {
     return (
-      <div className="min-h-screen flex flex-col bg-background text-text antialiased relative">
-        <Background />
-        <main className="flex-1">{children}</main>
-      </div>
+      <CartProvider>
+        <div className="min-h-screen flex flex-col bg-background text-text antialiased relative">
+          <Background />
+          <main className="flex-1">{children}</main>
+        </div>
+      </CartProvider>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-background text-text antialiased relative">
-      <Background />
-      <Navbar />
-      <main className="flex-1">{children}</main>
-      <Footer />
-    </div>
+    <CartProvider>
+      <div className="min-h-screen flex flex-col bg-background text-text antialiased relative">
+        <Background />
+        <Navbar />
+        <main className="flex-1">{children}</main>
+        <Footer />
+      </div>
+    </CartProvider>
   );
 }

@@ -3,11 +3,15 @@
 import { useParams } from 'next/navigation';
 import { useMemo, useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import Link from 'next/link';
 import { H2, H3, Text } from '../../../../components/atoms/Typography';
 import ImageGallery from '../../../../components/organisms/ImageGallery';
 import Button from '../../../../components/atoms/Button';
 import Icon from '../../../../components/atoms/Icon';
 import FeaturedProducts from '../../../../components/organisms/FeaturedProducts';
+import ReviewSection from '../../../../components/organisms/ReviewSection';
+import QuantitySelector from '../../../../components/molecules/QuantitySelector';
+import useCart from '../../../../hooks/useCart';
 import productsData from '../../../../data/products';
 import { notFound } from 'next/navigation';
 
@@ -27,21 +31,24 @@ export default function ProductDetailPage() {
     }
   }, [product]);
 
-  // Local state for wishlist/cart (can be replaced with global state)
+  // Local state for wishlist (not yet global — see useWishlist stub)
   const [isWishlisted, setIsWishlisted] = useState(false);
-  const [isInCart, setIsInCart] = useState(false);
+  const [quantity, setQuantity] = useState(1);
+  const { addToCart, isInCart } = useCart();
 
   // Prevent rendering until product is resolved (effect will throw 404 if null)
   if (!product) {
     return null; // or a loading spinner
   }
 
+  const inCart = isInCart(product.id);
+
   const handleToggleWishlist = () => {
     setIsWishlisted((prev) => !prev);
   };
 
   const handleAddToCart = () => {
-    setIsInCart(true);
+    if (!inCart) addToCart(product, quantity);
   };
 
   return (
@@ -90,16 +97,19 @@ export default function ProductDetailPage() {
               </Text>
             </div>
 
-            {/* Action Buttons */}
-            <div className="flex flex-wrap gap-4 mt-4">
+            {/* Quantity + Action Buttons */}
+            <div className="flex flex-wrap items-center gap-4 mt-4">
+              {!inCart && (
+                <QuantitySelector value={quantity} onChange={setQuantity} />
+              )}
               <Button
                 variant="primary"
                 size="lg"
                 onClick={handleAddToCart}
-                disabled={isInCart}
+                disabled={inCart}
                 className="flex-1 min-w-[150px]"
               >
-                {isInCart ? (
+                {inCart ? (
                   <>
                     <Icon name="check" className="w-5 h-5 mr-2" />
                     In Cart
@@ -126,6 +136,15 @@ export default function ProductDetailPage() {
               </Button>
             </div>
 
+            {inCart && (
+              <Link
+                href="/cart"
+                className="text-sm text-primary font-medium hover:text-primary-hover transition-colors -mt-2"
+              >
+                View cart →
+              </Link>
+            )}
+
             <div className="text-sm text-gray-400 mt-2">
               {product.stock > 0 ? (
                 <span className="text-green-400">In Stock</span>
@@ -135,6 +154,13 @@ export default function ProductDetailPage() {
             </div>
           </motion.div>
         </div>
+
+        {/* Reviews */}
+        <ReviewSection
+          productId={product.id}
+          rating={product.rating}
+          reviewCount={product.reviews || 0}
+        />
 
         {/* Recommended Products */}
         <motion.div

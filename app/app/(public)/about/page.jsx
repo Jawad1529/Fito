@@ -7,6 +7,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import Icon from '../../../components/atoms/Icon';
 import Tag from '../../../components/atoms/Tag';
+import owner1 from '@/assets/images/owner1.webp';
+import owner2 from '@/assets/images/owner2.webp';
 
 // Swap these for real photography/assets when available.
 const coachingImage =
@@ -15,15 +17,15 @@ const labImage =
   'https://i.ebayimg.com/images/g/i14AAOSwH9lnAFas/s-l1200.jpg';
 const teamMembers = [
   {
-    name: 'Founder One',
+    name: 'Muhammad Umer',
     title: 'Co-Founder & Head Coach',
-    image: 'https://images.squarespace-cdn.com/content/v1/5fbb9f4023132a4ab82151f6/0631ad68-a508-4903-aeab-b5303d8d0486/DSC06724-min.jpg',
+    image: owner1,
     credentials: ['CISSN Certified', '10+ Yrs Coaching'],
   },
   {
-    name: 'Founder Two',
+    name: 'Abdul Basit',
     title: 'Co-Founder & Operations',
-    image: 'https://images.squarespace-cdn.com/content/v1/5fbb9f4023132a4ab82151f6/0631ad68-a508-4903-aeab-b5303d8d0486/DSC06724-min.jpg',
+    image: owner2,
     credentials: ['MBA', 'Supply Chain'],
   },
   {

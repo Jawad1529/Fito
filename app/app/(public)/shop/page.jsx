@@ -13,7 +13,6 @@ export default function ShopPage() {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [sortBy, setSortBy] = useState('default');
   const [wishlist, setWishlist] = useState([]);
-  const [cartItems, setCartItems] = useState([]);
 
   // Extract unique categories
   const categories = useMemo(() => {
@@ -63,11 +62,6 @@ export default function ShopPage() {
     setWishlist((prev) =>
       prev.includes(productId) ? prev.filter((id) => id !== productId) : [...prev, productId]
     );
-  };
-
-  const addToCart = (productId) => {
-    setCartItems((prev) => [...prev, productId]);
-    console.log('Added to cart:', productId);
   };
 
   const clearFilters = () => {
@@ -189,9 +183,7 @@ export default function ShopPage() {
                 product={product}
                 index={index}
                 isWishlisted={wishlist.includes(product.id)}
-                isInCart={cartItems.includes(product.id)}
                 onToggleWishlist={toggleWishlist}
-                onAddToCart={addToCart}
               />
             ))}
           </div>

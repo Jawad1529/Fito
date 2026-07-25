@@ -6,11 +6,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Icon from '../atoms/Icon';
 import Button from '../atoms/Button';
 import Badge from '../atoms/Badge';
+import useCart from '../../hooks/useCart';
 
 const navLinks = [
   { label: 'Home', href: '/' },
   { label: 'Shop', href: '/shop' },
-  { label: 'Categories', href: '/categories' },
   { label: 'Consultation', href: '/consultation' },
   { label: 'Blog', href: '/blog' },
   { label: 'About', href: '/about' },
@@ -20,6 +20,7 @@ const navLinks = [
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { totalItems } = useCart();
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
@@ -80,10 +81,10 @@ export default function Navbar() {
                   <Icon name="bell" className="w-5 h-5" />
                 </button>
               </Badge>
-              <Badge count={2}>
-                <button aria-label="Cart" className="text-text-secondary hover:text-text transition-colors">
+              <Badge count={totalItems}>
+                <Link href="/cart" aria-label="Cart" className="text-text-secondary hover:text-text transition-colors">
                   <Icon name="cart" className="w-5 h-5" />
-                </button>
+                </Link>
               </Badge>
               <Link href="/login">
                 <Button variant="primary" icon={<Icon name="login" className="w-4 h-4" />}>
@@ -150,10 +151,15 @@ export default function Navbar() {
                       <Icon name="bell" className="w-5 h-5" />
                     </button>
                   </Badge>
-                  <Badge count={2}>
-                    <button aria-label="Cart" className="text-text-secondary hover:text-text">
+                  <Badge count={totalItems}>
+                    <Link
+                      href="/cart"
+                      aria-label="Cart"
+                      onClick={() => setMobileOpen(false)}
+                      className="text-text-secondary hover:text-text"
+                    >
                       <Icon name="cart" className="w-5 h-5" />
-                    </button>
+                    </Link>
                   </Badge>
                 </div>
 

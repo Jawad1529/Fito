@@ -30,13 +30,13 @@ export default function MotherWellnessForm({
       <Card className="bg-surface border border-border">
 
         <H4 className="mb-5">
-          Motherhood Stage
+          Motherhood Stage (ماں بننے کا مرحلہ)
         </H4>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 
           <div className="md:col-span-2">
-            <Field label="Which stage best describes you?">
+            <Field label="Which stage best describes you? (کون سا مرحلہ آپ سے مطابقت رکھتا ہے؟)">
               <Radio.Group
                 value={goalData.stage}
                 onChange={(e) =>
@@ -50,7 +50,7 @@ export default function MotherWellnessForm({
             </Field>
           </div>
 
-          <Field label="Due Date / Delivery Date">
+          <Field label="Due Date / Delivery Date (متوقع تاریخ / پیدائش کی تاریخ)">
             <DatePicker
               value={goalData.stageDate}
               onChange={(date) =>
@@ -62,7 +62,7 @@ export default function MotherWellnessForm({
             />
           </Field>
 
-          <Field label="Number of Children">
+          <Field label="Number of Children (بچوں کی تعداد)">
             <Select
               value={goalData.numChildren}
               onChange={(value) =>
@@ -78,7 +78,7 @@ export default function MotherWellnessForm({
           </Field>
 
           <div className="md:col-span-2">
-            <Field label="Delivery Type (if applicable)">
+            <Field label="Delivery Type (if applicable) (پیدائش کی قسم)">
               <Select
                 value={goalData.deliveryType}
                 onChange={(value) =>
@@ -101,12 +101,12 @@ export default function MotherWellnessForm({
       <Card className="bg-surface border border-border">
 
         <H4 className="mb-5">
-          Health &amp; Medical
+          Health &amp; Medical (صحت اور طبی معلومات)
         </H4>
 
         <div className="grid grid-cols-1 gap-5">
 
-          <Field label="Breastfeeding Status">
+          <Field label="Breastfeeding Status (دودھ پلانے کی صورتحال)">
             <Radio.Group
               value={goalData.breastfeeding}
               onChange={(e) =>
@@ -120,7 +120,7 @@ export default function MotherWellnessForm({
             </Radio.Group>
           </Field>
 
-          <Field label="Existing Conditions">
+          <Field label="Existing Conditions (موجودہ طبی حالات)">
             <Checkbox.Group
               className="flex flex-col gap-3"
               value={goalData.conditions}
@@ -137,7 +137,7 @@ export default function MotherWellnessForm({
             />
           </Field>
 
-          <Field label="Current Medications / Supplements">
+          <Field label="Current Medications / Supplements (موجودہ ادویات / سپلیمنٹس)">
             <Input
               value={goalData.medications}
               onChange={(e) =>
@@ -158,12 +158,12 @@ export default function MotherWellnessForm({
       <Card className="bg-surface border border-border">
 
         <H4 className="mb-5">
-          Nutrition &amp; Lifestyle
+          Nutrition &amp; Lifestyle (غذائیت اور طرز زندگی)
         </H4>
 
         <div className="grid grid-cols-1 gap-5">
 
-          <Field label="Meals Per Day">
+          <Field label="Meals Per Day (روزانہ کھانوں کی تعداد)">
             <Select
               value={goalData.meals}
               onChange={(value) =>
@@ -178,7 +178,7 @@ export default function MotherWellnessForm({
             />
           </Field>
 
-          <Field label="Water Intake (Litres)">
+          <Field label="Water Intake (Litres) (پانی کی مقدار)">
             <Slider
               min={1}
               max={6}
@@ -190,7 +190,7 @@ export default function MotherWellnessForm({
             />
           </Field>
 
-          <Field label="Sleep (Hours)">
+          <Field label="Sleep (Hours) (نیند کے گھنٹے)">
             <Slider
               min={2}
               max={12}
@@ -201,7 +201,7 @@ export default function MotherWellnessForm({
             />
           </Field>
 
-          <Field label="Current Energy Level">
+          <Field label="Current Energy Level (توانائی کی موجودہ سطح)">
             <Slider
               min={1}
               max={10}
@@ -220,7 +220,7 @@ export default function MotherWellnessForm({
       <Card className="bg-surface border border-border">
 
         <H4 className="mb-5">
-          Consultation Goals
+          Consultation Goals (مشاورت کے اہداف)
         </H4>
 
         <Checkbox.Group
@@ -245,7 +245,7 @@ export default function MotherWellnessForm({
       <Card className="bg-surface border border-border">
 
         <H4 className="mb-5">
-          Additional Notes
+          Additional Notes (اضافی نوٹس)
         </H4>
 
         <TextArea

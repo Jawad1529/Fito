@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import ConsultationFlow from '@/components/organisms/consultations/ConsultationFlow';
 import FeaturedProducts from '../../../components/organisms/FeaturedProducts';
 
@@ -10,7 +11,9 @@ export default function ConsultationPage() {
           Get a custom diet and supplement plan tailored to your goals – guided by our expert nutritionists.
         </p>
       </div>
-      <ConsultationFlow />
+      <Suspense fallback={null}>
+        <ConsultationFlow />
+      </Suspense>
       <div className="mt-20">
         <FeaturedProducts />
       </div>

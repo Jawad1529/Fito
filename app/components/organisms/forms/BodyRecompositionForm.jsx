@@ -26,10 +26,10 @@ export default function BodyRecompositionForm({
 
       {/* Goals */}
       <Card className="bg-surface border border-border">
-        <H4 className="mb-5">Body Goals</H4>
+        <H4 className="mb-5">Body Goals (جسمانی اہداف)</H4>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <Field label="Target Weight (kg)">
+          <Field label="Target Weight (kg) (ہدف وزن)">
             <InputNumber
               value={goalData.targetWeight}
               onChange={(value) =>
@@ -38,7 +38,7 @@ export default function BodyRecompositionForm({
             />
           </Field>
 
-          <Field label="Estimated Body Fat % (Optional)">
+          <Field label="Estimated Body Fat % (Optional) (تخمینی جسمانی چربی)">
             <InputNumber
               min={5}
               max={60}
@@ -50,7 +50,7 @@ export default function BodyRecompositionForm({
           </Field>
 
           <div className="md:col-span-2">
-            <Field label="Waist Circumference (cm)">
+            <Field label="Waist Circumference (cm) (کمر کا طواف)">
               <InputNumber
                 value={goalData.waist}
                 onChange={(value) =>
@@ -64,11 +64,11 @@ export default function BodyRecompositionForm({
 
       {/* Training */}
       <Card className="bg-surface border border-border">
-        <H4 className="mb-5">Training</H4>
+        <H4 className="mb-5">Training (تربیت)</H4>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 
-          <Field label="Workout Days / Week">
+          <Field label="Workout Days / Week (ورزش کے دن / ہفتہ)">
             <Slider
               min={1}
               max={7}
@@ -79,7 +79,7 @@ export default function BodyRecompositionForm({
             />
           </Field>
 
-          <Field label="Cardio Sessions / Week">
+          <Field label="Cardio Sessions / Week (کارڈیو سیشنز / ہفتہ)">
             <Slider
               min={0}
               max={7}
@@ -91,7 +91,7 @@ export default function BodyRecompositionForm({
           </Field>
 
           <div className="md:col-span-2">
-            <Field label="Training Experience">
+            <Field label="Training Experience (تربیتی تجربہ)">
               <Select
                 value={goalData.experience}
                 onChange={(value) =>
@@ -111,11 +111,11 @@ export default function BodyRecompositionForm({
 
       {/* Nutrition */}
       <Card className="bg-surface border border-border">
-        <H4 className="mb-5">Nutrition</H4>
+        <H4 className="mb-5">Nutrition (غذائیت)</H4>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 
-          <Field label="Meals Per Day">
+          <Field label="Meals Per Day (روزانہ کھانوں کی تعداد)">
             <Select
               value={goalData.meals}
               onChange={(value) =>
@@ -130,7 +130,7 @@ export default function BodyRecompositionForm({
             />
           </Field>
 
-          <Field label="Protein Intake (g/day)">
+          <Field label="Protein Intake (g/day) (پروٹین کی مقدار)">
             <InputNumber
               value={goalData.protein}
               onChange={(value) =>
@@ -140,7 +140,7 @@ export default function BodyRecompositionForm({
           </Field>
 
           <div className="md:col-span-2">
-            <Field label="Current Challenges">
+            <Field label="Current Challenges (موجودہ چیلنجز)">
               <Checkbox.Group
                 className="flex flex-col gap-3"
                 value={goalData.challenges}
@@ -163,11 +163,11 @@ export default function BodyRecompositionForm({
 
       {/* Lifestyle */}
       <Card className="bg-surface border border-border">
-        <H4 className="mb-5">Lifestyle</H4>
+        <H4 className="mb-5">Lifestyle (طرز زندگی)</H4>
 
         <div className="grid grid-cols-1 gap-5">
 
-          <Field label="Sleep (Hours)">
+          <Field label="Sleep (Hours) (نیند کے گھنٹے)">
             <Slider
               min={3}
               max={12}
@@ -178,7 +178,7 @@ export default function BodyRecompositionForm({
             />
           </Field>
 
-          <Field label="Additional Notes">
+          <Field label="Additional Notes (اضافی نوٹس)">
             <TextArea
               rows={4}
               value={goalData.notes || ''}

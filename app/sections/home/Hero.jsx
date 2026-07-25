@@ -8,7 +8,8 @@ import Link from 'next/link';
 import Button from '../../components/atoms/Button';
 import Icon from '../../components/atoms/Icon';
 import Tag from '../../components/atoms/Tag';
-import fatLoss from '../../assets/images/fat-loss.png'; // consultation / coaching panel
+import fatLoss from '../../assets/images/fat-loss.png';
+import heroImage from "@assets/images/hero.png";
 
 // Replace with a real product shot when available.
 const supplementImage =
@@ -264,14 +265,14 @@ export default function Hero() {
               animate={isInView ? { opacity: 1, x: 0 } : {}}
               transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1], delay: 0.35 }}
               style={glowShadow}
-              className="relative aspect-[4/3] w-[86%] ml-auto rounded-[28px] overflow-hidden ring-1 ring-border-light"
+              className="relative aspect-[4/3] w-[86%] ml-auto rounded-[28px] overflow-hidden ring-1 ring-border-light bg-black"
             >
               <Image
-                src={coachingImage}
+                src={heroImage}
                 alt="Certified nutrition coach reviewing a personalized plan with a client"
                 fill
                 unoptimized
-                className="object-cover"
+                className="object-contain"
                 priority
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-black/10" />

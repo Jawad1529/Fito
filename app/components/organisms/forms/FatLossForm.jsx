@@ -28,11 +28,11 @@ export default function FatLossForm({
       {/* Current Body */}
       <Card className="bg-surface border border-border">
 
-        <H4 className="mb-5">Current Body</H4>
+        <H4 className="mb-5">Current Body (موجودہ جسم)</H4>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 
-          <Field label="Current Weight (kg)">
+          <Field label="Current Weight (kg) (موجودہ وزن)">
             <InputNumber
               value={goalData.currentWeight}
               onChange={(value)=>
@@ -41,7 +41,7 @@ export default function FatLossForm({
             />
           </Field>
 
-          <Field label="Target Weight (kg)">
+          <Field label="Target Weight (kg) (ہدف وزن)">
             <InputNumber
               value={goalData.targetWeight}
               onChange={(value)=>
@@ -51,7 +51,7 @@ export default function FatLossForm({
           </Field>
 
           <div className="md:col-span-2">
-            <Field label="Waist Size (cm)">
+            <Field label="Waist Size (cm) (کمر کا سائز)">
               <InputNumber
                 value={goalData.waist}
                 onChange={(value)=>
@@ -69,11 +69,11 @@ export default function FatLossForm({
 
       <Card className="bg-surface border border-border">
 
-        <H4 className="mb-5">Lifestyle</H4>
+        <H4 className="mb-5">Lifestyle (طرز زندگی)</H4>
 
         <div className="grid grid-cols-1 gap-5">
 
-          <Field label="Daily Activity Level">
+          <Field label="Daily Activity Level (روزانہ سرگرمی کی سطح)">
             <Select
               value={goalData.activity}
               onChange={(value)=>
@@ -100,7 +100,7 @@ export default function FatLossForm({
             />
           </Field>
 
-          <Field label="Sleep (Hours)">
+          <Field label="Sleep (Hours) (نیند کے گھنٹے)">
             <Slider
               min={3}
               max={12}
@@ -111,7 +111,7 @@ export default function FatLossForm({
             />
           </Field>
 
-          <Field label="Water Intake (Litres)">
+          <Field label="Water Intake (Litres) (پانی کی مقدار)">
             <Slider
               min={1}
               max={6}
@@ -132,12 +132,12 @@ export default function FatLossForm({
       <Card className="bg-surface border border-border">
 
         <H4 className="mb-5">
-          Eating Habits
+          Eating Habits (کھانے کی عادات)
         </H4>
 
         <div className="grid grid-cols-1 gap-5">
 
-          <Field label="Meals Per Day">
+          <Field label="Meals Per Day (روزانہ کھانوں کی تعداد)">
             <Select
               value={goalData.meals}
               onChange={(value)=>
@@ -152,7 +152,7 @@ export default function FatLossForm({
             />
           </Field>
 
-          <Field label="Biggest Challenges">
+          <Field label="Biggest Challenges (سب سے بڑے چیلنجز)">
             <Checkbox.Group
               className="flex flex-col gap-3"
               value={goalData.challenges}
@@ -169,7 +169,7 @@ export default function FatLossForm({
             />
           </Field>
 
-          <Field label="Previous Diets">
+          <Field label="Previous Diets (پچھلی ڈائٹس)">
             <TextArea
               rows={4}
               value={goalData.previousDiets || ''}

@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 
 import useConsultation from '../../../hooks/useConsultation';
 import { CONSULTATION_GOALS } from '../../../utils/consultationConfig';
@@ -17,7 +18,13 @@ import ConsultationStepper from './ConsultationStepper';
  import NavigationButtons from './NavigationButtons';
 
 export default function ConsultationFlow() {
-  const consultation = useConsultation();
+  const searchParams = useSearchParams();
+  const goalParam = searchParams.get('goal');
+  const initialGoal = CONSULTATION_GOALS.some((goal) => goal.id === goalParam)
+    ? goalParam
+    : null;
+
+  const consultation = useConsultation(initialGoal);
 
   const flowRef = useRef(null);
   const isFirstRender = useRef(true);

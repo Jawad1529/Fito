@@ -25,9 +25,9 @@ const INITIAL_FORM_DATA = {
   transactionId: "",
 };
 
-export default function useConsultation() {
-  const [currentStep, setCurrentStep] = useState(0);
-  const [selectedGoal, setSelectedGoal] = useState(null);
+export default function useConsultation(initialGoal = null) {
+  const [currentStep, setCurrentStep] = useState(initialGoal ? 1 : 0);
+  const [selectedGoal, setSelectedGoal] = useState(initialGoal);
   const [formData, setFormData] = useState(INITIAL_FORM_DATA);
   const [isSubmitting, setIsSubmitting] = useState(false);
 

@@ -8,7 +8,6 @@ import productsData from '../../data/products'; // adjust path
 
 export default function FeaturedProducts() {
   const [wishlist, setWishlist] = useState([]);
-  const [cartItems, setCartItems] = useState([]);
 
   const toggleWishlist = (productId) => {
     setWishlist((prev) =>
@@ -16,11 +15,6 @@ export default function FeaturedProducts() {
         ? prev.filter((id) => id !== productId)
         : [...prev, productId]
     );
-  };
-
-  const addToCart = (productId) => {
-    setCartItems((prev) => [...prev, productId]);
-    console.log('Added to cart:', productId);
   };
 
   return (
@@ -46,9 +40,7 @@ export default function FeaturedProducts() {
               product={product}
               index={index}
               isWishlisted={wishlist.includes(product.id)}
-              isInCart={cartItems.includes(product.id)}
               onToggleWishlist={toggleWishlist}
-              onAddToCart={addToCart}
             />
           ))}
         </div>

@@ -31,12 +31,12 @@ export default function PCOSForm({
       <Card className="bg-surface border border-border">
 
         <H4 className="mb-5">
-          Medical Information
+          Medical Information (طبی معلومات)
         </H4>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 
-          <Field label="Have you been diagnosed with PCOS?">
+          <Field label="Have you been diagnosed with PCOS? (کیا آپ کو پی سی او ایس کی تشخیص ہوئی ہے؟)">
             <Radio.Group
               value={goalData.diagnosed}
               onChange={(e)=>
@@ -49,7 +49,7 @@ export default function PCOSForm({
             </Radio.Group>
           </Field>
 
-          <Field label="Diagnosis Date">
+          <Field label="Diagnosis Date (تشخیص کی تاریخ)">
             <DatePicker
               value={goalData.diagnosisDate}
               onChange={(date)=>
@@ -62,7 +62,7 @@ export default function PCOSForm({
           </Field>
 
           <div className="md:col-span-2">
-            <Field label="Current Medication">
+            <Field label="Current Medication (موجودہ ادویات)">
               <Input
                 value={goalData.medication}
                 onChange={(e)=>
@@ -85,7 +85,7 @@ export default function PCOSForm({
       <Card className="bg-surface border border-border">
 
         <H4 className="mb-5">
-          Symptoms
+          Symptoms (علامات)
         </H4>
 
         <Checkbox.Group
@@ -113,12 +113,12 @@ export default function PCOSForm({
       <Card className="bg-surface border border-border">
 
         <H4 className="mb-5">
-          Menstrual Cycle
+          Menstrual Cycle (ماہواری کا سائیکل)
         </H4>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 
-          <Field label="Cycle Regularity">
+          <Field label="Cycle Regularity (سائیکل کی باقاعدگی)">
             <Select
               value={goalData.cycle}
               onChange={(value)=>
@@ -141,7 +141,7 @@ export default function PCOSForm({
             />
           </Field>
 
-          <Field label="Last Period">
+          <Field label="Last Period (آخری ماہواری)">
             <DatePicker
               value={goalData.lastPeriod}
               onChange={(date)=>
@@ -162,12 +162,12 @@ export default function PCOSForm({
       <Card className="bg-surface border border-border">
 
         <H4 className="mb-5">
-          Lifestyle
+          Lifestyle (طرز زندگی)
         </H4>
 
         <div className="grid grid-cols-1 gap-5">
 
-          <Field label="Exercise Days / Week">
+          <Field label="Exercise Days / Week (ورزش کے دن / ہفتہ)">
             <Slider
               min={0}
               max={7}
@@ -178,7 +178,7 @@ export default function PCOSForm({
             />
           </Field>
 
-          <Field label="Sleep (Hours)">
+          <Field label="Sleep (Hours) (نیند کے گھنٹے)">
             <Slider
               min={3}
               max={12}
@@ -189,7 +189,7 @@ export default function PCOSForm({
             />
           </Field>
 
-          <Field label="Stress Level">
+          <Field label="Stress Level (ذہنی دباؤ کی سطح)">
             <Slider
               min={1}
               max={10}
@@ -209,7 +209,7 @@ export default function PCOSForm({
       <Card className="bg-surface border border-border">
 
         <H4 className="mb-5">
-          Consultation Goals
+          Consultation Goals (مشاورت کے اہداف)
         </H4>
 
         <Checkbox.Group
@@ -234,7 +234,7 @@ export default function PCOSForm({
       <Card className="bg-surface border border-border">
 
         <H4 className="mb-5">
-          Additional Notes
+          Additional Notes (اضافی نوٹس)
         </H4>
 
         <TextArea

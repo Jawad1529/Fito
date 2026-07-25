@@ -26,10 +26,10 @@ export default function MuscleGainForm({
 
       {/* Goal */}
       <Card className="bg-surface border border-border">
-        <H4 className="mb-5">Muscle Building Goal</H4>
+        <H4 className="mb-5">Muscle Building Goal (پٹھے بنانے کا ہدف)</H4>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <Field label="Target Weight (kg)">
+          <Field label="Target Weight (kg) (ہدف وزن)">
             <InputNumber
               value={goalData.targetWeight}
               onChange={(value) =>
@@ -38,7 +38,7 @@ export default function MuscleGainForm({
             />
           </Field>
 
-          <Field label="Primary Goal">
+          <Field label="Primary Goal (بنیادی مقصد)">
             <Radio.Group
               value={goalData.primaryGoal}
               onChange={(e) =>
@@ -55,11 +55,11 @@ export default function MuscleGainForm({
 
       {/* Training */}
       <Card className="bg-surface border border-border">
-        <H4 className="mb-5">Training</H4>
+        <H4 className="mb-5">Training (تربیت)</H4>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 
-          <Field label="Training Experience">
+          <Field label="Training Experience (تربیتی تجربہ)">
             <Select
               value={goalData.trainingExperience}
               onChange={(value)=>
@@ -73,7 +73,7 @@ export default function MuscleGainForm({
             />
           </Field>
 
-          <Field label="Workout Days / Week">
+          <Field label="Workout Days / Week (ورزش کے دن / ہفتہ)">
             <Slider
               min={1}
               max={7}
@@ -85,7 +85,7 @@ export default function MuscleGainForm({
           </Field>
 
           <div className="md:col-span-2">
-            <Field label="Do you have gym access?">
+            <Field label="Do you have gym access? (کیا آپ کو جم تک رسائی ہے؟)">
               <Select
                 value={goalData.gymAccess}
                 onChange={(value)=>
@@ -106,11 +106,11 @@ export default function MuscleGainForm({
       {/* Nutrition */}
       <Card className="bg-surface border border-border">
 
-        <H4 className="mb-5">Nutrition</H4>
+        <H4 className="mb-5">Nutrition (غذائیت)</H4>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 
-          <Field label="Meals Per Day">
+          <Field label="Meals Per Day (روزانہ کھانوں کی تعداد)">
             <Select
               value={goalData.mealsPerDay}
               onChange={(value)=>
@@ -125,7 +125,7 @@ export default function MuscleGainForm({
             />
           </Field>
 
-          <Field label="Protein Intake (g/day)">
+          <Field label="Protein Intake (g/day) (پروٹین کی مقدار)">
             <InputNumber
               value={goalData.protein}
               onChange={(value)=>
@@ -135,7 +135,7 @@ export default function MuscleGainForm({
           </Field>
 
           <div className="md:col-span-2">
-            <Field label="Water Intake (Litres)">
+            <Field label="Water Intake (Litres) (پانی کی مقدار)">
               <Slider
                 min={1}
                 max={6}
@@ -155,11 +155,11 @@ export default function MuscleGainForm({
       {/* Recovery */}
       <Card className="bg-surface border border-border">
 
-        <H4 className="mb-5">Recovery</H4>
+        <H4 className="mb-5">Recovery (بحالی)</H4>
 
         <div className="grid grid-cols-1 gap-5">
 
-          <Field label="Sleep (Hours)">
+          <Field label="Sleep (Hours) (نیند کے گھنٹے)">
             <Slider
               min={3}
               max={12}
@@ -170,7 +170,7 @@ export default function MuscleGainForm({
             />
           </Field>
 
-          <Field label="Any Previous Injuries?">
+          <Field label="Any Previous Injuries? (کوئی پرانی چوٹ؟)">
             <TextArea
               rows={4}
               value={goalData.injuries || ''}

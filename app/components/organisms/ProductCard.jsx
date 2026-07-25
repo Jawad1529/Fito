@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import Button from '../atoms/Button';
 import Icon from '../atoms/Icon';
+import useCart from '../../hooks/useCart';
 
 // Full Stars component (restored from your original)
 const Stars = ({ rating }) => {
@@ -47,15 +48,21 @@ const Star = ({ filled = false, half = false }) => (
 export default function ProductCard({
   product,
   isWishlisted = false,
-  isInCart = false,
   onToggleWishlist,
-  onAddToCart,
   index = 0,
 }) {
+  const { addToCart, isInCart } = useCart();
+  const inCart = isInCart(product.id);
+
   // Prevent navigation when clicking on interactive elements
   const handleButtonClick = (e, callback) => {
     e.stopPropagation();
-    callback(product.id);
+    callback?.(product.id);
+  };
+
+  const handleAddToCart = (e) => {
+    e.stopPropagation();
+    if (!inCart) addToCart(product);
   };
 
   return (
@@ -116,12 +123,13 @@ export default function ProductCard({
             </span>
             {/* Quick Add button – stops propagation */}
             <Button
-              variant={isInCart ? 'secondary' : 'primary'}
+              variant={inCart ? 'outline' : 'primary'}
               size="sm"
-              onClick={(e) => handleButtonClick(e, onAddToCart)}
+              onClick={handleAddToCart}
+              disabled={inCart}
               className="rounded-full px-4 py-1.5 text-xs"
             >
-              {isInCart ? 'In Cart' : 'Quick Add'}
+              {inCart ? 'In Cart' : 'Quick Add'}
             </Button>
           </div>
         </div>
