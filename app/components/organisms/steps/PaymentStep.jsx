@@ -11,6 +11,7 @@ import Upload from '../../atoms/Upload';
 export default function PaymentStep({
   formData,
   updateField,
+  selectedPlan,
 }) {
   const uploads = formData.uploads || {};
 
@@ -45,11 +46,13 @@ export default function PaymentStep({
       <Card className="bg-surface border border-border">
 
         <H5 className="mb-2">
-          Consultation Fee
+          {selectedPlan ? `${selectedPlan.label} Plan` : "Consultation Fee"}
         </H5>
 
         <div className="text-4xl font-bold text-primary">
-          Rs. 2,500
+          {selectedPlan
+            ? `Rs. ${selectedPlan.price.toLocaleString("en-US")}`
+            : "Rs. 2,500"}
         </div>
 
       </Card>

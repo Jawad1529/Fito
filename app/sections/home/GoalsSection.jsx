@@ -3,39 +3,48 @@
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { H2, Text } from '../../components/atoms/Typography';
+import Image from '../../components/atoms/Image';
+
+import heroImage from '../../assets/images/hero.png';
 
 // Kept in sync with CONSULTATION_GOALS ids in utils/consultationConfig.js —
 // clicking a card jumps straight into that goal's step in /consultation.
 const goals = [
   {
     id: 'fat-loss',
-    icon: '🔥',
+    image: heroImage,
     title: 'Fat Loss',
     description: 'Lose body fat with a personalized nutrition plan.',
   },
   {
     id: 'muscle-gain',
-    icon: '💪',
+    image: heroImage,
     title: 'Muscle Gain',
     description: 'Build lean muscle and increase strength.',
   },
   {
     id: 'body-recomposition',
-    icon: '⚖️',
+    image: heroImage,
     title: 'Body Recomposition',
     description: 'Build muscle while reducing body fat.',
   },
   {
     id: 'pcos',
-    icon: '🌸',
+    image: heroImage,
     title: 'PCOS',
     description: 'Nutrition guidance for managing PCOS symptoms.',
   },
   {
     id: 'mother-wellness',
-    icon: '🤱',
+    image: heroImage,
     title: 'Mother Wellness',
     description: 'Nutrition support for pregnancy, postpartum & breastfeeding.',
+  },
+  {
+    id: 'diabetes',
+    image: heroImage,
+    title: 'Diabetic Patients',
+    description: 'Nutrition guidance for managing blood sugar and diabetes.',
   },
 ];
 
@@ -62,7 +71,7 @@ export default function GoalsSection() {
           </Text>
         </motion.div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {goals.map((goal, index) => (
             <motion.button
               key={goal.id}
@@ -76,8 +85,14 @@ export default function GoalsSection() {
               className="relative cursor-pointer group bg-overlay backdrop-blur-sm border border-border-light rounded-2xl p-6 text-center transition-all duration-300 hover:border-primary/30 hover:bg-overlay-strong"
             >
               <div className="flex justify-center mb-4">
-                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center text-2xl group-hover:bg-primary/20 transition-colors">
-                  {goal.icon}
+                <div className="w-14 h-14">
+                  <Image
+                    src={goal.image}
+                    alt={goal.title}
+                    fill
+                    objectFit="contain"
+                    rounded="rounded-full"
+                  />
                 </div>
               </div>
               <h3 className="text-lg font-semibold text-text">{goal.title}</h3>

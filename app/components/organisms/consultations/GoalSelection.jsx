@@ -3,6 +3,7 @@
 import { CheckCircleFilled } from '@ant-design/icons';
 
 import Card from '../../atoms/Card';
+import Image from '../../atoms/Image';
 import { H2, H3, Text } from '../../atoms/Typography';
 
 export default function GoalSelection({
@@ -23,7 +24,7 @@ export default function GoalSelection({
         </Text>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
         {goals.map((goal) => {
 
@@ -33,7 +34,7 @@ export default function GoalSelection({
             <Card
               key={goal.id}
               hoverable
-              padding={28}
+              padding={0}
               onClick={() => onSelect(goal.id)}
               className={`
                 relative
@@ -49,21 +50,32 @@ export default function GoalSelection({
             >
               {isSelected && (
                 <CheckCircleFilled
-                  className="absolute top-5 right-5 text-primary text-xl"
+                  className="absolute top-5 right-5 z-10 text-primary text-xl bg-surface rounded-full"
                 />
               )}
 
-              <div className="text-5xl mb-5">
-                {goal.icon}
+              {goal.image && (
+                <div className="relative w-full aspect-square">
+                  <Image
+                    src={goal.image}
+                    alt={goal.title}
+                    fill
+                    objectFit="contain"
+                  />
+                </div>
+              )}
+
+              <div className="p-7">
+
+                <H3 className="mb-3">
+                  {goal.title}
+                </H3>
+
+                <Text muted>
+                  {goal.shortDescription}
+                </Text>
+
               </div>
-
-              <H3 className="mb-3">
-                {goal.title}
-              </H3>
-
-              <Text muted>
-                {goal.shortDescription}
-              </Text>
 
             </Card>
           );

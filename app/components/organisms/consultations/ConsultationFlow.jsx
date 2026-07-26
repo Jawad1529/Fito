@@ -7,6 +7,7 @@ import useConsultation from '../../../hooks/useConsultation';
 import { CONSULTATION_GOALS } from '../../../utils/consultationConfig';
 
 import GoalSelection from './GoalSelection';
+import PlanSelection from './PlanSelection';
 
 import PersonalInfoStep from '../../organisms/steps/PersonalInfoStep';
 import GoalSpecificStep from '../../organisms/steps/GoalSpecificStep';
@@ -32,8 +33,10 @@ export default function ConsultationFlow() {
   const {
     currentStep,
     selectedGoal,
+    selectedPlan,
     formData,
     setSelectedGoal,
+    setSelectedPlan,
     updateField,
     updateGoalData,
     next,
@@ -46,12 +49,22 @@ export default function ConsultationFlow() {
     (goal) => goal.id === selectedGoal
   );
 
+  const planStepIndex = 1;
+
   const steps = [
     <GoalSelection
       key="goal"
       goals={CONSULTATION_GOALS}
       selectedGoal={selectedGoal}
       onSelect={setSelectedGoal}
+    />,
+
+    <PlanSelection
+      key="plan"
+      goal={selectedGoalConfig}
+      plans={selectedGoalConfig?.plans || []}
+      selectedPlan={selectedPlan}
+      onSelect={setSelectedPlan}
     />,
 
     <PersonalInfoStep
@@ -77,6 +90,7 @@ export default function ConsultationFlow() {
       key="payment"
       formData={formData}
       updateField={updateField}
+      selectedPlan={selectedPlan}
     />,
 
     <SuccessStep key="success" />,
@@ -86,6 +100,7 @@ export default function ConsultationFlow() {
   // Payment is the last step with a Next/Submit button — Success is a
   // read-only screen reached only after a successful submit.
   const isFinalFormStep = currentStep === steps.length - 2;
+  const canProceed = currentStep === planStepIndex ? !!selectedPlan : true;
 
   useEffect(() => {
     if (isFirstRender.current) {
@@ -131,6 +146,7 @@ export default function ConsultationFlow() {
           currentStep={currentStep}
           totalSteps={steps.length - 1}
           isSubmitting={isSubmitting}
+          canProceed={canProceed}
           onNext={handleNext}
           onPrevious={previous}
         />

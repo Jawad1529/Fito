@@ -13,6 +13,7 @@ export default function Image({
   width,
   height,
   rounded = '',
+  objectFit = 'cover',
   className = '',
   unoptimized = true,
   ...rest
@@ -30,7 +31,7 @@ export default function Image({
         height={!fill ? height : undefined}
         unoptimized={unoptimized}
         onLoad={() => setLoaded(true)}
-        className={`${fill ? 'object-cover' : ''} ${rounded} transition-opacity duration-500 ${
+        className={`${fill ? (objectFit === 'contain' ? 'object-contain' : 'object-cover') : ''} ${rounded} transition-opacity duration-500 ${
           loaded ? 'opacity-100' : 'opacity-0'
         } ${className}`}
         {...rest}

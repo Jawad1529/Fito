@@ -28,8 +28,16 @@ const INITIAL_FORM_DATA = {
 export default function useConsultation(initialGoal = null) {
   const [currentStep, setCurrentStep] = useState(initialGoal ? 1 : 0);
   const [selectedGoal, setSelectedGoal] = useState(initialGoal);
+  const [selectedPlan, setSelectedPlan] = useState(null);
   const [formData, setFormData] = useState(INITIAL_FORM_DATA);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Plans are per-goal, so a plan chosen for one goal doesn't carry over
+  // if the user goes back and picks a different goal.
+  const chooseGoal = (goalId) => {
+    setSelectedGoal(goalId);
+    setSelectedPlan(null);
+  };
 
   const next = () => {
     setCurrentStep((prev) => prev + 1);
@@ -63,6 +71,7 @@ export default function useConsultation(initialGoal = null) {
   const resetConsultation = () => {
     setCurrentStep(0);
     setSelectedGoal(null);
+    setSelectedPlan(null);
     setFormData(INITIAL_FORM_DATA);
   };
 
@@ -80,6 +89,14 @@ export default function useConsultation(initialGoal = null) {
         status: "pending",
         submittedAt: new Date().toISOString(),
         goal: selectedGoal,
+        plan: selectedPlan
+          ? {
+              id: selectedPlan.id,
+              label: selectedPlan.label,
+              durationMonths: selectedPlan.durationMonths,
+              price: selectedPlan.price,
+            }
+          : null,
         personalInfo: {
           fullName: formData.fullName,
           email: formData.email,
@@ -115,6 +132,7 @@ export default function useConsultation(initialGoal = null) {
   return {
     currentStep,
     selectedGoal,
+    selectedPlan,
     formData,
     isSubmitting,
 
@@ -122,7 +140,8 @@ export default function useConsultation(initialGoal = null) {
     previous,
     goToStep,
 
-    setSelectedGoal,
+    setSelectedGoal: chooseGoal,
+    setSelectedPlan,
 
     updateField,
     updateGoalData,

@@ -4,6 +4,7 @@ import { CheckOutlined } from '@ant-design/icons';
 
 const steps = [
   "Goal",
+  "Plan",
   "Personal Info",
   "Questions",
   "Photos",
