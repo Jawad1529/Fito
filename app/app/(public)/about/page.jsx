@@ -18,7 +18,7 @@ const labImage =
 const teamMembers = [
   {
     name: 'Muhammad Umer',
-    title: 'Co-Founder & Head Coach',
+    title: 'Co-Founder & Head Coach & Lead Nutritionist',
     image: owner1,
     credentials: ['CISSN Certified', '10+ Yrs Coaching'],
   },
@@ -28,12 +28,7 @@ const teamMembers = [
     image: owner2,
     credentials: ['MBA', 'Supply Chain'],
   },
-  {
-    name: 'Nutritionist Name',
-    title: 'Lead Nutritionist',
-    image: 'https://images.squarespace-cdn.com/content/v1/5fbb9f4023132a4ab82151f6/0631ad68-a508-4903-aeab-b5303d8d0486/DSC06724-min.jpg',
-    credentials: ['Registered Dietitian', 'PCOS Specialist'],
-  },
+
 ];
 
 const stats = [
@@ -266,7 +261,7 @@ export default function About() {
             </motion.p>
           </div>
 
-          <div className="mt-14 grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-6 max-w-4xl mx-auto">
+          <div className="mt-14 grid grid-cols-1 sm:grid-cols-2 gap-8 sm:gap-6 max-w-4xl mx-auto">
             {teamMembers.map((member, i) => (
               <motion.div
                 key={member.name}
