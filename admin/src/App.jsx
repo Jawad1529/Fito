@@ -1,122 +1,60 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { ConfigProvider } from 'antd';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
+import { RequireAuth, RequireSuperAdmin } from './components/templates/ProtectedRoute';
+import AdminLayout from './components/templates/AdminLayout';
 
-function App() {
-  const [count, setCount] = useState(0)
+import LoginPage from './pages/Login/LoginPage';
+import DashboardPage from './pages/Dashboard/DashboardPage';
+import UserManagementPage from './pages/Users/UserManagementPage';
+import ConsultationManagementPage from './pages/Consultations/ConsultationManagementPage';
+import ConsultationDetailPage from './pages/Consultations/ConsultationDetailPage';
+import ProductManagementPage from './pages/Products/ProductManagementPage';
+import BlogManagementPage from './pages/Blogs/BlogManagementPage';
+import ReviewManagementPage from './pages/Reviews/ReviewManagementPage';
+import SettingsPage from './pages/Settings/SettingsPage';
+import UnauthorizedPage from './pages/Unauthorized/UnauthorizedPage';
+import { ROUTES } from './constants/routes';
 
+const theme = {
+  token: {
+    colorPrimary: '#CF4842',
+    colorPrimaryHover: '#A34840',
+    colorPrimaryActive: '#8A3B35',
+    borderRadius: 8,
+    fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+  },
+};
+
+export default function App() {
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <ConfigProvider theme={theme}>
+      <AuthProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path={ROUTES.LOGIN} element={<LoginPage />} />
 
-      <div className="ticks"></div>
+            <Route element={<RequireAuth />}>
+              <Route element={<AdminLayout />}>
+                <Route path={ROUTES.DASHBOARD} element={<DashboardPage />} />
+                <Route path={ROUTES.CONSULTATIONS} element={<ConsultationManagementPage />} />
+                <Route path={ROUTES.CONSULTATION_DETAIL} element={<ConsultationDetailPage />} />
+                <Route path={ROUTES.PRODUCTS} element={<ProductManagementPage />} />
+                <Route path={ROUTES.BLOGS} element={<BlogManagementPage />} />
+                <Route path={ROUTES.SETTINGS} element={<SettingsPage />} />
+                <Route path={ROUTES.UNAUTHORIZED} element={<UnauthorizedPage />} />
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+                <Route element={<RequireSuperAdmin />}>
+                  <Route path={ROUTES.USERS} element={<UserManagementPage />} />
+                  <Route path={ROUTES.REVIEWS} element={<ReviewManagementPage />} />
+                </Route>
+              </Route>
+            </Route>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+            <Route path="*" element={<Navigate to={ROUTES.DASHBOARD} replace />} />
+          </Routes>
+        </BrowserRouter>
+      </AuthProvider>
+    </ConfigProvider>
+  );
 }
-
-export default App
