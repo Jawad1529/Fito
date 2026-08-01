@@ -1,6 +1,7 @@
 import { ConfigProvider } from 'antd';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import { TestingModeProvider } from './context/TestingModeContext';
 import { RequireAuth, RequireSuperAdmin } from './components/templates/ProtectedRoute';
 import AdminLayout from './components/templates/AdminLayout';
 import { BRAND } from './constants/theme';
@@ -55,34 +56,36 @@ const theme = {
 export default function App() {
   return (
     <ConfigProvider theme={theme}>
-      <AuthProvider>
-        <BrowserRouter>
-          <Routes>
-            <Route path={ROUTES.LOGIN} element={<LoginPage />} />
+      <TestingModeProvider>
+        <AuthProvider>
+          <BrowserRouter>
+            <Routes>
+              <Route path={ROUTES.LOGIN} element={<LoginPage />} />
 
-            <Route element={<RequireAuth />}>
-              <Route element={<AdminLayout />}>
-                <Route path={ROUTES.DASHBOARD} element={<DashboardPage />} />
-                <Route path={ROUTES.CONSULTATIONS} element={<ConsultationManagementPage />} />
-                <Route path={ROUTES.CONSULTATION_DETAIL} element={<ConsultationDetailPage />} />
-                <Route path={ROUTES.PRODUCTS} element={<ProductManagementPage />} />
-                <Route path={ROUTES.BLOGS} element={<BlogManagementPage />} />
-                <Route path={ROUTES.NOTIFICATIONS} element={<NotificationManagementPage />} />
-                <Route path={ROUTES.SETTINGS} element={<SettingsPage />} />
-                <Route path={ROUTES.UNAUTHORIZED} element={<UnauthorizedPage />} />
+              <Route element={<RequireAuth />}>
+                <Route element={<AdminLayout />}>
+                  <Route path={ROUTES.DASHBOARD} element={<DashboardPage />} />
+                  <Route path={ROUTES.CONSULTATIONS} element={<ConsultationManagementPage />} />
+                  <Route path={ROUTES.CONSULTATION_DETAIL} element={<ConsultationDetailPage />} />
+                  <Route path={ROUTES.PRODUCTS} element={<ProductManagementPage />} />
+                  <Route path={ROUTES.BLOGS} element={<BlogManagementPage />} />
+                  <Route path={ROUTES.NOTIFICATIONS} element={<NotificationManagementPage />} />
+                  <Route path={ROUTES.SETTINGS} element={<SettingsPage />} />
+                  <Route path={ROUTES.UNAUTHORIZED} element={<UnauthorizedPage />} />
 
-                <Route element={<RequireSuperAdmin />}>
-                  <Route path={ROUTES.USERS} element={<UserManagementPage />} />
-                  <Route path={ROUTES.REVIEWS} element={<ReviewManagementPage />} />
-                  <Route path={ROUTES.ORDERS} element={<OrderManagementPage />} />
+                  <Route element={<RequireSuperAdmin />}>
+                    <Route path={ROUTES.USERS} element={<UserManagementPage />} />
+                    <Route path={ROUTES.REVIEWS} element={<ReviewManagementPage />} />
+                    <Route path={ROUTES.ORDERS} element={<OrderManagementPage />} />
+                  </Route>
                 </Route>
               </Route>
-            </Route>
 
-            <Route path="*" element={<Navigate to={ROUTES.DASHBOARD} replace />} />
-          </Routes>
-        </BrowserRouter>
-      </AuthProvider>
+              <Route path="*" element={<Navigate to={ROUTES.DASHBOARD} replace />} />
+            </Routes>
+          </BrowserRouter>
+        </AuthProvider>
+      </TestingModeProvider>
     </ConfigProvider>
   );
 }

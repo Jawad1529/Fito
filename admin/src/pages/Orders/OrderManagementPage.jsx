@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Modal, Descriptions, Select, Table, message } from 'antd';
 import PageHeading from '../../components/atoms/PageHeading';
 import SearchBar from '../../components/molecules/SearchBar';
@@ -7,12 +7,22 @@ import StatusTag from '../../components/atoms/StatusTag';
 import DataTable from '../../components/organisms/DataTable';
 import useTableQuery from '../../hooks/useTableQuery';
 import { orders as initialOrders, ORDER_STATUSES, PAYMENT_METHODS } from '../../data/orders';
+import { useTestingMode } from '../../context/TestingModeContext';
+import { fetchOrders, updateOrderStatus as updateOrderStatusApi } from '../../api/adminOrders.api';
 
 const paymentLabel = (value) => PAYMENT_METHODS.find((p) => p.value === value)?.label ?? value;
 const capitalize = (value) => value.charAt(0).toUpperCase() + value.slice(1);
 
 export default function OrderManagementPage() {
-    const [orders, setOrders] = useState(initialOrders);
+    const { testingMode } = useTestingMode();
+    // Remounts (resetting all local state) whenever testing mode is toggled,
+    // instead of syncing that reset through an effect.
+    return <OrderManagementPageInner key={testingMode} testingMode={testingMode} />;
+}
+
+function OrderManagementPageInner({ testingMode }) {
+    const [orders, setOrders] = useState(testingMode ? initialOrders : []);
+    const [loading, setLoading] = useState(!testingMode);
     const { searchText, setSearchText, filteredData } = useTableQuery(orders, {
         searchKeys: ['id', 'transactionId'],
     });
@@ -20,12 +30,42 @@ export default function OrderManagementPage() {
     const [viewing, setViewing] = useState(null);
     const [statusEditing, setStatusEditing] = useState(null);
 
-    const handleStatusChange = (status) => {
-        setOrders((prev) =>
-            prev.map((o) => (o.id === statusEditing.id ? { ...o, status } : o))
-        );
-        message.success('Order status updated');
-        setStatusEditing(null);
+    useEffect(() => {
+        if (testingMode) return;
+        let cancelled = false;
+        fetchOrders()
+            .then((data) => {
+                if (!cancelled) setOrders(data);
+            })
+            .catch(() => {
+                if (!cancelled) message.error('Failed to load orders');
+            })
+            .finally(() => {
+                if (!cancelled) setLoading(false);
+            });
+        return () => {
+            cancelled = true;
+        };
+    }, [testingMode]);
+
+    const handleStatusChange = async (status) => {
+        if (testingMode) {
+            setOrders((prev) =>
+                prev.map((o) => (o.id === statusEditing.id ? { ...o, status } : o))
+            );
+            message.success('Order status updated');
+            setStatusEditing(null);
+            return;
+        }
+
+        try {
+            const updated = await updateOrderStatusApi(statusEditing.id, status);
+            setOrders((prev) => prev.map((o) => (o.id === statusEditing.id ? updated : o)));
+            message.success('Order status updated');
+            setStatusEditing(null);
+        } catch {
+            message.error('Failed to update order status');
+        }
     };
 
     const handleDelete = (id) => {
@@ -73,7 +113,7 @@ export default function OrderManagementPage() {
                 <RowActions
                     onView={() => setViewing(record)}
                     onEdit={() => setStatusEditing(record)}
-                    onDelete={() => handleDelete(record.id)}
+                    onDelete={testingMode ? () => handleDelete(record.id) : undefined}
                 />
             ),
         },
@@ -93,7 +133,7 @@ export default function OrderManagementPage() {
                 actions={<SearchBar value={searchText} onChange={setSearchText} placeholder="Search orders..." />}
             />
 
-            <DataTable columns={columns} data={filteredData} />
+            <DataTable columns={columns} data={filteredData} loading={loading} />
 
             <Modal open={!!viewing} title="Order Details" onCancel={() => setViewing(null)} footer={null} width={560}>
                 {viewing && (

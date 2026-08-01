@@ -1,12 +1,87 @@
+import { OAuth2Client } from 'google-auth-library';
 import asyncHandler from '../utils/asyncHandler.js';
 import generateToken from '../utils/generateToken.js';
 import User from '../models/User.model.js';
 import { USER_STATUS } from '../constants/userStatus.js';
+import { OTP_PURPOSE } from '../constants/otpPurpose.js';
+import {
+    generateOtp,
+    hashOtp,
+    compareOtp,
+    OTP_TTL_MS,
+    OTP_RESEND_COOLDOWN_MS,
+    OTP_MAX_ATTEMPTS,
+} from '../utils/otp.util.js';
+import { sendOtpEmail } from '../utils/mailer.util.js';
 import { toPublicUser } from '../utils/serializers.js';
 
+const OTP_FIELDS = '+otp.codeHash +otp.purpose +otp.expiresAt +otp.attempts';
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+// Generates a fresh OTP, stores its hash on the user, and emails it.
+// Shared by registration and forgot-password so both go through one
+// cooldown/expiry/attempt-reset path.
+const issueOtp = async (user, purpose) => {
+    const issuedAt = user.otp?.expiresAt ? user.otp.expiresAt.getTime() - OTP_TTL_MS : 0;
+    if (Date.now() - issuedAt < OTP_RESEND_COOLDOWN_MS) {
+        const waitSeconds = Math.ceil((OTP_RESEND_COOLDOWN_MS - (Date.now() - issuedAt)) / 1000);
+        const err = new Error(`Please wait ${waitSeconds}s before requesting another code`);
+        err.statusCode = 429;
+        throw err;
+    }
+
+    const otp = generateOtp();
+    const codeHash = await hashOtp(otp);
+
+    // Send before persisting: if delivery fails, we don't want a stored code
+    // the user never received — that would also wrongly trip the cooldown
+    // above on their very next (immediate) retry.
+    await sendOtpEmail({ to: user.email, otp, purpose });
+
+    user.otp = {
+        codeHash,
+        purpose,
+        expiresAt: new Date(Date.now() + OTP_TTL_MS),
+        attempts: 0,
+    };
+    await user.save();
+};
+
+// Validates a submitted OTP against the stored hash for the given purpose,
+// tracking failed attempts. Throws with an appropriate status on failure.
+const checkOtp = async (user, purpose, submittedOtp) => {
+    if (!user.otp?.codeHash || user.otp.purpose !== purpose) {
+        const err = new Error('No pending verification code for this account. Please request a new one.');
+        err.statusCode = 400;
+        throw err;
+    }
+
+    if (user.otp.expiresAt < new Date()) {
+        const err = new Error('This code has expired. Please request a new one.');
+        err.statusCode = 400;
+        throw err;
+    }
+
+    if (user.otp.attempts >= OTP_MAX_ATTEMPTS) {
+        const err = new Error('Too many incorrect attempts. Please request a new code.');
+        err.statusCode = 429;
+        throw err;
+    }
+
+    const isMatch = await compareOtp(submittedOtp, user.otp.codeHash);
+    if (!isMatch) {
+        user.otp.attempts += 1;
+        await user.save();
+        const err = new Error('Invalid code. Please try again.');
+        err.statusCode = 400;
+        throw err;
+    }
+};
+
 // POST /api/auth/register
-// New signups start as USER_STATUS.INACTIVE (schema default) and cannot log
-// in until a super admin activates them, so no token is issued here.
+// New signups start as USER_STATUS.INACTIVE (schema default) and get an OTP
+// emailed to verify ownership of the address; verifying it (see verifyOtp)
+// activates the account, so no token is issued here yet.
 export const registerUser = asyncHandler(async (req, res) => {
     const { name, email, password, phone } = req.body;
 
@@ -22,11 +97,128 @@ export const registerUser = asyncHandler(async (req, res) => {
     }
 
     const user = await User.create({ name, email, password, phone });
+    await issueOtp(user, OTP_PURPOSE.VERIFY_EMAIL);
 
     res.status(201).json({
         user: toPublicUser(user),
-        message: 'Registration successful. Your account is pending approval from an admin.',
+        message: 'Registration successful. We emailed you a verification code.',
     });
+});
+
+// POST /api/auth/verify-otp
+// Confirms the emailed code, activates the account, and logs the user in.
+export const verifyOtp = asyncHandler(async (req, res) => {
+    const { email, otp } = req.body;
+    if (!email || !otp) {
+        res.status(400);
+        throw new Error('Email and code are required');
+    }
+
+    const user = await User.findOne({ email }).select(OTP_FIELDS);
+    if (!user) {
+        res.status(404);
+        throw new Error('No account found with this email');
+    }
+
+    try {
+        await checkOtp(user, OTP_PURPOSE.VERIFY_EMAIL, otp);
+    } catch (err) {
+        res.status(err.statusCode || 400);
+        throw err;
+    }
+
+    user.isEmailVerified = true;
+    // Don't let verifying an OTP silently undo an admin's block.
+    if (user.status !== USER_STATUS.BLOCKED) {
+        user.status = USER_STATUS.ACTIVE;
+    }
+    user.otp = undefined;
+    await user.save();
+
+    if (user.status === USER_STATUS.BLOCKED) {
+        res.status(403);
+        throw new Error('Your account has been blocked. Please contact support.');
+    }
+
+    res.json({
+        token: generateToken({ id: user._id }),
+        user: toPublicUser(user),
+    });
+});
+
+// POST /api/auth/resend-otp
+// Re-sends the email-verification code for a not-yet-verified account.
+export const resendOtp = asyncHandler(async (req, res) => {
+    const { email } = req.body;
+    if (!email) {
+        res.status(400);
+        throw new Error('Email is required');
+    }
+
+    const user = await User.findOne({ email }).select(OTP_FIELDS);
+    if (!user) {
+        res.status(404);
+        throw new Error('No account found with this email');
+    }
+    if (user.isEmailVerified) {
+        res.status(409);
+        throw new Error('This email is already verified');
+    }
+
+    try {
+        await issueOtp(user, OTP_PURPOSE.VERIFY_EMAIL);
+    } catch (err) {
+        res.status(err.statusCode || 500);
+        throw err;
+    }
+
+    res.json({ message: 'Verification code resent' });
+});
+
+// POST /api/auth/forgot-password
+// Always responds with the same message whether or not the account exists,
+// so this endpoint can't be used to enumerate registered emails.
+export const forgotPassword = asyncHandler(async (req, res) => {
+    const { email } = req.body;
+    if (!email) {
+        res.status(400);
+        throw new Error('Email is required');
+    }
+
+    const user = await User.findOne({ email }).select(OTP_FIELDS);
+    if (user) {
+        await issueOtp(user, OTP_PURPOSE.RESET_PASSWORD);
+    }
+
+    res.json({ message: 'If an account with that email exists, a reset code has been sent.' });
+});
+
+// POST /api/auth/reset-password
+export const resetPassword = asyncHandler(async (req, res) => {
+    const { email, otp, newPassword } = req.body;
+    if (!email || !otp || !newPassword) {
+        res.status(400);
+        throw new Error('Email, code and new password are required');
+    }
+
+    const user = await User.findOne({ email }).select(`+password ${OTP_FIELDS}`);
+    if (!user) {
+        res.status(404);
+        throw new Error('No account found with this email');
+    }
+
+    try {
+        await checkOtp(user, OTP_PURPOSE.RESET_PASSWORD, otp);
+    } catch (err) {
+        res.status(err.statusCode || 400);
+        throw err;
+    }
+
+    user.password = newPassword;
+    user.otp = undefined;
+    await user.save();
+
+    res.json({ message: 'Password reset successfully. You can now log in.' });
 });
 
 // POST /api/auth/login
@@ -34,7 +226,11 @@ export const loginUser = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
 
     const user = await User.findOne({ email }).select('+password');
-    if (!user || !(await user.comparePassword(password))) {
+    if (!user || !user.password) {
+        res.status(401);
+        throw new Error('Invalid email or password');
+    }
+    if (!(await user.comparePassword(password))) {
         res.status(401);
         throw new Error('Invalid email or password');
     }
@@ -46,7 +242,68 @@ export const loginUser = asyncHandler(async (req, res) => {
 
     if (user.status !== USER_STATUS.ACTIVE) {
         res.status(403);
-        throw new Error("Your account is pending approval. We'll notify you once an admin activates it.");
+        throw new Error('Please verify your email to activate your account.');
+    }
+
+    res.json({
+        token: generateToken({ id: user._id }),
+        user: toPublicUser(user),
+    });
+});
+
+// POST /api/auth/google
+// Verifies the ID token from Google's "Sign in with Google" button. Google
+// has already confirmed the email, so this activates the account (or links
+// googleId onto an existing email/password account) with no OTP step.
+export const googleAuth = asyncHandler(async (req, res) => {
+    const { credential } = req.body;
+    if (!credential) {
+        res.status(400);
+        throw new Error('Missing Google credential');
+    }
+
+    let payload;
+    try {
+        const ticket = await googleClient.verifyIdToken({
+            idToken: credential,
+            audience: process.env.GOOGLE_CLIENT_ID,
+        });
+        payload = ticket.getPayload();
+    } catch {
+        res.status(401);
+        throw new Error('Invalid Google credential');
+    }
+
+    if (!payload.email_verified) {
+        res.status(403);
+        throw new Error('Your Google account email is not verified');
+    }
+
+    let user = await User.findOne({ googleId: payload.sub });
+    if (!user) {
+        user = await User.findOne({ email: payload.email });
+        if (user) {
+            user.googleId = payload.sub;
+            user.isEmailVerified = true;
+            // Don't let linking a Google account silently undo an admin's block.
+            if (user.status !== USER_STATUS.BLOCKED) {
+                user.status = USER_STATUS.ACTIVE;
+            }
+            await user.save();
+        } else {
+            user = await User.create({
+                name: payload.name || payload.email.split('@')[0],
+                email: payload.email,
+                googleId: payload.sub,
+                isEmailVerified: true,
+                status: USER_STATUS.ACTIVE,
+            });
+        }
+    }
+
+    if (user.status === USER_STATUS.BLOCKED) {
+        res.status(403);
+        throw new Error('Your account has been blocked. Please contact support.');
     }
 
     res.json({

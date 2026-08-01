@@ -4,27 +4,29 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Form, message } from 'antd';
-import { MailOutlined, LockOutlined, GoogleOutlined, FacebookOutlined } from '@ant-design/icons';
+import { MailOutlined, LockOutlined, FacebookOutlined } from '@ant-design/icons';
 import { motion } from 'framer-motion';
 
 import Input from '@/components/atoms/Input';
 import Button from '@/components/atoms/Button';
 import Checkbox from '@/components/atoms/Checkbox';
 import Divider from '@/components/atoms/Divider';
+import GoogleAuthButton from '@/components/molecules/GoogleAuthButton';
+import useAuth from '@/hooks/useAuth';
 
 export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { login } = useAuth();
 
   const onFinish = async (values) => {
     setLoading(true);
-    // Simulate API call
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      await login(values);
       message.success('Logged in successfully!');
       router.push('/');
     } catch (error) {
-      message.error('Invalid credentials. Please try again.');
+      message.error(error?.response?.data?.message || 'Invalid credentials. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -80,16 +82,13 @@ export default function LoginPage() {
           <span className="text-text-muted text-sm">or continue with</span>
         </Divider>
 
-        <div className="flex gap-4">
-          <Button
-            type="button"
-            variant="outline"
-            fullWidth
-            icon={<GoogleOutlined />}
-            onClick={() => message.info('Google login coming soon')}
-          >
-            Google
-          </Button>
+        <div className="space-y-4">
+          <GoogleAuthButton
+            onAuthenticated={() => {
+              message.success('Logged in successfully!');
+              router.push('/');
+            }}
+          />
           <Button
             type="button"
             variant="outline"

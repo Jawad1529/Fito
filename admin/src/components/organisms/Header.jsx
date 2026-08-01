@@ -5,6 +5,7 @@ import { useAuth } from '../../context/AuthContext';
 import { ROLE_LABELS } from '../../constants/roles';
 import { ROUTES } from '../../constants/routes';
 import { PAGE_TITLES } from '../../constants/pageTitles';
+import TestingModeToggle from '../atoms/TestingModeToggle';
 
 const getPageTitle = (pathname) => {
     const match = PAGE_TITLES.find((entry) => matchPath({ path: entry.path, end: true }, pathname));
@@ -46,15 +47,18 @@ export default function Header({ collapsed, onToggle }) {
                 <h2 className="text-base sm:text-lg font-semibold text-gray-900 truncate">{pageTitle}</h2>
             </div>
 
-            <Dropdown menu={{ items: menuItems }} trigger={['click']}>
-                <button type="button" className="flex items-center gap-3 cursor-pointer rounded-lg px-2 py-1.5 -mr-2 hover:bg-gray-50 transition-colors">
-                    <div className="text-right hidden sm:block">
-                        <p className="text-sm font-medium text-gray-900 leading-tight">{user?.name}</p>
-                        <p className="text-xs text-gray-500 leading-tight">{ROLE_LABELS[user?.role]}</p>
-                    </div>
-                    <Avatar icon={<UserOutlined />} className="bg-primary-light text-primary" />
-                </button>
-            </Dropdown>
+            <div className="flex items-center gap-4">
+                <TestingModeToggle />
+                <Dropdown menu={{ items: menuItems }} trigger={['click']}>
+                    <button type="button" className="flex items-center gap-3 cursor-pointer rounded-lg px-2 py-1.5 -mr-2 hover:bg-gray-50 transition-colors">
+                        <div className="text-right hidden sm:block">
+                            <p className="text-sm font-medium text-gray-900 leading-tight">{user?.name}</p>
+                            <p className="text-xs text-gray-500 leading-tight">{ROLE_LABELS[user?.role]}</p>
+                        </div>
+                        <Avatar icon={<UserOutlined />} className="bg-primary-light text-primary" />
+                    </button>
+                </Dropdown>
+            </div>
         </header>
     );
 }

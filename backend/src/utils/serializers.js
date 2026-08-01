@@ -15,3 +15,16 @@ export const toPublicAdmin = (admin) => ({
     email: admin.email,
     role: admin.role,
 });
+
+export const toPublicOrder = (order) => ({
+    id: order._id,
+    user: order.user,
+    items: order.items,
+    total: order.total,
+    paymentMethod: order.paymentMethod,
+    transactionId: order.transactionId,
+    screenshotAttached: order.screenshotAttached,
+    shipping: order.shipping,
+    status: order.status,
+    placedAt: order.createdAt,
+});

@@ -11,19 +11,22 @@ import Input from '@/components/atoms/Input';
 import Button from '@/components/atoms/Button';
 import Checkbox from '@/components/atoms/Checkbox';
 import Divider from '@/components/atoms/Divider';
+import GoogleAuthButton from '@/components/molecules/GoogleAuthButton';
+import useAuth from '@/hooks/useAuth';
 
 export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { register } = useAuth();
 
   const onFinish = async (values) => {
     setLoading(true);
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      message.success('Account created successfully!');
-      router.push('/login');
+      const result = await register(values);
+      message.success(result?.message || 'Account created successfully!');
+      router.push(`/verify-otp?email=${encodeURIComponent(values.email)}`);
     } catch (error) {
-      message.error('Something went wrong. Please try again.');
+      message.error(error?.response?.data?.message || 'Something went wrong. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -115,6 +118,8 @@ export default function RegisterPage() {
         <Divider className="my-6">
           <span className="text-text-muted text-sm">or sign up with</span>
         </Divider>
+
+        <GoogleAuthButton onAuthenticated={() => router.push('/')} />
 
         <div className="text-center mt-6 text-text-muted">
           Already have an account?{' '}

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { UploadOutlined } from '@ant-design/icons';
+import { message } from 'antd';
 import { H2, H4, Text } from '../../../components/atoms/Typography';
 import Card from '../../../components/atoms/Card';
 import Input from '../../../components/atoms/Input';
@@ -11,6 +12,8 @@ import Upload from '../../../components/atoms/Upload';
 import Button from '../../../components/atoms/Button';
 import Icon from '../../../components/atoms/Icon';
 import useCart from '../../../hooks/useCart';
+import useTestingMode from '../../../hooks/useTestingMode';
+import { createOrder } from '../../../services/order.service';
 import { WHATSAPP_NUMBER } from '../../../utils/siteConfig';
 
 function buildWhatsAppMessage(order) {
@@ -37,6 +40,7 @@ function buildWhatsAppMessage(order) {
 
 export default function CheckoutPage() {
   const { items, totalPrice, clearCart } = useCart();
+  const { testingMode } = useTestingMode();
 
   const [shipping, setShipping] = useState({ name: '', phone: '', address: '', city: '' });
   const [paymentMethod, setPaymentMethod] = useState('cod');
@@ -44,37 +48,68 @@ export default function CheckoutPage() {
   const [screenshot, setScreenshot] = useState([]);
   const [error, setError] = useState('');
   const [order, setOrder] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
 
   const updateShipping = (field) => (e) =>
     setShipping((prev) => ({ ...prev, [field]: e.target.value }));
 
-  const handlePlaceOrder = (e) => {
+  const handlePlaceOrder = async (e) => {
     e.preventDefault();
     if (!shipping.name.trim() || !shipping.phone.trim() || !shipping.address.trim() || !shipping.city.trim()) {
       setError('Please fill in all shipping details.');
       return;
     }
     setError('');
+    setSubmitting(true);
 
-    const orderRecord = {
-      id:
-        typeof crypto !== 'undefined' && crypto.randomUUID
-          ? crypto.randomUUID().slice(0, 8)
-          : `${Date.now()}`,
-      placedAt: new Date().toISOString(),
-      items,
-      total: totalPrice,
-      paymentMethod,
-      transactionId,
-      shipping,
-      screenshotAttached: screenshot.length > 0,
-    };
+    try {
+      if (testingMode) {
+        const orderRecord = {
+          id:
+            typeof crypto !== 'undefined' && crypto.randomUUID
+              ? crypto.randomUUID().slice(0, 8)
+              : `${Date.now()}`,
+          placedAt: new Date().toISOString(),
+          items,
+          total: totalPrice,
+          paymentMethod,
+          transactionId,
+          shipping,
+          screenshotAttached: screenshot.length > 0,
+        };
 
-    const existingOrders = JSON.parse(localStorage.getItem('Fito_orders') || '[]');
-    localStorage.setItem('Fito_orders', JSON.stringify([...existingOrders, orderRecord]));
+        const existingOrders = JSON.parse(localStorage.getItem('Fito_orders') || '[]');
+        localStorage.setItem('Fito_orders', JSON.stringify([...existingOrders, orderRecord]));
 
-    setOrder(orderRecord);
-    clearCart();
+        setOrder(orderRecord);
+      } else {
+        const createdOrder = await createOrder({
+          items: items.map((item) => ({ name: item.name, qty: item.quantity, price: item.price })),
+          total: totalPrice,
+          paymentMethod,
+          transactionId,
+          screenshotAttached: screenshot.length > 0,
+          shipping,
+        });
+
+        setOrder({
+          id: createdOrder.id,
+          placedAt: createdOrder.placedAt,
+          items,
+          total: createdOrder.total,
+          paymentMethod: createdOrder.paymentMethod,
+          transactionId: createdOrder.transactionId,
+          shipping: createdOrder.shipping,
+        });
+      }
+
+      clearCart();
+    } catch {
+      setError('Something went wrong while placing your order. Please try again.');
+      message.error('Failed to place order');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleSendToWhatsApp = () => {
@@ -259,7 +294,7 @@ export default function CheckoutPage() {
               <span>Total</span>
               <span>PKR {totalPrice.toFixed(2)}</span>
             </div>
-            <Button type="submit" variant="primary" size="lg" fullWidth>
+            <Button type="submit" variant="primary" size="lg" fullWidth loading={submitting}>
               Place Order
             </Button>
           </div>

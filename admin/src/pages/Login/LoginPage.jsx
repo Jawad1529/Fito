@@ -4,10 +4,13 @@ import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useTestingMode } from '../../context/TestingModeContext';
+import TestingModeToggle from '../../components/atoms/TestingModeToggle';
 import { ROUTES } from '../../constants/routes';
 
 export default function LoginPage() {
     const { login } = useAuth();
+    const { testingMode } = useTestingMode();
     const navigate = useNavigate();
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
@@ -33,6 +36,10 @@ export default function LoginPage() {
                     'radial-gradient(circle at 50% 0%, var(--color-primary-light) 0%, var(--color-page) 55%)',
             }}
         >
+            <div className="fixed top-4 right-4">
+                <TestingModeToggle />
+            </div>
+
             <motion.div
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -53,7 +60,13 @@ export default function LoginPage() {
 
                     {error && <Alert type="error" message={error} className="mb-4" showIcon />}
 
-                    <Form layout="vertical" onFinish={onFinish} initialValues={{ email: 'super@Fito.com', password: 'password' }}>
+                    <Form
+                        layout="vertical"
+                        onFinish={onFinish}
+                        initialValues={
+                            testingMode ? { email: 'super@Fito.com', password: 'password' } : undefined
+                        }
+                    >
                         <Form.Item name="email" label="Email" rules={[{ required: true, message: 'Email is required' }]}>
                             <Input size="large" prefix={<UserOutlined className="text-gray-400" />} placeholder="you@Fito.com" />
                         </Form.Item>
@@ -65,9 +78,11 @@ export default function LoginPage() {
                         </Button>
                     </Form>
 
-                    <p className="text-xs text-gray-400 text-center mt-6">
-                        Demo: super@Fito.com / admin@Fito.com — password: password
-                    </p>
+                    {testingMode && (
+                        <p className="text-xs text-gray-400 text-center mt-6">
+                            Demo: super@Fito.com / admin@Fito.com — password: password
+                        </p>
+                    )}
                 </Card>
             </motion.div>
         </div>

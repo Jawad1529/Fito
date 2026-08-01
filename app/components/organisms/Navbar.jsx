@@ -3,10 +3,13 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Switch, Tooltip } from 'antd';
 import Icon from '../atoms/Icon';
 import Button from '../atoms/Button';
 import Badge from '../atoms/Badge';
 import useCart from '../../hooks/useCart';
+import useAuth from '../../hooks/useAuth';
+import useTestingMode from '../../hooks/useTestingMode';
 
 const navLinks = [
   { label: 'Home', href: '/' },
@@ -21,6 +24,8 @@ export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const { totalItems } = useCart();
+  const { user, isAuthenticated, logout } = useAuth();
+  const { testingMode, setTestingMode } = useTestingMode();
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
@@ -73,6 +78,18 @@ export default function Navbar() {
 
             {/* Right side */}
             <div className="hidden lg:flex items-center space-x-5">
+              <Tooltip
+                title={
+                  testingMode
+                    ? 'Testing mode is ON — using mock data, no API calls'
+                    : 'Testing mode is OFF — using the live API'
+                }
+              >
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-text-secondary">Testing</span>
+                  <Switch size="small" checked={testingMode} onChange={setTestingMode} />
+                </div>
+              </Tooltip>
               <button aria-label="Search" className="text-text-secondary hover:text-text transition-colors">
                 <Icon name="search" className="w-5 h-5" />
               </button>
@@ -86,11 +103,20 @@ export default function Navbar() {
                   <Icon name="cart" className="w-5 h-5" />
                 </Link>
               </Badge>
-              <Link href="/login">
-                <Button variant="primary" icon={<Icon name="login" className="w-4 h-4" />}>
-                  Login
-                </Button>
-              </Link>
+              {isAuthenticated ? (
+                <div className="flex items-center gap-3">
+                  <span className="text-sm text-text-secondary">Hi, {user?.name}</span>
+                  <Button variant="outline" onClick={logout}>
+                    Logout
+                  </Button>
+                </div>
+              ) : (
+                <Link href="/login">
+                  <Button variant="primary" icon={<Icon name="login" className="w-4 h-4" />}>
+                    Login
+                  </Button>
+                </Link>
+              )}
             </div>
 
             {/* Compact controls below lg: search + menu only */}
@@ -163,16 +189,37 @@ export default function Navbar() {
                   </Badge>
                 </div>
 
-                <Link href="/login" onClick={() => setMobileOpen(false)}>
-                  <Button
-                    variant="primary"
-                    icon={<Icon name="login" className="w-4 h-4" />}
-                    fullWidth
-                    className="mt-6"
-                  >
-                    Login
-                  </Button>
-                </Link>
+                <div className="flex items-center justify-between pt-5">
+                  <span className="text-sm text-text-secondary">Testing Mode</span>
+                  <Switch size="small" checked={testingMode} onChange={setTestingMode} />
+                </div>
+
+                {isAuthenticated ? (
+                  <div className="mt-6">
+                    <p className="text-sm text-text-secondary mb-2">Signed in as {user?.name}</p>
+                    <Button
+                      variant="outline"
+                      fullWidth
+                      onClick={() => {
+                        logout();
+                        setMobileOpen(false);
+                      }}
+                    >
+                      Logout
+                    </Button>
+                  </div>
+                ) : (
+                  <Link href="/login" onClick={() => setMobileOpen(false)}>
+                    <Button
+                      variant="primary"
+                      icon={<Icon name="login" className="w-4 h-4" />}
+                      fullWidth
+                      className="mt-6"
+                    >
+                      Login
+                    </Button>
+                  </Link>
+                )}
               </div>
             </motion.div>
           </>
