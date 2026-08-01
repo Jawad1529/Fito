@@ -60,7 +60,7 @@ export default function TransformationStories() {
         >
           <H2>Transformation Stories</H2>
           <Text muted className="mt-3 max-w-xl mx-auto">
-            Real results from real people who trusted Fitoo to help them reach their goals.
+            Real results from real people who trusted Fito to help them reach their goals.
           </Text>
         </motion.div>
 

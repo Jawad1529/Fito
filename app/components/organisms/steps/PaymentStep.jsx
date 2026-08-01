@@ -75,7 +75,7 @@ export default function PaymentStep({
           <div>
             <Text muted>Account Title</Text>
             <div className="text-text font-medium">
-              Fitoo Nutrition
+              Fito Nutrition
             </div>
           </div>
 

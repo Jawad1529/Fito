@@ -58,7 +58,7 @@ export default function Sidebar({ collapsed }) {
                     F
                 </div>
                 {!collapsed && (
-                    <span className="text-base font-semibold text-gray-900 tracking-tight">Fitoo Admin</span>
+                    <span className="text-base font-semibold text-gray-900 tracking-tight">Fito Admin</span>
                 )}
             </div>
 

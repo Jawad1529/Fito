@@ -47,15 +47,15 @@ export default function LoginPage() {
                         <div className="w-11 h-11 rounded-xl bg-primary text-white flex items-center justify-center text-lg font-bold mx-auto mb-4">
                             F
                         </div>
-                        <h1 className="text-xl font-semibold text-gray-900">Fitoo Admin</h1>
+                        <h1 className="text-xl font-semibold text-gray-900">Fito Admin</h1>
                         <p className="text-sm text-gray-500 mt-1">Sign in to manage your store</p>
                     </div>
 
                     {error && <Alert type="error" message={error} className="mb-4" showIcon />}
 
-                    <Form layout="vertical" onFinish={onFinish} initialValues={{ email: 'super@Fitoo.com', password: 'password' }}>
+                    <Form layout="vertical" onFinish={onFinish} initialValues={{ email: 'super@Fito.com', password: 'password' }}>
                         <Form.Item name="email" label="Email" rules={[{ required: true, message: 'Email is required' }]}>
-                            <Input size="large" prefix={<UserOutlined className="text-gray-400" />} placeholder="you@Fitoo.com" />
+                            <Input size="large" prefix={<UserOutlined className="text-gray-400" />} placeholder="you@Fito.com" />
                         </Form.Item>
                         <Form.Item name="password" label="Password" rules={[{ required: true, message: 'Password is required' }]}>
                             <Input.Password size="large" prefix={<LockOutlined className="text-gray-400" />} placeholder="••••••••" />
@@ -66,7 +66,7 @@ export default function LoginPage() {
                     </Form>
 
                     <p className="text-xs text-gray-400 text-center mt-6">
-                        Demo: super@Fitoo.com / admin@Fitoo.com — password: password
+                        Demo: super@Fito.com / admin@Fito.com — password: password
                     </p>
                 </Card>
             </motion.div>

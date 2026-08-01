@@ -9,7 +9,7 @@ const { ROLES } = require('../constants/roles');
 const run = async () => {
     await connectDB();
 
-    const email = process.env.SEED_SUPER_ADMIN_EMAIL || 'super@Fitoo.com';
+    const email = process.env.SEED_SUPER_ADMIN_EMAIL || 'super@Fito.com';
     const existing = await Admin.findOne({ email });
     if (existing) {
         console.log(`Super admin already exists: ${email}`);

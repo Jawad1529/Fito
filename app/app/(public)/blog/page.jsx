@@ -28,7 +28,7 @@ export default function BlogPage() {
           transition={{ duration: 0.6 }}
           className="text-center mb-10"
         >
-          <H2>The Fitoo Blog</H2>
+          <H2>The Fito Blog</H2>
           <Text muted className="mt-2 max-w-xl mx-auto">
             Nutrition science, training tips, and supplement guides to help you train and eat smarter.
           </Text>

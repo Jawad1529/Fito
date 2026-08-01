@@ -1,6 +1,6 @@
-# Fitoo Frontend Architecture Documentation
+# Fito Frontend Architecture Documentation
 
-> **Project:** Fitoo
+> **Project:** Fito
 >
 > **Framework:** Next.js 15 (App Router)
 >
@@ -34,7 +34,7 @@
 # Folder Structure
 
 ```text
-Fitoo/
+Fito/
 │
 ├── app/                        # Next.js App Router
 │   ├── (public)/
@@ -650,6 +650,6 @@ Focus on performance over excessive visual effects.
 
 # Vision
 
-Fitoo is designed to become a complete fitness ecosystem combining premium supplement e-commerce with personalized diet consultation.
+Fito is designed to become a complete fitness ecosystem combining premium supplement e-commerce with personalized diet consultation.
 
 The architecture emphasizes scalability, clean code, maintainability, performance, accessibility, and SEO so the project can grow without requiring major structural changes.

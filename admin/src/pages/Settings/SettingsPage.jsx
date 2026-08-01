@@ -75,7 +75,7 @@ function GeneralSettingsTab() {
             <Form
                 form={form}
                 layout="vertical"
-                initialValues={{ storeName: 'Fitoo', supportEmail: 'support@Fitoo.com' }}
+                initialValues={{ storeName: 'Fito', supportEmail: 'support@Fito.com' }}
                 onFinish={() => message.success('Settings saved')}
             >
                 <Form.Item name="storeName" label="Store Name" rules={[{ required: true }]}>

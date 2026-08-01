@@ -50,7 +50,7 @@ export default function Navbar() {
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <Link href="/" className="text-2xl font-bold text-text tracking-tight shrink-0">
-              Fitoo
+              Fito
             </Link>
 
             {/* Desktop nav — only from lg up, so tablets don't get crammed */}

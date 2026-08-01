@@ -23,7 +23,7 @@ const makeWelcomeMessage = () => ({
 
 export default function ConversationPanel() {
   const [messages, setMessages] = useLocalStorageState(
-    'Fitoo_conversation',
+    'Fito_conversation',
     null
   );
   const bottomRef = useRef(null);

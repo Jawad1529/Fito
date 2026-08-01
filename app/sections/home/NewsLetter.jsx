@@ -88,7 +88,7 @@ export default function Newsletter() {
                   You're subscribed! 🎉
                 </Text>
                 <Text className="text-text-muted text-sm">
-                  Check your inbox for exclusive updates from Fitoo.
+                  Check your inbox for exclusive updates from Fito.
                 </Text>
                 <Button
                   variant="outline"

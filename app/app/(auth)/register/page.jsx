@@ -37,7 +37,7 @@ export default function RegisterPage() {
     >
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-text">Create Account</h1>
-        <p className="text-text-muted mt-2">Join Fitoo and start your fitness journey</p>
+        <p className="text-text-muted mt-2">Join Fito and start your fitness journey</p>
       </div>
 
       <Form

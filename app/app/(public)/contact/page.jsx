@@ -25,7 +25,7 @@ export default function ContactPage() {
     }
     setError('');
 
-    const subject = encodeURIComponent(`Message from ${form.name} via Fitoo website`);
+    const subject = encodeURIComponent(`Message from ${form.name} via Fito website`);
     const body = encodeURIComponent(`${form.message}\n\n— ${form.name} (${form.email})`);
     window.location.href = `mailto:${CONTACT_EMAIL}?subject=${subject}&body=${body}`;
   };
