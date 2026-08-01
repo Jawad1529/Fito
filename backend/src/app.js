@@ -1,9 +1,9 @@
-const express = require('express');
-const cors = require('cors');
-const authRoutes = require('./routes/auth.routes');
-const adminAuthRoutes = require('./routes/adminAuth.routes');
-const adminUsersRoutes = require('./routes/adminUsers.routes');
-const { notFound, errorHandler } = require('./middleware/error.middleware');
+import express from 'express';
+import cors from 'cors';
+import authRoutes from './routes/auth.routes.js';
+import adminAuthRoutes from './routes/adminAuth.routes.js';
+import adminUsersRoutes from './routes/adminUsers.routes.js';
+import { notFound, errorHandler } from './middleware/error.middleware.js';
 
 const app = express();
 
@@ -19,4 +19,4 @@ app.use('/api/admin/users', adminUsersRoutes);
 app.use(notFound);
 app.use(errorHandler);
 
-module.exports = app;
+export default app;

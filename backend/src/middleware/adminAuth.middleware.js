@@ -1,10 +1,10 @@
-const jwt = require('jsonwebtoken');
-const asyncHandler = require('../utils/asyncHandler');
-const Admin = require('../models/Admin.model');
-const { ROLES } = require('../constants/roles');
+import jwt from 'jsonwebtoken';
+import asyncHandler from '../utils/asyncHandler.js';
+import Admin from '../models/Admin.model.js';
+import { ROLES } from '../constants/roles.js';
 
 // Protects admin-panel routes.
-const protectAdmin = asyncHandler(async (req, res, next) => {
+export const protectAdmin = asyncHandler(async (req, res, next) => {
     const header = req.headers.authorization;
     if (!header?.startsWith('Bearer ')) {
         res.status(401);
@@ -27,12 +27,10 @@ const protectAdmin = asyncHandler(async (req, res, next) => {
 });
 
 // Gates routes to super admins only, e.g. creating new admin accounts.
-const requireSuperAdmin = (req, res, next) => {
+export const requireSuperAdmin = (req, res, next) => {
     if (req.admin?.role !== ROLES.SUPER_ADMIN) {
         res.status(403);
         throw new Error('Super admin access required');
     }
     next();
 };
-
-module.exports = { protectAdmin, requireSuperAdmin };

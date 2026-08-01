@@ -1,6 +1,6 @@
-const express = require('express');
-const { loginAdmin, getMeAdmin, createAdmin } = require('../controllers/adminAuth.controller');
-const { protectAdmin, requireSuperAdmin } = require('../middleware/adminAuth.middleware');
+import express from 'express';
+import { loginAdmin, getMeAdmin, createAdmin } from '../controllers/adminAuth.controller.js';
+import { protectAdmin, requireSuperAdmin } from '../middleware/adminAuth.middleware.js';
 
 const router = express.Router();
 
@@ -9,4 +9,4 @@ router.get('/me', protectAdmin, getMeAdmin);
 // Only an authenticated super admin can create new admin accounts.
 router.post('/create', protectAdmin, requireSuperAdmin, createAdmin);
 
-module.exports = router;
+export default router;

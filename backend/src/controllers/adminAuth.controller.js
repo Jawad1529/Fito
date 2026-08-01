@@ -1,11 +1,11 @@
-const asyncHandler = require('../utils/asyncHandler');
-const generateToken = require('../utils/generateToken');
-const Admin = require('../models/Admin.model');
-const { ROLES } = require('../constants/roles');
-const { toPublicAdmin } = require('../utils/serializers');
+import asyncHandler from '../utils/asyncHandler.js';
+import generateToken from '../utils/generateToken.js';
+import Admin from '../models/Admin.model.js';
+import { ROLES } from '../constants/roles.js';
+import { toPublicAdmin } from '../utils/serializers.js';
 
 // POST /api/admin/auth/login
-const loginAdmin = asyncHandler(async (req, res) => {
+export const loginAdmin = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
 
     const admin = await Admin.findOne({ email }).select('+password');
@@ -21,12 +21,12 @@ const loginAdmin = asyncHandler(async (req, res) => {
 });
 
 // GET /api/admin/auth/me
-const getMeAdmin = asyncHandler(async (req, res) => {
+export const getMeAdmin = asyncHandler(async (req, res) => {
     res.json({ admin: toPublicAdmin(req.admin) });
 });
 
 // POST /api/admin/auth/create — super admin only, no public admin signup.
-const createAdmin = asyncHandler(async (req, res) => {
+export const createAdmin = asyncHandler(async (req, res) => {
     const { name, email, password, role } = req.body;
 
     if (!name || !email || !password) {
@@ -49,5 +49,3 @@ const createAdmin = asyncHandler(async (req, res) => {
 
     res.status(201).json({ admin: toPublicAdmin(admin) });
 });
-
-module.exports = { loginAdmin, getMeAdmin, createAdmin };

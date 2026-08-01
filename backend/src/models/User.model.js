@@ -1,6 +1,6 @@
-const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
-const { USER_STATUS } = require('../constants/userStatus');
+import mongoose from 'mongoose';
+import bcrypt from 'bcryptjs';
+import { USER_STATUS } from '../constants/userStatus.js';
 
 // App-side (customer) account — no roles, that's admin-only. New signups
 // start inactive and can't log in until a super admin activates them.
@@ -29,4 +29,4 @@ userSchema.methods.comparePassword = function comparePassword(candidate) {
     return bcrypt.compare(candidate, this.password);
 };
 
-module.exports = mongoose.model('User', userSchema);
+export default mongoose.model('User', userSchema);

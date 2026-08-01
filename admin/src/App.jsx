@@ -14,6 +14,7 @@ import ProductManagementPage from './pages/Products/ProductManagementPage';
 import BlogManagementPage from './pages/Blogs/BlogManagementPage';
 import NotificationManagementPage from './pages/Notifications/NotificationManagementPage';
 import ReviewManagementPage from './pages/Reviews/ReviewManagementPage';
+import OrderManagementPage from './pages/Orders/OrderManagementPage';
 import SettingsPage from './pages/Settings/SettingsPage';
 import UnauthorizedPage from './pages/Unauthorized/UnauthorizedPage';
 import { ROUTES } from './constants/routes';
@@ -73,6 +74,7 @@ export default function App() {
                 <Route element={<RequireSuperAdmin />}>
                   <Route path={ROUTES.USERS} element={<UserManagementPage />} />
                   <Route path={ROUTES.REVIEWS} element={<ReviewManagementPage />} />
+                  <Route path={ROUTES.ORDERS} element={<OrderManagementPage />} />
                 </Route>
               </Route>
             </Route>

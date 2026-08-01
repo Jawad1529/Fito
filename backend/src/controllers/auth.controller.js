@@ -1,13 +1,13 @@
-const asyncHandler = require('../utils/asyncHandler');
-const generateToken = require('../utils/generateToken');
-const User = require('../models/User.model');
-const { USER_STATUS } = require('../constants/userStatus');
-const { toPublicUser } = require('../utils/serializers');
+import asyncHandler from '../utils/asyncHandler.js';
+import generateToken from '../utils/generateToken.js';
+import User from '../models/User.model.js';
+import { USER_STATUS } from '../constants/userStatus.js';
+import { toPublicUser } from '../utils/serializers.js';
 
 // POST /api/auth/register
 // New signups start as USER_STATUS.INACTIVE (schema default) and cannot log
 // in until a super admin activates them, so no token is issued here.
-const registerUser = asyncHandler(async (req, res) => {
+export const registerUser = asyncHandler(async (req, res) => {
     const { name, email, password, phone } = req.body;
 
     if (!name || !email || !password) {
@@ -30,7 +30,7 @@ const registerUser = asyncHandler(async (req, res) => {
 });
 
 // POST /api/auth/login
-const loginUser = asyncHandler(async (req, res) => {
+export const loginUser = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
 
     const user = await User.findOne({ email }).select('+password');
@@ -56,8 +56,6 @@ const loginUser = asyncHandler(async (req, res) => {
 });
 
 // GET /api/auth/me
-const getMe = asyncHandler(async (req, res) => {
+export const getMe = asyncHandler(async (req, res) => {
     res.json({ user: toPublicUser(req.user) });
 });
-
-module.exports = { registerUser, loginUser, getMe };

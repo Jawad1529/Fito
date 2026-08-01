@@ -1,10 +1,10 @@
 // One-off script to create the first super admin, since there's no public
 // admin signup route. Run with `npm run seed:admin`.
-require('dotenv').config();
-const mongoose = require('mongoose');
-const connectDB = require('../config/db');
-const Admin = require('../models/Admin.model');
-const { ROLES } = require('../constants/roles');
+import 'dotenv/config';
+import mongoose from 'mongoose';
+import connectDB from '../config/db.js';
+import Admin from '../models/Admin.model.js';
+import { ROLES } from '../constants/roles.js';
 
 const run = async () => {
     await connectDB();

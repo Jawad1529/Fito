@@ -1,6 +1,6 @@
 // Shared response shapes so User/Admin documents are serialized the same
 // way everywhere they're returned (auth, admin user management, etc).
-const toPublicUser = (user) => ({
+export const toPublicUser = (user) => ({
     id: user._id,
     name: user.name,
     email: user.email,
@@ -9,11 +9,9 @@ const toPublicUser = (user) => ({
     createdAt: user.createdAt,
 });
 
-const toPublicAdmin = (admin) => ({
+export const toPublicAdmin = (admin) => ({
     id: admin._id,
     name: admin.name,
     email: admin.email,
     role: admin.role,
 });
-
-module.exports = { toPublicUser, toPublicAdmin };

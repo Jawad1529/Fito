@@ -9,6 +9,7 @@ export const PAGE_TITLES = [
     { path: ROUTES.CONSULTATIONS, title: 'Consultation Management' },
     { path: ROUTES.PRODUCTS, title: 'Product Management' },
     { path: ROUTES.REVIEWS, title: 'Review Management' },
+    { path: ROUTES.ORDERS, title: 'Order Management' },
     { path: ROUTES.BLOGS, title: 'Blog Management' },
     { path: ROUTES.NOTIFICATIONS, title: 'Notification Management' },
     { path: ROUTES.SETTINGS, title: 'Settings' },

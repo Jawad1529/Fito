@@ -1,10 +1,10 @@
-const jwt = require('jsonwebtoken');
-const asyncHandler = require('../utils/asyncHandler');
-const User = require('../models/User.model');
-const { USER_STATUS } = require('../constants/userStatus');
+import jwt from 'jsonwebtoken';
+import asyncHandler from '../utils/asyncHandler.js';
+import User from '../models/User.model.js';
+import { USER_STATUS } from '../constants/userStatus.js';
 
 // Protects app-side (customer) routes.
-const protect = asyncHandler(async (req, res, next) => {
+export const protect = asyncHandler(async (req, res, next) => {
     const header = req.headers.authorization;
     if (!header?.startsWith('Bearer ')) {
         res.status(401);
@@ -35,5 +35,3 @@ const protect = asyncHandler(async (req, res, next) => {
     req.user = user;
     next();
 });
-
-module.exports = { protect };

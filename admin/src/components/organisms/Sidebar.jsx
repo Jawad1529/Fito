@@ -5,6 +5,7 @@ import {
     TeamOutlined,
     MedicineBoxOutlined,
     ShoppingOutlined,
+    ShoppingCartOutlined,
     StarOutlined,
     ReadOutlined,
     BellOutlined,
@@ -25,6 +26,7 @@ export default function Sidebar({ collapsed }) {
         { key: ROUTES.CONSULTATIONS, icon: <MedicineBoxOutlined />, label: 'Consultation Management' },
         { key: ROUTES.PRODUCTS, icon: <ShoppingOutlined />, label: 'Product Management' },
         isSuperAdmin && { key: ROUTES.REVIEWS, icon: <StarOutlined />, label: 'Review Management' },
+        isSuperAdmin && { key: ROUTES.ORDERS, icon: <ShoppingCartOutlined />, label: 'Order Management' },
         { key: ROUTES.BLOGS, icon: <ReadOutlined />, label: 'Blog Management' },
         { key: ROUTES.NOTIFICATIONS, icon: <BellOutlined />, label: 'Notification Management' },
     ].filter(Boolean);

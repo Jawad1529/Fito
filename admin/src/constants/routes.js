@@ -6,6 +6,7 @@ export const ROUTES = {
     CONSULTATION_DETAIL: '/consultations/:id',
     PRODUCTS: '/products',
     REVIEWS: '/reviews',
+    ORDERS: '/orders',
     BLOGS: '/blogs',
     NOTIFICATIONS: '/notifications',
     SETTINGS: '/settings',

@@ -1,6 +1,6 @@
-const express = require('express');
-const { listUsers, updateUserStatus } = require('../controllers/adminUsers.controller');
-const { protectAdmin, requireSuperAdmin } = require('../middleware/adminAuth.middleware');
+import express from 'express';
+import { listUsers, updateUserStatus } from '../controllers/adminUsers.controller.js';
+import { protectAdmin, requireSuperAdmin } from '../middleware/adminAuth.middleware.js';
 
 const router = express.Router();
 
@@ -11,4 +11,4 @@ router.use(protectAdmin, requireSuperAdmin);
 router.get('/', listUsers);
 router.patch('/:id/status', updateUserStatus);
 
-module.exports = router;
+export default router;

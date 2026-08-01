@@ -1,6 +1,6 @@
-const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
-const { ROLES } = require('../constants/roles');
+import mongoose from 'mongoose';
+import bcrypt from 'bcryptjs';
+import { ROLES } from '../constants/roles.js';
 
 const adminSchema = new mongoose.Schema(
     {
@@ -26,4 +26,4 @@ adminSchema.methods.comparePassword = function comparePassword(candidate) {
     return bcrypt.compare(candidate, this.password);
 };
 
-module.exports = mongoose.model('Admin', adminSchema);
+export default mongoose.model('Admin', adminSchema);
