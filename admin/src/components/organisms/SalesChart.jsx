@@ -9,6 +9,7 @@ import {
     CartesianGrid,
 } from 'recharts';
 import { salesLast7Days, salesLast30Days, salesLast12Months } from '../../data/analytics';
+import { BRAND } from '../../constants/theme';
 
 const RANGES = [
     { key: '7d', label: 'Last 7 Days', data: salesLast7Days },
@@ -30,8 +31,8 @@ export default function SalesChart() {
                                 <AreaChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                                     <defs>
                                         <linearGradient id="salesGradient" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="5%" stopColor="#CF4842" stopOpacity={0.4} />
-                                            <stop offset="95%" stopColor="#CF4842" stopOpacity={0} />
+                                            <stop offset="5%" stopColor={BRAND.primary} stopOpacity={0.4} />
+                                            <stop offset="95%" stopColor={BRAND.primary} stopOpacity={0} />
                                         </linearGradient>
                                     </defs>
                                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
@@ -50,7 +51,7 @@ export default function SalesChart() {
                                     <Area
                                         type="monotone"
                                         dataKey="sales"
-                                        stroke="#CF4842"
+                                        stroke={BRAND.primary}
                                         strokeWidth={2}
                                         fill="url(#salesGradient)"
                                     />

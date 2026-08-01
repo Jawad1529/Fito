@@ -7,6 +7,7 @@ export const ROUTES = {
     PRODUCTS: '/products',
     REVIEWS: '/reviews',
     BLOGS: '/blogs',
+    NOTIFICATIONS: '/notifications',
     SETTINGS: '/settings',
     UNAUTHORIZED: '/unauthorized',
 };

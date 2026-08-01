@@ -15,7 +15,7 @@ export default function DataTable({ columns, data, loading, rowKey = 'id', pageS
                 pageSizeOptions: [5, 8, 10, 20],
                 showTotal: (total) => `${total} items`,
             }}
-            className="bg-white rounded-xl overflow-hidden"
+            className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden"
         />
     );
 }

@@ -39,7 +39,7 @@ export default function Header({ collapsed, onToggle }) {
                     type="button"
                     onClick={onToggle}
                     aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-                    className="text-lg text-gray-600 hover:text-primary transition-colors shrink-0"
+                    className="text-lg text-gray-600 hover:text-primary hover:bg-gray-50 transition-colors shrink-0 w-9 h-9 rounded-lg flex items-center justify-center -ml-1"
                 >
                     {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
                 </button>
@@ -47,7 +47,7 @@ export default function Header({ collapsed, onToggle }) {
             </div>
 
             <Dropdown menu={{ items: menuItems }} trigger={['click']}>
-                <button type="button" className="flex items-center gap-3 cursor-pointer">
+                <button type="button" className="flex items-center gap-3 cursor-pointer rounded-lg px-2 py-1.5 -mr-2 hover:bg-gray-50 transition-colors">
                     <div className="text-right hidden sm:block">
                         <p className="text-sm font-medium text-gray-900 leading-tight">{user?.name}</p>
                         <p className="text-xs text-gray-500 leading-tight">{ROLE_LABELS[user?.role]}</p>

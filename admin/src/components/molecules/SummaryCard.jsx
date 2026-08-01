@@ -1,9 +1,10 @@
 import { Card } from 'antd';
+import { BRAND } from '../../constants/theme';
 
-export default function SummaryCard({ icon, label, value, accent = '#CF4842' }) {
+export default function SummaryCard({ icon, label, value, accent = BRAND.primary }) {
     return (
         <Card
-            className="rounded-2xl border border-gray-100 shadow-sm"
+            className="rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
             styles={{ body: { padding: '20px' } }}
         >
             <div className="flex items-center gap-4">

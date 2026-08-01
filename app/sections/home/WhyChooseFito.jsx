@@ -81,7 +81,7 @@ const features = [
   },
 ];
 
-export default function WhyChooseFito() {
+export default function WhyChooseFitoo() {
   return (
     <section className="relative py-20 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -92,7 +92,7 @@ export default function WhyChooseFito() {
           viewport={{ once: true }}
           className="text-center mb-12"
         >
-          <H2>Why Choose Fito</H2>
+          <H2>Why Choose Fitoo</H2>
           <Text muted className="mt-3 max-w-xl mx-auto">
             We combine science, quality, and care to deliver the best nutrition experience.
           </Text>

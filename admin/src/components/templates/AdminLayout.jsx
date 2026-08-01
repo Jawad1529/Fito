@@ -23,7 +23,7 @@ export default function AdminLayout() {
             </Sider>
             <Layout>
                 <Header collapsed={collapsed} onToggle={() => setCollapsed((c) => !c)} />
-                <Content className="p-4 sm:p-6 bg-[#f5f6fa] min-h-[calc(100vh-64px)]">
+                <Content className="p-4 sm:p-6 bg-page min-h-[calc(100vh-64px)]">
                     <Outlet />
                 </Content>
             </Layout>

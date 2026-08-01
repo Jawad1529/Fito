@@ -2,7 +2,7 @@ import './globals.css';
 import MainLayout from '@/components/layouts/MainLayout';
 
 export const metadata = {
-  title: 'Fito',
+  title: 'Fitoo',
   description: 'Premium supplements and personalized diet consultation',
 };
 

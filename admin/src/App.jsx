@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { RequireAuth, RequireSuperAdmin } from './components/templates/ProtectedRoute';
 import AdminLayout from './components/templates/AdminLayout';
+import { BRAND } from './constants/theme';
 
 import LoginPage from './pages/Login/LoginPage';
 import DashboardPage from './pages/Dashboard/DashboardPage';
@@ -11,6 +12,7 @@ import ConsultationManagementPage from './pages/Consultations/ConsultationManage
 import ConsultationDetailPage from './pages/Consultations/ConsultationDetailPage';
 import ProductManagementPage from './pages/Products/ProductManagementPage';
 import BlogManagementPage from './pages/Blogs/BlogManagementPage';
+import NotificationManagementPage from './pages/Notifications/NotificationManagementPage';
 import ReviewManagementPage from './pages/Reviews/ReviewManagementPage';
 import SettingsPage from './pages/Settings/SettingsPage';
 import UnauthorizedPage from './pages/Unauthorized/UnauthorizedPage';
@@ -18,11 +20,34 @@ import { ROUTES } from './constants/routes';
 
 const theme = {
   token: {
-    colorPrimary: '#CF4842',
-    colorPrimaryHover: '#A34840',
-    colorPrimaryActive: '#8A3B35',
+    colorPrimary: BRAND.primary,
+    colorPrimaryHover: BRAND.primaryHover,
+    colorPrimaryActive: BRAND.primaryActive,
     borderRadius: 8,
     fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    colorBgLayout: '#F5F6FA',
+  },
+  components: {
+    Table: {
+      borderRadius: 16,
+      headerBg: '#FAFAFB',
+      headerColor: '#6B7280',
+      rowHoverBg: BRAND.primaryLight,
+      cellPaddingBlock: 14,
+      headerSplitColor: 'transparent',
+    },
+    Button: {
+      controlHeight: 38,
+      fontWeight: 500,
+      primaryShadow: 'none',
+    },
+    Menu: {
+      itemSelectedBg: BRAND.primaryLight,
+      itemSelectedColor: BRAND.primary,
+      itemBorderRadius: 10,
+      itemMarginInline: 12,
+      itemHeight: 42,
+    },
   },
 };
 
@@ -41,6 +66,7 @@ export default function App() {
                 <Route path={ROUTES.CONSULTATION_DETAIL} element={<ConsultationDetailPage />} />
                 <Route path={ROUTES.PRODUCTS} element={<ProductManagementPage />} />
                 <Route path={ROUTES.BLOGS} element={<BlogManagementPage />} />
+                <Route path={ROUTES.NOTIFICATIONS} element={<NotificationManagementPage />} />
                 <Route path={ROUTES.SETTINGS} element={<SettingsPage />} />
                 <Route path={ROUTES.UNAUTHORIZED} element={<UnauthorizedPage />} />
 

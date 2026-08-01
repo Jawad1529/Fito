@@ -3,11 +3,11 @@ import { ROLES } from '../constants/roles';
 
 const AuthContext = createContext(null);
 
-const STORAGE_KEY = 'fito_admin_auth';
+const STORAGE_KEY = 'Fitoo_admin_auth';
 
 const DUMMY_ADMINS = [
-    { email: 'super@fito.com', password: 'password', name: 'Omar Farooq', role: ROLES.SUPER_ADMIN },
-    { email: 'admin@fito.com', password: 'password', name: 'Dr. Amina Farooq', role: ROLES.ADMIN },
+    { email: 'super@Fitoo.com', password: 'password', name: 'Omar Farooq', role: ROLES.SUPER_ADMIN },
+    { email: 'admin@Fitoo.com', password: 'password', name: 'Dr. Amina Farooq', role: ROLES.ADMIN },
 ];
 
 const loadStoredUser = () => {

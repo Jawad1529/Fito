@@ -14,6 +14,11 @@ const COLOR_MAP = {
     processing: 'blue',
     shipped: 'cyan',
     cancelled: 'red',
+    sent: 'green',
+    scheduled: 'gold',
+    info: 'blue',
+    promo: 'purple',
+    alert: 'red',
 };
 
 const formatLabel = (value) =>

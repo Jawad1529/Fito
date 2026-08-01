@@ -18,16 +18,19 @@ import { dashboardSummary } from '../../data/analytics';
 import { appUsers } from '../../data/appUsers';
 import { recentOrders } from '../../data/orders';
 import { reviews } from '../../data/reviews';
+import { BRAND } from '../../constants/theme';
 
+// A small coordinated palette (similar saturation/lightness) instead of
+// arbitrary hues, so the stat row reads as one designed set.
 export default function DashboardPage() {
     const cards = [
-        { icon: <TeamOutlined />, label: 'Total Users', value: dashboardSummary.totalUsers.toLocaleString(), accent: '#CF4842' },
-        { icon: <CrownOutlined />, label: 'Total Admins', value: dashboardSummary.totalAdmins, accent: '#f59e0b' },
-        { icon: <ShoppingOutlined />, label: 'Total Products', value: dashboardSummary.totalProducts, accent: '#3b82f6' },
-        { icon: <MedicineBoxOutlined />, label: 'Total Consultations', value: dashboardSummary.totalConsultations, accent: '#10b981' },
-        { icon: <ReadOutlined />, label: 'Total Blogs', value: dashboardSummary.totalBlogs, accent: '#ec4899' },
-        { icon: <StarOutlined />, label: 'Total Reviews', value: dashboardSummary.totalReviews, accent: '#eab308' },
-        { icon: <DollarOutlined />, label: 'Total Sales', value: `$${dashboardSummary.totalSales.toLocaleString()}`, accent: '#ef4444' },
+        { icon: <TeamOutlined />, label: 'Total Users', value: dashboardSummary.totalUsers.toLocaleString(), accent: BRAND.primary },
+        { icon: <CrownOutlined />, label: 'Total Admins', value: dashboardSummary.totalAdmins, accent: '#B8763B' },
+        { icon: <ShoppingOutlined />, label: 'Total Products', value: dashboardSummary.totalProducts, accent: '#3D74B8' },
+        { icon: <MedicineBoxOutlined />, label: 'Total Consultations', value: dashboardSummary.totalConsultations, accent: '#3F9B7B' },
+        { icon: <ReadOutlined />, label: 'Total Blogs', value: dashboardSummary.totalBlogs, accent: '#9C5FBF' },
+        { icon: <StarOutlined />, label: 'Total Reviews', value: dashboardSummary.totalReviews, accent: '#D4A72C' },
+        { icon: <DollarOutlined />, label: 'Total Sales', value: `$${dashboardSummary.totalSales.toLocaleString()}`, accent: '#33587A' },
     ];
 
     return (
