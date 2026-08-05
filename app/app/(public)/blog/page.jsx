@@ -67,8 +67,8 @@ export default function BlogPage() {
               key={cat}
               onClick={() => setSelectedCategory(cat)}
               className={`px-4 py-2 rounded-full text-sm font-medium border transition-colors ${selectedCategory === cat
-                  ? 'bg-primary border-primary text-text-inverse'
-                  : 'bg-transparent border-border-light text-text-secondary hover:text-text hover:border-primary/40'
+                ? 'bg-primary border-primary text-text-inverse'
+                : 'bg-transparent border-border-light text-text-secondary hover:text-text hover:border-primary/40'
                 }`}
             >
               {cat === 'all' ? 'All Posts' : cat}
@@ -89,8 +89,8 @@ export default function BlogPage() {
           </div>
         ) : posts.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {posts.map((post, index) => (
-              <BlogCard key={post.slug} post={post} index={index} />
+            {posts.map((post) => (
+              <BlogCard key={post.slug} post={post} />
             ))}
           </div>
         ) : (

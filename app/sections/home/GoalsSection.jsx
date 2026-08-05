@@ -1,9 +1,6 @@
-'use client';
-
-import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
+import Link from 'next/link';
+import Image from 'next/image';
 import { H2, Text } from '../../components/atoms/Typography';
-import Image from '../../components/atoms/Image';
 
 import heroImage from '../../assets/images/hero.png';
 
@@ -48,61 +45,50 @@ const goals = [
   },
 ];
 
+// No 'use client' — the cards are links, not buttons with JS handlers, so this
+// whole section ships zero JavaScript. Links also prefetch and work on
+// middle-click, which router.push never did.
 export default function GoalsSection() {
-  const router = useRouter();
-
-  const handleGoalClick = (goalId) => {
-    router.push(`/consultation?goal=${goalId}`);
-  };
-
   return (
-    <section className="relative py-20 overflow-hidden">
+    <section className="relative py-20 section-defer">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
-          className="text-center mb-12"
-        >
+        <div className="text-center mb-12 reveal">
           <H2>What&apos;s Your Goal?</H2>
           <Text muted className="mt-3 max-w-xl mx-auto">
             Pick your goal and we&apos;ll drop you straight into the matching consultation flow.
           </Text>
-        </motion.div>
+        </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {goals.map((goal, index) => (
-            <motion.button
+        {/* Reveal + hover are pure CSS now. Six framer-motion nodes with
+            staggered whileInView meant six JS-driven animations competing with
+            the scroll on the main thread. */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 reveal">
+          {goals.map((goal) => (
+            <Link
               key={goal.id}
-              type="button"
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              viewport={{ once: true }}
-              whileHover={{ scale: 1.03, y: -4 }}
-              onClick={() => handleGoalClick(goal.id)}
-              className="relative cursor-pointer group bg-overlay backdrop-blur-sm border border-border-light rounded-2xl p-6 text-center transition-all duration-300 hover:border-primary/30 hover:bg-overlay-strong"
+              href={`/consultation?goal=${goal.id}`}
+              className="relative block group glass border border-border-light rounded-2xl p-6 text-center hover-lift hover-lift-sm hover:border-primary/30"
             >
               <div className="flex justify-center mb-4">
-                <div className="w-14 h-14">
-                  <Image
-                    src={goal.image}
-                    alt={goal.title}
-                    fill
-                    objectFit="contain"
-                    rounded="rounded-full"
-                  />
-                </div>
+                {/* Static import, so next/image knows the intrinsic size and
+                    generates a blur placeholder at build time — no need for the
+                    client-side skeleton wrapper in atoms/Image. `alt=""`
+                    because the heading right below already names the goal. */}
+                <Image
+                  src={goal.image}
+                  alt=""
+                  width={56}
+                  height={56}
+                  placeholder="blur"
+                  className="w-14 h-14 rounded-full object-contain"
+                />
               </div>
               <h3 className="text-lg font-semibold text-text">{goal.title}</h3>
-              <p className="mt-2 text-sm text-text-muted leading-relaxed">
-                {goal.description}
-              </p>
-              <div className="mt-4 text-primary text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+              <p className="mt-2 text-sm text-text-muted leading-relaxed">{goal.description}</p>
+              <div className="mt-4 text-primary text-sm font-medium md:opacity-0 md:group-hover:opacity-100 transition-opacity">
                 Start Consultation →
               </div>
-            </motion.button>
+            </Link>
           ))}
         </div>
       </div>

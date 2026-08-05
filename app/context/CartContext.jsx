@@ -13,18 +13,18 @@ export function CartProvider({ children }) {
       const existing = items.find((item) => item.id === product.id);
       const next = existing
         ? items.map((item) =>
-            item.id === product.id ? { ...item, quantity: item.quantity + quantity } : item
-          )
+          item.id === product.id ? { ...item, quantity: item.quantity + quantity } : item
+        )
         : [
-            ...items,
-            {
-              id: product.id,
-              name: product.name,
-              price: product.price,
-              image: product.image,
-              quantity,
-            },
-          ];
+          ...items,
+          {
+            id: product.id,
+            name: product.name,
+            price: product.price,
+            image: product.image,
+            quantity,
+          },
+        ];
       setItems(next);
     },
     [items, setItems]
@@ -54,8 +54,20 @@ export function CartProvider({ children }) {
 
   const isInCart = useCallback((id) => items.some((item) => item.id === id), [items]);
 
-  const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
-  const totalPrice = items.reduce((sum, item) => sum + item.quantity * item.price, 0);
+  // Derived in one pass and memoized — this context sits above every page, so
+  // it re-runs on any ancestor render otherwise.
+  const { totalItems, totalPrice } = useMemo(
+    () =>
+      items.reduce(
+        (acc, item) => {
+          acc.totalItems += item.quantity;
+          acc.totalPrice += item.quantity * item.price;
+          return acc;
+        },
+        { totalItems: 0, totalPrice: 0 }
+      ),
+    [items]
+  );
 
   const value = useMemo(
     () => ({

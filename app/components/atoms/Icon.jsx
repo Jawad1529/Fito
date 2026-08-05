@@ -33,6 +33,29 @@ const PATHS = {
   ),
   check: <path d="M20 6L9 17l-5-5" />,
   chevronDown: <path d="M6 9l6 6 6-6" />,
+  // These four were referenced across the app but never defined here, so they
+  // silently rendered nothing (Icon returns null on an unknown name).
+  heart: (
+    <path d="M12 20.3l-1.2-1.1C6.4 15.2 3.5 12.6 3.5 9.4A4.4 4.4 0 0 1 12 7.3a4.4 4.4 0 0 1 8.5 2.1c0 3.2-2.9 5.8-7.3 9.8L12 20.3z" />
+  ),
+  'trending-up': (
+    <>
+      <path d="M3 17l6-6 4 4 8-8" />
+      <path d="M15 7h6v6" />
+    </>
+  ),
+  'check-circle': (
+    <>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M8.5 12.5l2.5 2.5 4.5-5" />
+    </>
+  ),
+  sparkle: (
+    <>
+      <path d="M12 3l1.9 4.9L19 9.8l-5.1 1.9L12 16.6l-1.9-4.9L5 9.8l5.1-1.9L12 3z" />
+      <path d="M18.5 15.5l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8.8-2z" />
+    </>
+  ),
   arrowRight: <path d="M5 12h14M13 5l7 7-7 7" />,
   star: (
     <path

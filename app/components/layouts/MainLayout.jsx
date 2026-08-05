@@ -1,49 +1,24 @@
-'use client';
-
-import { usePathname } from 'next/navigation';
-import { GoogleOAuthProvider } from '@react-oauth/google';
-import Navbar from '@/components/organisms/Navbar';
+// Server component.
+//
+// `children` was always fine here (children pass through a client boundary as
+// already-rendered server output), but Background and Footer were being pulled
+// into the client tree just because their parent was a client component. Now
+// only the pieces that genuinely need the route — the header and footer — sit
+// behind a client boundary, and providers are isolated in their own file.
 import Footer from '@/components/organisms/Footer';
-import { TestingModeProvider } from '@/context/TestingModeContext';
-import { AuthProvider } from '@/context/AuthContext';
-import { CartProvider } from '@/context/CartContext';
 import Background from './Background';
-
-const AUTH_ROUTE_PREFIXES = ['/login', '/register', '/forgot-password', '/verify-otp', '/reset-password'];
+import AppProviders from './AppProviders';
+import LayoutChrome from './LayoutChrome';
 
 export default function MainLayout({ children }) {
-  const pathname = usePathname();
-  const isAuthRoute = AUTH_ROUTE_PREFIXES.some((prefix) => pathname.startsWith(prefix));
-
-  if (isAuthRoute) {
-    return (
-      <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID}>
-        <TestingModeProvider>
-          <AuthProvider>
-            <CartProvider>
-              <div className="min-h-screen flex flex-col bg-background text-text antialiased relative">
-                <Background />
-                <main className="flex-1">{children}</main>
-              </div>
-            </CartProvider>
-          </AuthProvider>
-        </TestingModeProvider>
-      </GoogleOAuthProvider>
-    );
-  }
-
   return (
-    <TestingModeProvider>
-      <AuthProvider>
-        <CartProvider>
-          <div className="min-h-screen flex flex-col bg-background text-text antialiased relative">
-            <Background />
-            <Navbar />
-            <main className="flex-1">{children}</main>
-            <Footer />
-          </div>
-        </CartProvider>
-      </AuthProvider>
-    </TestingModeProvider>
+    <AppProviders>
+      <div className="min-h-screen flex flex-col bg-background text-text antialiased relative">
+        <Background />
+        {/* Footer is passed in as a prop so it stays server-rendered even
+            though LayoutChrome decides whether to show it. */}
+        <LayoutChrome footer={<Footer />}>{children}</LayoutChrome>
+      </div>
+    </AppProviders>
   );
 }

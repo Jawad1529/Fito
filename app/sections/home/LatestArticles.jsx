@@ -1,6 +1,7 @@
 'use client';
 
-import { motion } from 'framer-motion';
+// Still a client component because it reads testing mode and fetches, but all
+// the scroll-time animation work is gone.
 import Image from 'next/image';
 import Link from 'next/link';
 import { H2, Text } from '../../components/atoms/Typography';
@@ -25,20 +26,14 @@ export default function LatestArticles() {
   const articles = testingMode ? blogsData.slice(0, LIMIT) : apiPosts ?? [];
 
   return (
-    <section className="relative py-20 overflow-hidden">
+    <section className="relative py-20 section-defer">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
-          className="text-center mb-12"
-        >
+        <div className="text-center mb-12 reveal">
           <H2>Latest Articles</H2>
           <Text muted className="mt-3 max-w-xl mx-auto">
             Stay informed with expert insights on nutrition, supplements, and fitness.
           </Text>
-        </motion.div>
+        </div>
 
         {loading ? (
           <div className="flex justify-center py-16">
@@ -49,15 +44,11 @@ export default function LatestArticles() {
             No articles published yet.
           </Text>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {articles.map((article, index) => (
-              <motion.article
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 reveal">
+            {articles.map((article) => (
+              <article
                 key={article.id ?? article.slug}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                className="group bg-overlay backdrop-blur-sm border border-border-light rounded-2xl overflow-hidden transition-all duration-500 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-2 flex flex-col"
+                className="group glass border border-border-light rounded-2xl overflow-hidden hover-lift hover:border-primary/30 flex flex-col"
               >
                 <div className="relative w-full aspect-[16/9] overflow-hidden">
                   <Image
@@ -65,7 +56,8 @@ export default function LatestArticles() {
                     alt={article.title}
                     fill
                     unoptimized
-                    className="object-cover transition-transform duration-700 group-hover:scale-105"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    className="object-cover transition-transform duration-700 md:group-hover:scale-105"
                   />
                   <div className="absolute top-3 left-3 bg-primary/90 text-text-inverse text-xs font-semibold px-3 py-1.5 rounded-full">
                     {article.category}
@@ -101,30 +93,27 @@ export default function LatestArticles() {
                       className="inline-flex items-center text-sm font-medium text-primary hover:text-primary-hover transition-colors group-hover:gap-2 gap-1.5"
                     >
                       Read Full Article
-                      <span className="transition-transform group-hover:translate-x-1">→</span>
+                      <span className="transition-transform md:group-hover:translate-x-1">→</span>
                     </Link>
                   </div>
                 </div>
-              </motion.article>
+              </article>
             ))}
           </div>
         )}
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          viewport={{ once: true }}
-          className="text-center mt-12"
-        >
+        <div className="text-center mt-12 reveal">
           <Link
             href="/blog"
             className="inline-flex items-center gap-2 text-text-secondary hover:text-text transition-colors border border-border-light hover:border-primary/30 px-6 py-3 rounded-xl hover:bg-primary/5 group"
           >
             View All Articles
-            <Icon name="arrowRight" className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            <Icon
+              name="arrowRight"
+              className="w-4 h-4 transition-transform md:group-hover:translate-x-1"
+            />
           </Link>
-        </motion.div>
+        </div>
       </div>
     </section>
   );

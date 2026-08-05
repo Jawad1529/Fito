@@ -134,8 +134,8 @@ export default function BlogDetailPage() {
         >
           <h3 className="text-2xl font-bold text-text mb-6">More on {post.category}</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {relatedPosts.map((related, index) => (
-              <BlogCard key={related.slug} post={related} index={index} />
+            {relatedPosts.map((related) => (
+              <BlogCard key={related.slug} post={related} />
             ))}
           </div>
         </motion.div>

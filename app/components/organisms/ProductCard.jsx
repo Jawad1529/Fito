@@ -1,140 +1,92 @@
-'use client';
-
-import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
-import Button from '../atoms/Button';
-import Icon from '../atoms/Icon';
-import useCart from '../../hooks/useCart';
+import { memo } from 'react';
 import imageUrl from '../../utils/imageUrl';
+import ProductCardActions from './ProductCardActions';
 
-// Full Stars component (restored from your original)
-const Stars = ({ rating }) => {
-  const fullStars = Math.floor(rating);
-  const halfStar = rating % 1 >= 0.5 ? 1 : 0;
-  const emptyStars = 5 - fullStars - halfStar;
+// Static star geometry — hoisted out of render so it isn't rebuilt per card.
+const STAR_PATH =
+  'M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z';
+
+function Star({ fill }) {
   return (
-    <div className="flex items-center gap-0.5">
-      {[...Array(fullStars)].map((_, i) => (
-        <Star key={`full-${i}`} filled />
-      ))}
-      {halfStar === 1 && <Star half />}
-      {[...Array(emptyStars)].map((_, i) => (
-        <Star key={`empty-${i}`} />
+    <svg
+      className={`w-4 h-4 ${fill === 'none' ? 'text-text-muted' : 'text-primary'}`}
+      viewBox="0 0 24 24"
+      fill={fill === 'full' ? 'currentColor' : fill === 'half' ? 'url(#halfStar)' : 'none'}
+      stroke="currentColor"
+      strokeWidth="1.5"
+      aria-hidden="true"
+    >
+      <path d={STAR_PATH} />
+    </svg>
+  );
+}
+
+function Stars({ rating = 0 }) {
+  const full = Math.floor(rating);
+  const half = rating % 1 >= 0.5 ? 1 : 0;
+
+  return (
+    <div className="flex items-center gap-0.5" role="img" aria-label={`Rated ${rating} out of 5`}>
+      {Array.from({ length: 5 }, (_, i) => (
+        <Star key={i} fill={i < full ? 'full' : i === full && half ? 'half' : 'none'} />
       ))}
     </div>
   );
-};
+}
 
-const Star = ({ filled = false, half = false }) => (
-  <svg
-    className={`w-4 h-4 ${filled ? 'text-primary' : half ? 'text-primary' : 'text-text-muted'}`}
-    fill={filled ? 'currentColor' : half ? 'url(#halfGrad)' : 'none'}
-    stroke="currentColor"
-    strokeWidth="1.5"
-    viewBox="0 0 24 24"
-  >
-    {half && (
-      <defs>
-        <linearGradient id="halfGrad" x1="0" x2="1" y1="0" y2="0">
-          <stop offset="50%" stopColor="currentColor" />
-          <stop offset="50%" stopColor="none" />
-        </linearGradient>
-      </defs>
-    )}
-    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
-  </svg>
-);
-
-export default function ProductCard({
-  product,
-  isWishlisted = false,
-  onToggleWishlist,
-  index = 0,
-}) {
-  const { addToCart, isInCart } = useCart();
-  const inCart = isInCart(product.id);
-
-  // Prevent navigation when clicking on interactive elements
-  const handleButtonClick = (e, callback) => {
-    e.stopPropagation();
-    callback?.(product.id);
-  };
-
-  const handleAddToCart = (e) => {
-    e.stopPropagation();
-    if (!inCart) addToCart(product);
-  };
+function ProductCard({ product, isWishlisted = false, onToggleWishlist }) {
+  const href = `/product/${product.slug || product.id}`;
 
   return (
-    <Link href={`/product/${product.id}`} passHref>
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: index * 0.1 }}
-        viewport={{ once: true }}
-        whileHover={{ y: -8 }}
-        className="group relative bg-overlay backdrop-blur-sm border border-border-light rounded-2xl p-4 transition-all duration-300 hover:border-primary/30 hover:bg-overlay-strong flex flex-col cursor-pointer"
-      >
-        {/* Image */}
-        <div className="relative w-full aspect-square rounded-xl overflow-hidden bg-overlay mb-4">
-          <Image
-            src={imageUrl(product.image)}
-            alt={product.name}
-            fill
-            unoptimized
-            className="object-cover transition-transform duration-500 group-hover:scale-105"
-          />
+    // Card is a plain element, not an anchor. The link is a stretched overlay
+    // (see below), which is valid HTML — the previous button-inside-anchor
+    // nesting is what required all the stopPropagation handlers.
+    <div className="group relative glass border border-border-light rounded-2xl p-4 flex flex-col hover-lift hover:border-primary/30">
+      <div className="relative w-full aspect-square rounded-xl overflow-hidden bg-overlay mb-4">
+        <Image
+          src={imageUrl(product.image)}
+          alt={product.seo?.imageAlt || product.name}
+          fill
+          // Tells the optimizer the real rendered width per breakpoint. Without
+          // it, next/image assumes 100vw and ships a ~1200px file to a phone
+          // that only ever paints it around 340px.
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+          className="object-cover transition-transform duration-500 md:group-hover:scale-105"
+        />
+      </div>
+
+      <div className="flex flex-col flex-1">
+        <h3 className="text-text font-semibold text-lg leading-tight">
+          {/* Stretched link: covers the whole card for pointer users, stays a
+              single normal link for keyboard and screen readers. */}
+          <Link href={href} className="after:absolute after:inset-0 after:z-0">
+            {product.name}
+          </Link>
+        </h3>
+
+        <span className="text-sm text-text-muted mb-1">{product.category}</span>
+
+        <div className="flex items-center gap-2 mt-1">
+          <Stars rating={product.rating ?? 0} />
+          <span className="text-sm text-text-muted">({product.reviews ?? 0})</span>
         </div>
 
-        {/* Wishlist button – stops propagation */}
-        <button
-          onClick={(e) => handleButtonClick(e, onToggleWishlist)}
-          className="absolute top-4 right-4 w-9 h-9 rounded-full bg-scrim backdrop-blur-sm flex items-center justify-center transition-colors hover:bg-primary/20 border border-border-light z-10"
-          aria-label="Add to wishlist"
-        >
-          <Icon
-            name="heart"
-            className={`w-4 h-4 ${isWishlisted ? 'text-primary fill-primary' : 'text-text-secondary'}`}
-          />
-        </button>
+        <p className="text-sm text-text-muted mt-2 flex-1 line-clamp-2">{product.description}</p>
+      </div>
 
-        {/* Product info */}
-        <div className="flex flex-col flex-1">
-          <div className="flex items-start justify-between">
-            <h3 className="text-text font-semibold text-lg leading-tight">
-              {product.name}
-            </h3>
-          </div>
-          <span className="text-sm text-text-muted mb-1">{product.category}</span>
-
-          {/* Rating with stars – now fully functional */}
-          <div className="flex items-center gap-2 mt-1">
-            <Stars rating={product.rating ?? 0} />
-            <span className="text-sm text-text-muted">({product.reviews ?? 0})</span>
-          </div>
-
-          <p className="text-sm text-text-muted mt-2 flex-1 line-clamp-2">
-            {product.description}
-          </p>
-
-          <div className="mt-4 flex items-center justify-between">
-            <span className="text-xl font-bold text-text">
-              PKR {product.price.toFixed(2)}
-            </span>
-            {/* Quick Add button – stops propagation */}
-            <Button
-              variant={inCart ? 'outline' : 'primary'}
-              size="sm"
-              onClick={handleAddToCart}
-              disabled={inCart}
-              className="rounded-full px-4 py-1.5 text-xs"
-            >
-              {inCart ? 'In Cart' : 'Quick Add'}
-            </Button>
-          </div>
-        </div>
-      </motion.div>
-    </Link>
+      {/* Interactive bits are a small client island; the rest of the card stays
+          server-rendered with no cart context and no hydration cost. */}
+      <ProductCardActions
+        product={product}
+        isWishlisted={isWishlisted}
+        onToggleWishlist={onToggleWishlist}
+      />
+    </div>
   );
 }
+
+// Grids render 8+ of these; memo stops a cart change from re-rendering cards
+// whose props didn't move.
+export default memo(ProductCard);

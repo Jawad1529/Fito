@@ -1,31 +1,44 @@
-'use client';
-
-import { motion, useReducedMotion } from 'framer-motion';
-
+// Decorative app-wide backdrop. Deliberately NOT a client component and
+// deliberately free of framer-motion.
+//
+// This element is `fixed`, so it stays in the compositor for the entire
+// session. It previously animated two `blur-3xl` glows (600px and 300px) on an
+// infinite loop, which meant the GPU re-blurred ~400k pixels every frame for as
+// long as the tab was open — including while scrolling. That was the single
+// largest contributor to mobile scroll jank.
+//
+// The glows are now static radial gradients. A radial gradient is rasterized
+// once and cached; a blurred div is not. Visually they're the same soft falloff
+// at a fraction of the cost, and the drift animation was never perceptible
+// against a full-page scroll anyway.
 export default function Background() {
-  const reduceMotion = useReducedMotion();
-
   return (
-    <div className="fixed inset-0 z-0 pointer-events-none">
+    <div className="fixed inset-0 z-0 decor" aria-hidden="true">
       {/* Brand wash — background fading into primary, per design tokens */}
       <div className="absolute inset-0 bg-gradient-brand opacity-20" />
 
-      {/* Large glow – centered */}
-      <motion.div
-        animate={reduceMotion ? {} : { x: [0, 30, -20, 0], y: [0, -20, 20, 0] }}
-        transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut' }}
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/20 rounded-full blur-3xl"
+      {/* Centre glow + top-right glow, baked into one paint. */}
+      <div
+        className="absolute inset-0"
+        style={{
+          backgroundImage: `
+            radial-gradient(
+              38% 32% at 50% 50%,
+              color-mix(in srgb, var(--primary) 20%, transparent) 0%,
+              transparent 100%
+            ),
+            radial-gradient(
+              20% 18% at 88% 22%,
+              color-mix(in srgb, var(--primary) 12%, transparent) 0%,
+              transparent 100%
+            )
+          `,
+        }}
       />
 
-      {/* Smaller glow – top right */}
-      <motion.div
-        animate={reduceMotion ? {} : { x: [0, -25, 15, 0], y: [0, 15, -15, 0] }}
-        transition={{ duration: 14, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
-        className="absolute top-[20%] right-[10%] w-[300px] h-[300px] bg-primary/10 rounded-full blur-3xl"
-      />
-
-      {/* Precision grid — defined once in globals.css, shared app-wide */}
-      <div className="absolute inset-0 opacity-[0.1] bg-grid-pattern" />
+      {/* Precision grid — hidden on small screens where it's near-invisible
+          but still costs a full-viewport tiled paint. */}
+      <div className="absolute inset-0 opacity-[0.1] bg-grid-pattern hidden sm:block" />
     </div>
   );
 }

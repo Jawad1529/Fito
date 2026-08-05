@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Switch, Tooltip } from 'antd';
@@ -27,10 +27,25 @@ export default function Navbar() {
   const { user, isAuthenticated, logout } = useAuth();
   const { testingMode, setTestingMode } = useTestingMode();
 
+  // A sentinel + IntersectionObserver instead of a scroll listener.
+  //
+  // The old version ran a handler on every scroll event and called setState
+  // each time, so React re-rendered the navbar dozens of times per second
+  // while scrolling. The observer fires exactly twice — once crossing 50px
+  // down, once crossing back up — and does its work off the main thread.
+  const sentinelRef = useRef(null);
+
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 50);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    const node = sentinelRef.current;
+    if (!node) return undefined;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsScrolled(!entry.isIntersecting),
+      { threshold: 0 }
+    );
+    observer.observe(node);
+
+    return () => observer.disconnect();
   }, []);
 
   // Lock body scroll while the mobile menu is open
@@ -43,13 +58,16 @@ export default function Navbar() {
 
   return (
     <>
-      <motion.nav
-        initial={{ y: -20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.6 }}
-        className={`fixed top-0 left-0 w-full z-50 transition-colors duration-300 ${
-          isScrolled ? 'bg-background/80 backdrop-blur-md shadow-lg' : 'bg-transparent'
-        }`}
+      {/* Zero-height marker 50px down the document. Whether it's in view is
+          what drives the scrolled state, via IntersectionObserver. */}
+      <div ref={sentinelRef} aria-hidden="true" className="absolute top-[50px] h-px w-px" />
+
+      {/* Plain <nav>: the mount animation was a one-off that cost a
+          framer-motion subscription on the most persistent element in the app,
+          and it delayed the header paint on first load. */}
+      <nav
+        className={`fixed top-0 left-0 w-full z-50 transition-colors duration-300 ${isScrolled ? 'glass-strong shadow-lg' : 'bg-transparent'
+          }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
@@ -68,9 +86,8 @@ export default function Navbar() {
                 >
                   {link.label}
                   <span
-                    className={`absolute left-0 right-0 bottom-0 h-0.5 bg-primary origin-left transition-transform ${
-                      link.label === 'Home' ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
-                    }`}
+                    className={`absolute left-0 right-0 bottom-0 h-0.5 bg-primary origin-left transition-transform ${link.label === 'Home' ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
+                      }`}
                   />
                 </Link>
               ))}
@@ -130,7 +147,7 @@ export default function Navbar() {
             </div>
           </div>
         </div>
-      </motion.nav>
+      </nav>
 
       {/* Mobile / tablet menu */}
       <AnimatePresence>

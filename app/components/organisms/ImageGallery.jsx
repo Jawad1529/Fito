@@ -5,7 +5,9 @@ import { motion } from 'framer-motion';
 import Image from 'next/image';
 import imageUrl from '../../utils/imageUrl';
 
-const ImageGallery = ({ images }) => {
+// `alt` is the SEO alt text generated for the product; it falls back to a
+// generic label so the gallery still works for non-product images.
+const ImageGallery = ({ images, alt = 'Product image' }) => {
   const [selectedImage, setSelectedImage] = useState(images?.[0] || '');
 
   // If no images, show placeholder
@@ -30,7 +32,7 @@ const ImageGallery = ({ images }) => {
           >
             <Image
               src={imageUrl(img)}
-              alt={`Thumbnail ${idx + 1}`}
+              alt={`${alt} — view ${idx + 1}`}
               fill
               unoptimized
               className="object-cover hover:scale-105 transition"
@@ -43,7 +45,7 @@ const ImageGallery = ({ images }) => {
       <div className="relative  min-h-[300px] flex-1 border-2 rounded-2xl overflow-hidden bg-white/5 order-1 md:order-2">
         <Image
           src={imageUrl(selectedImage)}
-          alt="Product main image"
+          alt={alt}
           fill
           unoptimized
           className="object-contain"

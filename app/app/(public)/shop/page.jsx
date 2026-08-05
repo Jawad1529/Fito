@@ -1,7 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
-import { motion } from 'framer-motion';
+import { useCallback, useMemo, useState } from 'react';
 import { H2, Text } from '../../../components/atoms/Typography';
 import ProductCard from '../../../components/organisms/ProductCard';
 import Icon from '../../../components/atoms/Icon';
@@ -79,40 +78,31 @@ export default function ShopPage() {
     return apiProducts ?? [];
   }, [testingMode, apiProducts, searchQuery, selectedCategory, sortBy]);
 
-  const toggleWishlist = (productId) => {
+  // Memoized so the memo on ProductCard holds across filter/wishlist changes.
+  const toggleWishlist = useCallback((productId) => {
     setWishlist((prev) =>
       prev.includes(productId) ? prev.filter((id) => id !== productId) : [...prev, productId]
     );
-  };
+  }, []);
 
-  const clearFilters = () => {
+  const clearFilters = useCallback(() => {
     setSearchQuery('');
     setSelectedCategory('all');
     setSortBy('default');
-  };
+  }, []);
 
   return (
     <div className="pt-24 pb-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-10"
-        >
+        <div className="text-center mb-10">
           <H2>Shop All Supplements</H2>
           <Text muted className="mt-2 max-w-xl mx-auto">
             Find the perfect product for your fitness journey – filtered by goal, category, or price.
           </Text>
-        </motion.div>
+        </div>
 
         {/* Filters Bar */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-          className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-4 sm:p-6 mb-8"
-        >
+        <div className="glass border border-border-light rounded-2xl p-4 sm:p-6 mb-8">
           <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-end">
             <div className="flex-1">
               <label htmlFor="search" className="block text-sm font-medium text-gray-300 mb-1">
@@ -178,11 +168,13 @@ export default function ShopPage() {
               Clear
             </Button>
           </div>
-        </motion.div>
+        </div>
 
-        <div className="flex justify-between items-center mb-6">
-          <Text className="text-gray-400">
-            Showing <span className="text-white font-semibold">{products.length}</span> products
+        {/* Announces the new count when filters change, which was previously
+            a silent update for screen reader users. */}
+        <div className="flex justify-between items-center mb-6" aria-live="polite" aria-atomic="true">
+          <Text className="text-text-muted">
+            Showing <span className="text-text font-semibold">{products.length}</span> products
           </Text>
         </div>
 
@@ -199,11 +191,10 @@ export default function ShopPage() {
           </div>
         ) : products.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {products.map((product, index) => (
+            {products.map((product) => (
               <ProductCard
                 key={product.id}
                 product={product}
-                index={index}
                 isWishlisted={wishlist.includes(product.id)}
                 onToggleWishlist={toggleWishlist}
               />
