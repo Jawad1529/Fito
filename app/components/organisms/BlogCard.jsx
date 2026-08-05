@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
+import imageUrl from '../../utils/imageUrl';
 
 export default function BlogCard({ post, index = 0 }) {
   return (
@@ -17,7 +18,7 @@ export default function BlogCard({ post, index = 0 }) {
       >
         <div className="relative w-full aspect-[16/10] overflow-hidden bg-overlay">
           <Image
-            src={post.image}
+            src={imageUrl(post.image)}
             alt={post.title}
             fill
             unoptimized

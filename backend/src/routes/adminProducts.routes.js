@@ -1,0 +1,22 @@
+import express from 'express';
+import {
+    listProducts,
+    createProduct,
+    updateProduct,
+    deleteProduct,
+} from '../controllers/adminProducts.controller.js';
+import { protectAdmin } from '../middleware/adminAuth.middleware.js';
+import { uploadProductImages } from '../middleware/upload.middleware.js';
+
+const router = express.Router();
+
+// Any admin can manage products, matching the /products route gating in the
+// admin panel (not restricted to super admins).
+router.use(protectAdmin);
+
+router.get('/', listProducts);
+router.post('/', uploadProductImages, createProduct);
+router.patch('/:id', uploadProductImages, updateProduct);
+router.delete('/:id', deleteProduct);
+
+export default router;

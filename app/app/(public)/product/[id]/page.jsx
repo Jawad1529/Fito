@@ -1,71 +1,96 @@
 'use client';
 
 import { useParams } from 'next/navigation';
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { H2, H3, Text } from '../../../../components/atoms/Typography';
 import ImageGallery from '../../../../components/organisms/ImageGallery';
 import Button from '../../../../components/atoms/Button';
 import Icon from '../../../../components/atoms/Icon';
+import Spinner from '../../../../components/atoms/Spinner';
 import FeaturedProducts from '../../../../components/organisms/FeaturedProducts';
 import ReviewSection from '../../../../components/organisms/ReviewSection';
 import QuantitySelector from '../../../../components/molecules/QuantitySelector';
 import useCart from '../../../../hooks/useCart';
-import productsData from '../../../../data/products';
-import { notFound } from 'next/navigation';
+import useTestingMode from '../../../../hooks/useTestingMode';
+import useApiResource from '../../../../hooks/useApiResource';
+import { getProduct } from '../../../../services/product.service';
+import productsData from '../../../../data/products.json';
 
 export default function ProductDetailPage() {
   const { id } = useParams();
+  const { testingMode } = useTestingMode();
 
-  // Compute product from local data
+  const {
+    data: apiProduct,
+    loading,
+    error,
+    setData: setProduct,
+  } = useApiResource(() => getProduct(id), [id], {
+    skip: testingMode || !id,
+    fallback: null,
+  });
+
   const product = useMemo(() => {
-    if (!id) return null;
-    return productsData.find((p) => p.id === parseInt(id)) || null;
-  }, [id]);
+    if (!testingMode) return apiProduct;
+    return productsData.find((p) => String(p.id) === String(id)) || null;
+  }, [testingMode, apiProduct, id]);
 
-  // Trigger 404 if product not found (effect is acceptable here)
-  useEffect(() => {
-    if (!product) {
-      notFound();
-    }
-  }, [product]);
-
-  // Local state for wishlist (not yet global — see useWishlist stub)
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const { addToCart, isInCart } = useCart();
 
-  // Prevent rendering until product is resolved (effect will throw 404 if null)
-  if (!product) {
-    return null; // or a loading spinner
+  if (loading) {
+    return (
+      <div className="pt-24 pb-16 min-h-screen flex justify-center">
+        <Spinner className="w-8 h-8" />
+      </div>
+    );
+  }
+
+  if (error || !product) {
+    return (
+      <div className="pt-24 pb-16 min-h-screen">
+        <div className="max-w-xl mx-auto px-4 text-center py-20">
+          <H2>Product Not Found</H2>
+          <Text muted className="mt-2">
+            {error || "That product doesn't exist or is no longer available."}
+          </Text>
+          <Button href="/shop" variant="primary" size="lg" className="mt-6">
+            Browse Products
+          </Button>
+        </div>
+      </div>
+    );
   }
 
   const inCart = isInCart(product.id);
-
-  const handleToggleWishlist = () => {
-    setIsWishlisted((prev) => !prev);
-  };
 
   const handleAddToCart = () => {
     if (!inCart) addToCart(product, quantity);
   };
 
+  // Keeps the rating summary in sync after a review is written or removed.
+  const handleRatingChange = ({ rating, reviewCount }) => {
+    if (testingMode) return;
+    setProduct((prev) => (prev ? { ...prev, rating, reviews: reviewCount, reviewCount } : prev));
+  };
+
   return (
     <div className="pt-24 pb-16 min-h-screen bg-black">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Product Detail */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Image Gallery */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <ImageGallery images={product.images || [product.image]} />
+            <ImageGallery
+              images={product.images?.length ? product.images : [product.image].filter(Boolean)}
+            />
           </motion.div>
 
-          {/* Product Info */}
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -80,28 +105,23 @@ export default function ProductDetailPage() {
               <div className="flex items-center gap-3 mt-2">
                 <div className="flex items-center gap-1 text-yellow-400">
                   <Icon name="star" className="w-5 h-5 fill-current" />
-                  <span className="font-semibold text-white">{product.rating}</span>
+                  <span className="font-semibold text-white">
+                    {Number(product.rating ?? 0).toFixed(1)}
+                  </span>
                 </div>
                 <span className="text-gray-400">•</span>
-                <span className="text-gray-400">{product.reviews || 0} reviews</span>
+                <span className="text-gray-400">{product.reviews ?? 0} reviews</span>
               </div>
             </div>
 
-            <div className="text-3xl font-bold text-white">
-              PKR {product.price.toFixed(2)}
-            </div>
+            <div className="text-3xl font-bold text-white">PKR {product.price.toFixed(2)}</div>
 
             <div className="border-t border-white/10 pt-6">
-              <Text className="text-gray-300 leading-relaxed">
-                {product.description}
-              </Text>
+              <Text className="text-gray-300 leading-relaxed">{product.description}</Text>
             </div>
 
-            {/* Quantity + Action Buttons */}
             <div className="flex flex-wrap items-center gap-4 mt-4">
-              {!inCart && (
-                <QuantitySelector value={quantity} onChange={setQuantity} />
-              )}
+              {!inCart && <QuantitySelector value={quantity} onChange={setQuantity} />}
               <Button
                 variant="primary"
                 size="lg"
@@ -124,14 +144,12 @@ export default function ProductDetailPage() {
               <Button
                 variant="outline"
                 size="lg"
-                onClick={handleToggleWishlist}
+                onClick={() => setIsWishlisted((prev) => !prev)}
                 className="px-4"
               >
                 <Icon
                   name="heart"
-                  className={`w-5 h-5 ${
-                    isWishlisted ? 'fill-red-500 text-red-500' : ''
-                  }`}
+                  className={`w-5 h-5 ${isWishlisted ? 'fill-red-500 text-red-500' : ''}`}
                 />
               </Button>
             </div>
@@ -155,24 +173,26 @@ export default function ProductDetailPage() {
           </motion.div>
         </div>
 
-        {/* Reviews */}
         <ReviewSection
           productId={product.id}
-          rating={product.rating}
-          reviewCount={product.reviews || 0}
+          rating={product.rating ?? 0}
+          reviewCount={product.reviews ?? 0}
+          onRatingChange={handleRatingChange}
         />
 
-        {/* Recommended Products */}
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.4 }}
           className="mt-16"
         >
-          <H3 className="text-2xl font-bold text-white mb-6">
-            You May Also Like
-          </H3>
-          <FeaturedProducts />
+          <H3 className="text-2xl font-bold text-white mb-6">You May Also Like</H3>
+          <FeaturedProducts
+            title=""
+            subtitle=""
+            limit={4}
+            excludeId={product.id}
+          />
         </motion.div>
       </div>
     </div>

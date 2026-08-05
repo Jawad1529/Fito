@@ -1,37 +1,72 @@
 'use client';
 
-import { useParams, notFound } from 'next/navigation';
-import { useEffect, useMemo } from 'react';
+import { useParams } from 'next/navigation';
+import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
 import { H2, Text } from '../../../../components/atoms/Typography';
 import Icon from '../../../../components/atoms/Icon';
 import Avatar from '../../../../components/atoms/Avatar';
+import Spinner from '../../../../components/atoms/Spinner';
 import BlogCard from '../../../../components/organisms/BlogCard';
+import useTestingMode from '../../../../hooks/useTestingMode';
+import useApiResource from '../../../../hooks/useApiResource';
+import { getBlogBySlug } from '../../../../services/blog.service';
+import imageUrl from '../../../../utils/imageUrl';
 import blogsData from '../../../../data/blogs.json';
 
 export default function BlogDetailPage() {
   const { slug } = useParams();
+  const { testingMode } = useTestingMode();
 
-  const post = useMemo(() => {
-    if (!slug) return null;
-    return blogsData.find((p) => p.slug === slug) || null;
-  }, [slug]);
+  const {
+    data,
+    loading,
+    error,
+  } = useApiResource(() => getBlogBySlug(slug), [slug], {
+    skip: testingMode || !slug,
+    fallback: null,
+  });
 
-  useEffect(() => {
-    if (slug && !post) {
-      notFound();
+  const { post, relatedPosts } = useMemo(() => {
+    if (testingMode) {
+      const found = blogsData.find((p) => p.slug === slug) || null;
+      return {
+        post: found,
+        relatedPosts: found
+          ? blogsData.filter((p) => p.slug !== found.slug && p.category === found.category).slice(0, 3)
+          : [],
+      };
     }
-  }, [slug, post]);
+    return { post: data?.blog ?? null, relatedPosts: data?.related ?? [] };
+  }, [testingMode, data, slug]);
 
-  const relatedPosts = useMemo(() => {
-    if (!post) return [];
-    return blogsData.filter((p) => p.slug !== post.slug && p.category === post.category).slice(0, 3);
-  }, [post]);
+  if (loading) {
+    return (
+      <div className="pt-24 pb-16 min-h-screen flex justify-center">
+        <Spinner className="w-8 h-8" />
+      </div>
+    );
+  }
 
-  if (!post) {
-    return null;
+  if (error || !post) {
+    return (
+      <div className="pt-24 pb-16 min-h-screen">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center py-20">
+          <H2>Post Not Found</H2>
+          <Text muted className="mt-2">
+            {error || "That article doesn't exist or is no longer published."}
+          </Text>
+          <Link
+            href="/blog"
+            className="inline-flex items-center gap-2 text-sm text-primary hover:underline mt-6"
+          >
+            Back to Blog
+          </Link>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -72,7 +107,7 @@ export default function BlogDetailPage() {
           transition={{ duration: 0.6, delay: 0.1 }}
           className="relative w-full aspect-[16/9] rounded-2xl overflow-hidden mt-8"
         >
-          <Image src={post.image} alt={post.title} fill unoptimized className="object-cover" />
+          <Image src={imageUrl(post.image)} alt={post.title} fill unoptimized className="object-cover" />
         </motion.div>
 
         <motion.div
@@ -81,7 +116,7 @@ export default function BlogDetailPage() {
           transition={{ duration: 0.6, delay: 0.2 }}
           className="flex flex-col gap-5 mt-8"
         >
-          {post.content.map((paragraph, i) => (
+          {(post.content ?? []).map((paragraph, i) => (
             <Text key={i} className="text-text-secondary leading-relaxed">
               {paragraph}
             </Text>

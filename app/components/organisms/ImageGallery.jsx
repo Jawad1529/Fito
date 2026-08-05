@@ -3,9 +3,10 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
+import imageUrl from '../../utils/imageUrl';
 
 const ImageGallery = ({ images }) => {
-  const [selectedImage, setSelectedImage] = useState(images[0] || '');
+  const [selectedImage, setSelectedImage] = useState(images?.[0] || '');
 
   // If no images, show placeholder
   if (!images || images.length === 0) {
@@ -24,14 +25,14 @@ const ImageGallery = ({ images }) => {
           <button
             key={idx}
             onClick={() => setSelectedImage(img)}
-            className={`relative w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden border-2 transition-all ${
-              selectedImage === img ? 'border' : 'border-transparent'
-            }`}
+            className={`relative w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden border-2 transition-all ${selectedImage === img ? 'border' : 'border-transparent'
+              }`}
           >
             <Image
-              src={img}
+              src={imageUrl(img)}
               alt={`Thumbnail ${idx + 1}`}
               fill
+              unoptimized
               className="object-cover hover:scale-105 transition"
             />
           </button>
@@ -41,9 +42,10 @@ const ImageGallery = ({ images }) => {
       {/* Main Image */}
       <div className="relative  min-h-[300px] flex-1 border-2 rounded-2xl overflow-hidden bg-white/5 order-1 md:order-2">
         <Image
-          src={selectedImage}
+          src={imageUrl(selectedImage)}
           alt="Product main image"
           fill
+          unoptimized
           className="object-contain"
           priority
         />

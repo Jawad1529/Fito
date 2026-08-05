@@ -1,25 +1,70 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import Link from 'next/link';
 import { H3, Text } from '../atoms/Typography';
 import Button from '../atoms/Button';
 import Card from '../atoms/Card';
 import Avatar from '../atoms/Avatar';
 import Input from '../atoms/Input';
 import TextArea from '../atoms/TextArea';
+import Spinner from '../atoms/Spinner';
 import Rating from '../molecules/Rating';
+import useAuth from '../../hooks/useAuth';
+import useTestingMode from '../../hooks/useTestingMode';
+import useApiResource from '../../hooks/useApiResource';
+import {
+  getProductReviews,
+  createReview,
+  updateMyReview,
+  deleteMyReview,
+} from '../../services/review.service';
 import reviewsData from '../../data/reviews.json';
 
-export default function ReviewSection({ productId, rating = 0, reviewCount = 0 }) {
-  const [reviews, setReviews] = useState(() => reviewsData[String(productId)] || []);
+const errorMessage = (err, fallback) =>
+  err?.response?.data?.message || err?.message || fallback;
+
+export default function ReviewSection({
+  productId,
+  rating = 0,
+  reviewCount = 0,
+  onRatingChange,
+}) {
+  const { testingMode } = useTestingMode();
+  const { user, isAuthenticated } = useAuth();
+
+  const {
+    data: apiReviews,
+    loading,
+    setData: setApiReviews,
+  } = useApiResource(() => getProductReviews(productId), [productId], {
+    skip: testingMode || !productId,
+    fallback: [],
+  });
+
+  // Testing mode keeps the old local-only behaviour so the UI works offline.
+  const [localReviews, setLocalReviews] = useState(
+    () => reviewsData[String(productId)] || []
+  );
+
+  const reviews = testingMode ? localReviews : apiReviews ?? [];
+
   const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState(null);
   const [name, setName] = useState('');
   const [score, setScore] = useState(0);
   const [comment, setComment] = useState('');
   const [error, setError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+
+  // Reviews are one-per-user, so this is either their review or undefined.
+  const myReview = useMemo(() => {
+    if (testingMode || !user?.id) return null;
+    return reviews.find((r) => String(r.userId) === String(user.id)) ?? null;
+  }, [reviews, user?.id, testingMode]);
 
   const breakdown = useMemo(() => {
-    const counts = [0, 0, 0, 0, 0]; // counts[0] => 1 star ... counts[4] => 5 star
+    const counts = [0, 0, 0, 0, 0];
     reviews.forEach((r) => {
       const idx = Math.min(5, Math.max(1, Math.round(r.rating))) - 1;
       counts[idx] += 1;
@@ -30,36 +75,126 @@ export default function ReviewSection({ productId, rating = 0, reviewCount = 0 }
       .reverse();
   }, [reviews]);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!name.trim() || !score || !comment.trim()) {
-      setError('Please add your name, a rating, and a comment.');
-      return;
-    }
-    setReviews((prev) => [
-      {
-        id: Date.now(),
-        name: name.trim(),
-        rating: score,
-        comment: comment.trim(),
-        date: new Date().toISOString().slice(0, 10),
-      },
-      ...prev,
-    ]);
+  // Averages are recomputed locally so the summary updates without a refetch.
+  const notifyRatingChange = (nextReviews) => {
+    if (!onRatingChange) return;
+    const count = nextReviews.length;
+    const avg = count
+      ? Math.round((nextReviews.reduce((sum, r) => sum + r.rating, 0) / count) * 10) / 10
+      : 0;
+    onRatingChange({ rating: avg, reviewCount: count });
+  };
+
+  const resetForm = () => {
     setName('');
     setScore(0);
     setComment('');
     setError('');
+    setEditingId(null);
     setShowForm(false);
   };
+
+  const openEdit = (review) => {
+    setEditingId(review.id);
+    setScore(review.rating);
+    setComment(review.comment);
+    setError('');
+    setShowForm(true);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (testingMode) {
+      if (!name.trim() || !score || !comment.trim()) {
+        setError('Please add your name, a rating, and a comment.');
+        return;
+      }
+      setLocalReviews((prev) => [
+        {
+          id: Date.now(),
+          name: name.trim(),
+          rating: score,
+          comment: comment.trim(),
+          date: new Date().toISOString().slice(0, 10),
+          replies: [],
+        },
+        ...prev,
+      ]);
+      resetForm();
+      return;
+    }
+
+    if (!score || !comment.trim()) {
+      setError('Please add a rating and a comment.');
+      return;
+    }
+
+    setSubmitting(true);
+    setError('');
+    try {
+      if (editingId) {
+        const updated = await updateMyReview(editingId, { rating: score, comment });
+        const next = (apiReviews ?? []).map((r) => (r.id === editingId ? updated : r));
+        setApiReviews(next);
+        notifyRatingChange(next);
+      } else {
+        const created = await createReview({ productId, rating: score, comment });
+        const next = [created, ...(apiReviews ?? [])];
+        setApiReviews(next);
+        notifyRatingChange(next);
+      }
+      resetForm();
+    } catch (err) {
+      setError(errorMessage(err, 'Could not save your review. Please try again.'));
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (testingMode) {
+      setLocalReviews((prev) => prev.filter((r) => r.id !== id));
+      return;
+    }
+    try {
+      await deleteMyReview(id);
+      const next = (apiReviews ?? []).filter((r) => r.id !== id);
+      setApiReviews(next);
+      notifyRatingChange(next);
+      if (editingId === id) resetForm();
+    } catch (err) {
+      setError(errorMessage(err, 'Could not delete your review.'));
+    }
+  };
+
+  const canWrite = testingMode || isAuthenticated;
+  const alreadyReviewed = !!myReview && !editingId;
 
   return (
     <div className="mt-16 border-t border-white/10 pt-12">
       <div className="flex items-center justify-between flex-wrap gap-4 mb-8">
         <H3 className="text-2xl font-bold text-white">Customer Reviews</H3>
-        <Button variant="outline" size="md" onClick={() => setShowForm((v) => !v)}>
-          {showForm ? 'Cancel' : 'Write a Review'}
-        </Button>
+
+        {canWrite ? (
+          alreadyReviewed ? (
+            <Button variant="outline" size="md" onClick={() => openEdit(myReview)}>
+              Edit Your Review
+            </Button>
+          ) : (
+            <Button
+              variant="outline"
+              size="md"
+              onClick={() => (showForm ? resetForm() : setShowForm(true))}
+            >
+              {showForm ? 'Cancel' : 'Write a Review'}
+            </Button>
+          )
+        ) : (
+          <Link href="/login" className="text-sm text-primary font-medium hover:underline">
+            Log in to write a review →
+          </Link>
+        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-10">
@@ -82,16 +217,18 @@ export default function ReviewSection({ productId, rating = 0, reviewCount = 0 }
         </div>
       </div>
 
-      {showForm && (
+      {showForm && canWrite && (
         <Card className="bg-white/5 border border-white/10 mb-10">
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            <Input
-              id="review-name"
-              label="Your Name"
-              placeholder="Jane Doe"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
+            {testingMode && (
+              <Input
+                id="review-name"
+                label="Your Name"
+                placeholder="Jane Doe"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
+            )}
             <div>
               <label className="block text-sm text-text-secondary mb-1.5">Your Rating</label>
               <Rating value={score} onChange={setScore} />
@@ -104,14 +241,25 @@ export default function ReviewSection({ productId, rating = 0, reviewCount = 0 }
               onChange={(e) => setComment(e.target.value)}
             />
             {error && <Text className="text-red-400 text-sm">{error}</Text>}
-            <Button type="submit" variant="primary" className="self-start">
-              Submit Review
-            </Button>
+            <div className="flex items-center gap-3">
+              <Button type="submit" variant="primary" loading={submitting}>
+                {editingId ? 'Update Review' : 'Submit Review'}
+              </Button>
+              {editingId && (
+                <Button type="button" variant="ghost" onClick={() => handleDelete(editingId)}>
+                  Delete Review
+                </Button>
+              )}
+            </div>
           </form>
         </Card>
       )}
 
-      {reviews.length === 0 ? (
+      {loading ? (
+        <div className="flex justify-center py-10">
+          <Spinner className="w-6 h-6" />
+        </div>
+      ) : reviews.length === 0 ? (
         <Text className="text-gray-400">No reviews yet. Be the first to share your thoughts!</Text>
       ) : (
         <div className="flex flex-col gap-6">
@@ -125,6 +273,47 @@ export default function ReviewSection({ productId, rating = 0, reviewCount = 0 }
                 </div>
                 <Rating value={r.rating} className="my-1" size="w-4 h-4" />
                 <Text className="text-gray-300">{r.comment}</Text>
+
+                {/* Replies are authored in the admin panel by the super admin —
+                    read-only here. */}
+                {(r.replies ?? []).length > 0 && (
+                  <div className="mt-4 flex flex-col gap-3 pl-4 border-l-2 border-primary/30">
+                    {r.replies.map((reply) => (
+                      <div key={reply.id}>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-semibold text-white">
+                            {reply.authorName}
+                          </span>
+                          {reply.authorType === 'admin' && (
+                            <span className="text-[10px] uppercase tracking-wide bg-primary/20 text-primary px-2 py-0.5 rounded-full">
+                              Fito Team
+                            </span>
+                          )}
+                        </div>
+                        <Text className="text-gray-400 text-sm mt-0.5">{reply.message}</Text>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {myReview?.id === r.id && (
+                  <div className="flex items-center gap-3 mt-3">
+                    <button
+                      type="button"
+                      onClick={() => openEdit(r)}
+                      className="text-xs text-primary hover:underline"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(r.id)}
+                      className="text-xs text-gray-500 hover:text-red-400"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           ))}

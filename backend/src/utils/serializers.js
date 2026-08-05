@@ -28,3 +28,59 @@ export const toPublicOrder = (order) => ({
     status: order.status,
     placedAt: order.createdAt,
 });
+
+// `image` is duplicated as the first entry of `images` because the app's
+// ProductCard reads product.image while the detail gallery reads images[].
+export const toPublicProduct = (product) => ({
+    id: product._id,
+    name: product.name,
+    category: product.category,
+    price: product.price,
+    stock: product.stock,
+    description: product.description,
+    image: product.images?.[0],
+    images: product.images ?? [],
+    rating: product.rating,
+    reviews: product.reviewCount,
+    reviewCount: product.reviewCount,
+    status: product.status,
+    createdAt: product.createdAt,
+});
+
+export const toPublicBlog = (blog) => ({
+    id: blog._id,
+    title: blog.title,
+    slug: blog.slug,
+    category: blog.category,
+    author: blog.author,
+    excerpt: blog.excerpt,
+    content: blog.content ?? [],
+    readTime: blog.readTime,
+    image: blog.image,
+    // The app renders `date` as a plain YYYY-MM-DD string.
+    date: blog.publishedAt?.toISOString().slice(0, 10),
+    status: blog.status,
+    createdAt: blog.createdAt,
+});
+
+export const toPublicReply = (reply) => ({
+    id: reply._id,
+    authorType: reply.authorType,
+    authorName: reply.authorName,
+    message: reply.message,
+    createdAt: reply.createdAt,
+});
+
+export const toPublicReview = (review) => ({
+    id: review._id,
+    // Populated documents expose _id; unpopulated ones are the raw ObjectId.
+    productId: review.product?._id ?? review.product,
+    productName: review.product?.name,
+    userId: review.user?._id ?? review.user,
+    name: review.userName,
+    rating: review.rating,
+    comment: review.comment,
+    replies: (review.replies ?? []).map(toPublicReply),
+    date: review.createdAt?.toISOString().slice(0, 10),
+    createdAt: review.createdAt,
+});

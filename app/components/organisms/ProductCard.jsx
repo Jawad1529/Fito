@@ -6,6 +6,7 @@ import Link from 'next/link';
 import Button from '../atoms/Button';
 import Icon from '../atoms/Icon';
 import useCart from '../../hooks/useCart';
+import imageUrl from '../../utils/imageUrl';
 
 // Full Stars component (restored from your original)
 const Stars = ({ rating }) => {
@@ -78,7 +79,7 @@ export default function ProductCard({
         {/* Image */}
         <div className="relative w-full aspect-square rounded-xl overflow-hidden bg-overlay mb-4">
           <Image
-            src={product.image}
+            src={imageUrl(product.image)}
             alt={product.name}
             fill
             unoptimized
@@ -109,8 +110,8 @@ export default function ProductCard({
 
           {/* Rating with stars – now fully functional */}
           <div className="flex items-center gap-2 mt-1">
-            <Stars rating={product.rating} />
-            <span className="text-sm text-text-muted">({product.reviews})</span>
+            <Stars rating={product.rating ?? 0} />
+            <span className="text-sm text-text-muted">({product.reviews ?? 0})</span>
           </div>
 
           <p className="text-sm text-text-muted mt-2 flex-1 line-clamp-2">

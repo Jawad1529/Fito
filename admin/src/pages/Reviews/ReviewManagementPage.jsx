@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Modal, Input, Button, message } from 'antd';
+import { useEffect, useState } from 'react';
+import { Modal, Input, Button, message, Tag, Empty } from 'antd';
 import { MessageOutlined } from '@ant-design/icons';
 import PageHeading from '../../components/atoms/PageHeading';
 import SearchBar from '../../components/molecules/SearchBar';
@@ -8,9 +8,31 @@ import RatingStars from '../../components/atoms/RatingStars';
 import DataTable from '../../components/organisms/DataTable';
 import useTableQuery from '../../hooks/useTableQuery';
 import { reviews as initialReviews } from '../../data/reviews';
+import { useTestingMode } from '../../context/TestingModeContext';
+import {
+    fetchReviews,
+    addReply as addReplyApi,
+    updateReply as updateReplyApi,
+    deleteReply as deleteReplyApi,
+    deleteReview as deleteReviewApi,
+} from '../../api/adminReviews.api';
+
+const apiError = (err, fallback) => err?.response?.data?.message || fallback;
+
+// A review can carry several replies; the table column shows the latest one
+// written by the admin side.
+const latestAdminReply = (review) =>
+    [...(review.replies ?? [])].reverse().find((r) => r.authorType === 'admin') ?? null;
 
 export default function ReviewManagementPage() {
-    const [reviews, setReviews] = useState(initialReviews);
+    const { testingMode } = useTestingMode();
+    return <ReviewManagementPageInner key={testingMode} testingMode={testingMode} />;
+}
+
+function ReviewManagementPageInner({ testingMode }) {
+    const [reviews, setReviews] = useState(testingMode ? initialReviews : []);
+    const [loading, setLoading] = useState(!testingMode);
+    const [saving, setSaving] = useState(false);
     const { searchText, setSearchText, filteredData } = useTableQuery(reviews, {
         searchKeys: ['name', 'productName', 'comment'],
     });
@@ -18,28 +40,100 @@ export default function ReviewManagementPage() {
     const [replying, setReplying] = useState(null);
     const [replyText, setReplyText] = useState('');
 
+    useEffect(() => {
+        if (testingMode) return undefined;
+        let cancelled = false;
+        fetchReviews()
+            .then((data) => {
+                if (!cancelled) setReviews(data);
+            })
+            .catch(() => {
+                if (!cancelled) message.error('Failed to load reviews');
+            })
+            .finally(() => {
+                if (!cancelled) setLoading(false);
+            });
+        return () => {
+            cancelled = true;
+        };
+    }, [testingMode]);
+
+    // Keeps the modal in sync after a reply is added, edited, or removed.
+    const applyUpdated = (updated) => {
+        setReviews((prev) => prev.map((r) => (r.id === updated.id ? updated : r)));
+        setReplying(updated);
+    };
+
     const openReply = (record) => {
         setReplying(record);
-        setReplyText(record.adminReply || '');
+        setReplyText(testingMode ? record.adminReply || '' : '');
     };
 
-    const handleSaveReply = () => {
-        setReviews((prev) =>
-            prev.map((r) => (r.id === replying.id ? { ...r, adminReply: replyText } : r))
-        );
-        message.success('Reply saved');
-        setReplying(null);
+    const handleSendReply = async () => {
+        if (!replyText.trim()) {
+            message.warning('Write a reply first');
+            return;
+        }
+
+        if (testingMode) {
+            setReviews((prev) =>
+                prev.map((r) => (r.id === replying.id ? { ...r, adminReply: replyText } : r))
+            );
+            message.success('Reply saved');
+            setReplying(null);
+            return;
+        }
+
+        setSaving(true);
+        try {
+            const updated = await addReplyApi(replying.id, replyText);
+            applyUpdated(updated);
+            setReplyText('');
+            message.success('Reply posted');
+        } catch (err) {
+            message.error(apiError(err, 'Failed to post reply'));
+        } finally {
+            setSaving(false);
+        }
     };
 
-    const handleDelete = (id) => {
-        setReviews((prev) => prev.filter((r) => r.id !== id));
-        message.success('Review deleted');
+    const handleEditReply = async (reply) => {
+        const next = window.prompt('Edit reply', reply.message);
+        if (next === null || !next.trim() || next === reply.message) return;
+        try {
+            applyUpdated(await updateReplyApi(replying.id, reply.id, next));
+            message.success('Reply updated');
+        } catch (err) {
+            message.error(apiError(err, 'Failed to update reply'));
+        }
+    };
+
+    const handleDeleteReply = async (reply) => {
+        try {
+            applyUpdated(await deleteReplyApi(replying.id, reply.id));
+            message.success('Reply deleted');
+        } catch (err) {
+            message.error(apiError(err, 'Failed to delete reply'));
+        }
+    };
+
+    const handleDelete = async (id) => {
+        if (testingMode) {
+            setReviews((prev) => prev.filter((r) => r.id !== id));
+            message.success('Review deleted');
+            return;
+        }
+        try {
+            await deleteReviewApi(id);
+            setReviews((prev) => prev.filter((r) => r.id !== id));
+            message.success('Review deleted');
+        } catch (err) {
+            message.error(apiError(err, 'Failed to delete review'));
+        }
     };
 
     const columns = [
-        { title: 'Review ID', dataIndex: 'id' },
-        { title: 'Product ID', dataIndex: 'productId' },
-        { title: 'Product Name', dataIndex: 'productName' },
+        { title: 'Product', dataIndex: 'productName', render: (name) => name || '—' },
         { title: 'User', dataIndex: 'name' },
         {
             title: 'Rating',
@@ -48,12 +142,19 @@ export default function ReviewManagementPage() {
             render: (r) => <RatingStars rating={r} />,
         },
         { title: 'Review', dataIndex: 'comment', ellipsis: true },
-        { title: 'Created At', dataIndex: 'date', sorter: (a, b) => a.date.localeCompare(b.date) },
+        {
+            title: 'Created At',
+            dataIndex: 'date',
+            sorter: (a, b) => String(a.date ?? '').localeCompare(String(b.date ?? '')),
+        },
         {
             title: 'Admin Reply',
-            dataIndex: 'adminReply',
+            key: 'adminReply',
             ellipsis: true,
-            render: (reply) => reply || <span className="text-gray-400">No reply yet</span>,
+            render: (_, record) => {
+                const reply = testingMode ? record.adminReply : latestAdminReply(record)?.message;
+                return reply || <span className="text-gray-400">No reply yet</span>;
+            },
         },
         {
             title: 'Actions',
@@ -75,29 +176,88 @@ export default function ReviewManagementPage() {
                 actions={<SearchBar value={searchText} onChange={setSearchText} placeholder="Search reviews..." />}
             />
 
-            <DataTable columns={columns} data={filteredData} />
+            <DataTable columns={columns} data={filteredData} loading={loading} />
 
             <Modal
                 open={!!replying}
-                title="Reply to Review"
+                title="Review Thread"
                 onCancel={() => setReplying(null)}
-                onOk={handleSaveReply}
-                okText="Save Reply"
+                footer={null}
+                width={560}
             >
                 {replying && (
-                    <div className="mb-4">
-                        <p className="text-sm text-gray-500 mb-1">
-                            {replying.name} on {replying.productName}
-                        </p>
-                        <p className="text-sm bg-gray-50 rounded-lg p-3">{replying.comment}</p>
-                    </div>
+                    <>
+                        <div className="mb-4">
+                            <p className="text-sm text-gray-500 mb-1">
+                                {replying.name} on {replying.productName || 'this product'}
+                            </p>
+                            <RatingStars rating={replying.rating} />
+                            <p className="text-sm bg-gray-50 rounded-lg p-3 mt-2">{replying.comment}</p>
+                        </div>
+
+                        {!testingMode && (
+                            <div className="mb-4">
+                                <div className="text-sm font-medium text-gray-700 mb-2">Replies</div>
+                                {(replying.replies ?? []).length === 0 ? (
+                                    <Empty
+                                        image={Empty.PRESENTED_IMAGE_SIMPLE}
+                                        description="No replies yet"
+                                    />
+                                ) : (
+                                    <div className="flex flex-col gap-3">
+                                        {replying.replies.map((reply) => (
+                                            <div
+                                                key={reply.id}
+                                                className="border border-gray-100 rounded-lg p-3"
+                                            >
+                                                <div className="flex items-center justify-between gap-2">
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-sm font-medium">
+                                                            {reply.authorName}
+                                                        </span>
+                                                        <Tag color={reply.authorType === 'admin' ? 'blue' : 'default'}>
+                                                            {reply.authorType === 'admin' ? 'Admin' : 'Customer'}
+                                                        </Tag>
+                                                    </div>
+                                                    <div className="flex items-center gap-1">
+                                                        {/* Only admin replies can be reworded; customer
+                                                            replies are moderated by deletion. */}
+                                                        {reply.authorType === 'admin' && (
+                                                            <Button
+                                                                type="link"
+                                                                size="small"
+                                                                onClick={() => handleEditReply(reply)}
+                                                            >
+                                                                Edit
+                                                            </Button>
+                                                        )}
+                                                        <ConfirmDeleteButton
+                                                            onConfirm={() => handleDeleteReply(reply)}
+                                                            title="Delete this reply?"
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <p className="text-sm text-gray-600 mt-1">{reply.message}</p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
+                        <Input.TextArea
+                            rows={4}
+                            value={replyText}
+                            onChange={(e) => setReplyText(e.target.value)}
+                            placeholder="Write a reply..."
+                        />
+                        <div className="flex justify-end mt-3">
+                            <Button type="primary" loading={saving} onClick={handleSendReply}>
+                                {testingMode ? 'Save Reply' : 'Post Reply'}
+                            </Button>
+                        </div>
+                    </>
                 )}
-                <Input.TextArea
-                    rows={4}
-                    value={replyText}
-                    onChange={(e) => setReplyText(e.target.value)}
-                    placeholder="Write a reply..."
-                />
             </Modal>
         </div>
     );

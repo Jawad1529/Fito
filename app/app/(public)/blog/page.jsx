@@ -4,20 +4,42 @@ import { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { H2, Text } from '../../../components/atoms/Typography';
 import BlogCard from '../../../components/organisms/BlogCard';
+import Button from '../../../components/atoms/Button';
+import Spinner from '../../../components/atoms/Spinner';
+import useTestingMode from '../../../hooks/useTestingMode';
+import useApiResource from '../../../hooks/useApiResource';
+import { getBlogs, getBlogCategories } from '../../../services/blog.service';
 import blogsData from '../../../data/blogs.json';
 
 export default function BlogPage() {
+  const { testingMode } = useTestingMode();
   const [selectedCategory, setSelectedCategory] = useState('all');
 
-  const categories = useMemo(() => {
-    const cats = blogsData.map((post) => post.category);
-    return ['all', ...new Set(cats)];
-  }, []);
+  const { data: apiCategories } = useApiResource(getBlogCategories, [], {
+    skip: testingMode,
+    fallback: [],
+  });
 
-  const filteredPosts = useMemo(() => {
+  const {
+    data: apiPosts,
+    loading,
+    error,
+    reload,
+  } = useApiResource(() => getBlogs({ category: selectedCategory }), [selectedCategory], {
+    skip: testingMode,
+    fallback: [],
+  });
+
+  const categories = useMemo(() => {
+    const source = testingMode ? blogsData.map((post) => post.category) : apiCategories ?? [];
+    return ['all', ...new Set(source)];
+  }, [testingMode, apiCategories]);
+
+  const posts = useMemo(() => {
+    if (!testingMode) return apiPosts ?? [];
     if (selectedCategory === 'all') return blogsData;
     return blogsData.filter((post) => post.category === selectedCategory);
-  }, [selectedCategory]);
+  }, [testingMode, apiPosts, selectedCategory]);
 
   return (
     <div className="pt-24 pb-16 min-h-screen">
@@ -44,20 +66,30 @@ export default function BlogPage() {
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
-              className={`px-4 py-2 rounded-full text-sm font-medium border transition-colors ${
-                selectedCategory === cat
+              className={`px-4 py-2 rounded-full text-sm font-medium border transition-colors ${selectedCategory === cat
                   ? 'bg-primary border-primary text-text-inverse'
                   : 'bg-transparent border-border-light text-text-secondary hover:text-text hover:border-primary/40'
-              }`}
+                }`}
             >
               {cat === 'all' ? 'All Posts' : cat}
             </button>
           ))}
         </motion.div>
 
-        {filteredPosts.length > 0 ? (
+        {loading ? (
+          <div className="flex justify-center py-20">
+            <Spinner className="w-8 h-8" />
+          </div>
+        ) : error ? (
+          <div className="text-center py-16">
+            <Text className="text-danger">{error}</Text>
+            <Button variant="outline" onClick={reload} className="mt-4">
+              Try Again
+            </Button>
+          </div>
+        ) : posts.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredPosts.map((post, index) => (
+            {posts.map((post, index) => (
               <BlogCard key={post.slug} post={post} index={index} />
             ))}
           </div>
