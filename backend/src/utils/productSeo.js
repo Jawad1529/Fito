@@ -3,35 +3,14 @@
 // save, which means seeded, created and edited products all stay in sync.
 import slugify from './slugify.js';
 import { PRODUCT_STATUS } from '../constants/contentStatus.js';
-
-const BRAND = 'Fito';
-const TITLE_LIMIT = 60;
-const DESCRIPTION_LIMIT = 160;
-
-// Cuts at the last word boundary so titles/descriptions never end mid-word.
-const clamp = (value, limit) => {
-    const text = String(value ?? '').replace(/\s+/g, ' ').trim();
-    if (text.length <= limit) return text;
-    const cut = text.slice(0, limit - 1);
-    const lastSpace = cut.lastIndexOf(' ');
-    return `${(lastSpace > limit * 0.6 ? cut.slice(0, lastSpace) : cut).replace(/[,.;:-]$/, '')}…`;
-};
-
-const STOP_WORDS = new Set([
-    'with', 'for', 'and', 'the', 'per', 'zero', 'pure', 'your', 'from', 'plus', 'more',
-]);
-
-// Longest words first: multi-word phrases carry more search intent than filler.
-const keywordsFrom = (text, max) =>
-    [
-        ...new Set(
-            String(text ?? '')
-                .toLowerCase()
-                .match(/[a-z0-9+]{3,}/g) ?? []
-        ),
-    ]
-        .filter((word) => !STOP_WORDS.has(word))
-        .slice(0, max);
+import {
+    BRAND,
+    DESCRIPTION_LIMIT,
+    clamp,
+    composeTitle,
+    firstSentence,
+    keywordsFrom,
+} from './seoText.js';
 
 const buildProductSeo = (product) => {
     const name = String(product.name ?? '').trim();
@@ -40,20 +19,10 @@ const buildProductSeo = (product) => {
     const price = Number(product.price ?? 0);
     const inStock = Number(product.stock ?? 0) > 0 && product.status !== PRODUCT_STATUS.OUT_OF_STOCK;
 
-    // First sentence reads as a summary; the rest is detail the snippet drops anyway.
-    const summary = description.split(/(?<=[.!?])\s+/)[0] || description;
-
-    // The brand suffix must survive truncation, so the category is only added
-    // when the full title still fits; otherwise the name alone is clamped.
-    const brandSuffix = ` | ${BRAND}`;
-    const withCategory = category ? `${name} - ${category}` : name;
-    const metaTitle =
-        `${withCategory}${brandSuffix}`.length <= TITLE_LIMIT
-            ? `${withCategory}${brandSuffix}`
-            : `${clamp(name, TITLE_LIMIT - brandSuffix.length)}${brandSuffix}`;
+    const metaTitle = composeTitle(name, category);
 
     const metaDescription = clamp(
-        `${summary} ${inStock ? 'Buy' : 'Shop'} ${name} online at ${BRAND} for PKR ${price.toFixed(0)}.`,
+        `${firstSentence(description)} ${inStock ? 'Buy' : 'Shop'} ${name} online at ${BRAND} for PKR ${price.toFixed(0)}.`,
         DESCRIPTION_LIMIT
     );
 
@@ -84,5 +53,5 @@ const buildProductSeo = (product) => {
 const buildProductSlug = (product) =>
     [slugify(product.name), String(product._id).slice(-6)].filter(Boolean).join('-');
 
-export { buildProductSeo, buildProductSlug, clamp };
+export { buildProductSeo, buildProductSlug };
 export default buildProductSeo;

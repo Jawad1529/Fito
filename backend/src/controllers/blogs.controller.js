@@ -36,6 +36,9 @@ export const getBlogBySlug = asyncHandler(async (req, res) => {
         throw new Error('Blog post not found');
     }
 
+    // Posts written before SEO generation existed get backfilled on first read.
+    if (!blog.seo?.metaTitle) await blog.save();
+
     // Same-category suggestions powering the "More on {category}" strip.
     const related = await Blog.find({
         ...PUBLIC_FILTER,

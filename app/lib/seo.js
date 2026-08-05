@@ -26,6 +26,10 @@ export const buildMetadata = ({
     keywords = [],
     type = 'website',
     noIndex = false,
+    // Only meaningful when type is 'article'.
+    publishedTime,
+    modifiedTime,
+    authors = [],
 } = {}) => {
     const canonical = absoluteUrl(path);
     const resolvedTitle = clamp(title || `${SITE_NAME} — ${SITE_TAGLINE}`, 70);
@@ -54,6 +58,10 @@ export const buildMetadata = ({
             title: resolvedTitle,
             description: resolvedDescription,
             images: ogImages,
+            // og:article:* tags are ignored for non-article types.
+            ...(type === 'article'
+                ? { publishedTime, modifiedTime, authors: authors.filter(Boolean) }
+                : {}),
         },
         twitter: {
             card: 'summary_large_image',
@@ -62,6 +70,37 @@ export const buildMetadata = ({
             description: resolvedDescription,
             images: ogImages.map((image) => image.url),
         },
+    };
+};
+
+// Blog metadata mirrors the product path: text comes from blog.seo, with the
+// raw fields as a fallback for posts not yet regenerated.
+export const buildBlogMetadata = (post) => {
+    if (!post) {
+        return buildMetadata({
+            title: `Article Not Found | ${SITE_NAME}`,
+            description: 'This article is unavailable.',
+            noIndex: true,
+        });
+    }
+
+    const seo = post.seo ?? {};
+
+    return {
+        ...buildMetadata({
+            title: seo.metaTitle || `${post.title} | ${SITE_NAME}`,
+            description: seo.metaDescription || post.excerpt,
+            path: `/blog/${post.slug}`,
+            images: [post.image],
+            imageAlt: seo.imageAlt || post.title,
+            keywords: seo.keywords ?? [],
+            type: 'article',
+            noIndex: post.status === 'draft',
+            publishedTime: post.publishedAt ?? post.createdAt,
+            modifiedTime: post.updatedAt ?? post.publishedAt,
+            authors: [post.author],
+        }),
+        authors: post.author ? [{ name: post.author }] : undefined,
     };
 };
 

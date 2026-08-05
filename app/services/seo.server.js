@@ -1,7 +1,7 @@
-// Server-only product reads for generateMetadata() and sitemap generation.
+// Server-only reads for generateMetadata() and sitemap generation.
 // The axios client in services/api.js reaches into localStorage for the auth
 // token, so it can't run during SSR — plain fetch keeps this usable on the
-// server and lets Next cache the response.
+// server and lets Next cache and dedupe the response.
 import { API_BASE_URL } from '@/config/siteConfig';
 
 const REVALIDATE_SECONDS = 300;
@@ -29,4 +29,16 @@ export const getProductForSeo = async (idOrSlug) => {
 export const getProductsForSeo = async () => {
     const data = await getJson('/products');
     return data?.products ?? [];
+};
+
+// Returns { blog, related } so the detail page can hydrate both from one call.
+export const getBlogForSeo = async (slug) => {
+    if (!slug) return null;
+    const data = await getJson(`/blogs/${encodeURIComponent(slug)}`);
+    return data?.blog ? { blog: data.blog, related: data.related ?? [] } : null;
+};
+
+export const getBlogsForSeo = async () => {
+    const data = await getJson('/blogs');
+    return data?.blogs ?? [];
 };

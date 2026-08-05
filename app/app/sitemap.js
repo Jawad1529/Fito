@@ -1,8 +1,8 @@
 import { SITE_URL } from '@/config/siteConfig';
-import { getProductsForSeo } from '@/services/product.server';
+import { getProductsForSeo, getBlogsForSeo } from '@/services/seo.server';
 
-// Products added through the admin panel show up here on the next revalidation,
-// so no one has to touch the sitemap when the catalogue changes.
+// Products and posts added through the admin panel show up here on the next
+// revalidation, so no one has to touch the sitemap when content changes.
 export const revalidate = 3600;
 
 const STATIC_ROUTES = [
@@ -16,7 +16,7 @@ const STATIC_ROUTES = [
 ];
 
 export default async function sitemap() {
-    const products = await getProductsForSeo();
+    const [products, blogs] = await Promise.all([getProductsForSeo(), getBlogsForSeo()]);
 
     return [
         ...STATIC_ROUTES.map(({ path, priority, changeFrequency }) => ({
@@ -30,6 +30,12 @@ export default async function sitemap() {
             lastModified: new Date(product.updatedAt ?? product.createdAt ?? Date.now()),
             changeFrequency: 'weekly',
             priority: 0.8,
+        })),
+        ...blogs.map((post) => ({
+            url: `${SITE_URL}/blog/${post.slug}`,
+            lastModified: new Date(post.updatedAt ?? post.publishedAt ?? Date.now()),
+            changeFrequency: 'monthly',
+            priority: 0.6,
         })),
     ];
 }

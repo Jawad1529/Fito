@@ -1,6 +1,6 @@
 import ProductTemplate from '@/components/templates/ProductTemplate';
 import JsonLd from '@/components/shared/JsonLd';
-import { getProductForSeo } from '@/services/product.server';
+import { getProductForSeo } from '@/services/seo.server';
 import { buildProductMetadata } from '@/lib/seo';
 import { productJsonLd, breadcrumbJsonLd } from '@/lib/jsonld';
 

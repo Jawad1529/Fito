@@ -54,6 +54,30 @@ export const productJsonLd = (product) => {
   return jsonLd;
 };
 
+export const articleJsonLd = (post) => {
+  if (!post) return null;
+
+  const url = absoluteUrl(`/blog/${post.slug}`);
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: post.title,
+    description: post.seo?.metaDescription || post.excerpt,
+    image: [post.image].filter(Boolean).map(imageUrl),
+    articleSection: post.category,
+    keywords: (post.seo?.keywords ?? []).join(', ') || undefined,
+    wordCount: post.seo?.wordCount || undefined,
+    author: { '@type': 'Person', name: post.author },
+    publisher: { '@type': 'Organization', name: SITE_NAME, url: SITE_URL },
+    datePublished: post.publishedAt ?? post.createdAt,
+    dateModified: post.updatedAt ?? post.publishedAt ?? post.createdAt,
+    // Required by Google so the article can't be attributed to the wrong page.
+    mainEntityOfPage: { '@type': 'WebPage', '@id': url },
+    url,
+  };
+};
+
 export const breadcrumbJsonLd = (trail = []) => ({
   '@context': 'https://schema.org',
   '@type': 'BreadcrumbList',
@@ -70,6 +94,43 @@ export const organizationJsonLd = () => ({
   '@type': 'Organization',
   name: SITE_NAME,
   url: SITE_URL,
+});
+
+// Declares the site's search endpoint so Google can offer a sitelinks
+// searchbox. The URL template has to match the shop page's query param.
+export const websiteJsonLd = () => ({
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: SITE_NAME,
+  url: SITE_URL,
+  potentialAction: {
+    '@type': 'SearchAction',
+    target: {
+      '@type': 'EntryPoint',
+      urlTemplate: `${SITE_URL}/shop?search={search_term_string}`,
+    },
+    'query-input': 'required name=search_term_string',
+  },
+});
+
+// `mainEntity` points back at the Organization so the About page is understood
+// as being about the company rather than as a standalone article.
+export const aboutPageJsonLd = ({ description, teamMembers = [] } = {}) => ({
+  '@context': 'https://schema.org',
+  '@type': 'AboutPage',
+  name: `About ${SITE_NAME}`,
+  description,
+  url: absoluteUrl('/about'),
+  mainEntity: {
+    '@type': 'Organization',
+    name: SITE_NAME,
+    url: SITE_URL,
+    employee: teamMembers.map((member) => ({
+      '@type': 'Person',
+      name: member.name,
+      jobTitle: member.title,
+    })),
+  },
 });
 
 export default productJsonLd;

@@ -14,7 +14,7 @@ function BlogCard({ post }) {
       <div className="relative w-full aspect-[16/10] overflow-hidden bg-overlay">
         <Image
           src={imageUrl(post.image)}
-          alt={post.title}
+          alt={post.seo?.imageAlt || post.title}
           fill
           unoptimized
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
