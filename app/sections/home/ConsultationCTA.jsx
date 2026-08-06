@@ -5,7 +5,6 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import Image from 'next/image';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
 import { H2, Text } from '../../components/atoms/Typography';
 import Button from '../../components/atoms/Button';
 import Icon from '../../components/atoms/Icon';
@@ -48,23 +47,18 @@ export default function ConsultationCTA() {
   });
 
   return (
-    <section className="relative py-20 md:py-28 overflow-hidden">
+    <section className="relative py-20 md:py-28 section-defer">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           {/* Left side: Image & headline */}
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.7 }}
-            viewport={{ once: true }}
-            className="order-2 lg:order-1"
-          >
+          <div className="order-2 lg:order-1 reveal">
             <div className="relative w-full max-w-md mx-auto aspect-square rounded-2xl overflow-hidden shadow-2xl ring-1 ring-primary/10">
               <Image
                 src={consultationImage}
                 alt="Nutrition consultation"
                 fill
-                unoptimized
+                sizes="(max-width: 1024px) 100vw, 448px"
+                placeholder="blur"
                 className="object-cover"
               />
               {/* subtle glow overlay */}
@@ -80,17 +74,11 @@ export default function ConsultationCTA() {
                 on your body goals.
               </Text>
             </div>
-          </motion.div>
+          </div>
 
           {/* Right side: Form */}
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.7, delay: 0.2 }}
-            viewport={{ once: true }}
-            className="order-1 lg:order-2"
-          >
-            <div className="bg-overlay backdrop-blur-sm border border-border-light rounded-2xl p-6 sm:p-8 shadow-xl transition-all hover:border-primary/30">
+          <div className="order-1 lg:order-2 reveal">
+            <div className="glass border border-border-light rounded-2xl p-6 sm:p-8 shadow-xl transition-colors hover:border-primary/30">
               {submitted ? (
                 <div className="text-center py-8">
                   <Icon name="check-circle" className="w-16 h-16 text-primary mx-auto" />
@@ -116,11 +104,10 @@ export default function ConsultationCTA() {
                       id="name"
                       type="text"
                       {...formik.getFieldProps('name')}
-                      className={`w-full px-4 py-3 rounded-xl bg-overlay-strong border ${
-                        formik.touched.name && formik.errors.name
-                          ? 'border-danger'
-                          : 'border-border-light'
-                      } text-text placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary/50 transition`}
+                      className={`w-full px-4 py-3 rounded-xl bg-overlay-strong border ${formik.touched.name && formik.errors.name
+                        ? 'border-danger'
+                        : 'border-border-light'
+                        } text-text placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary/50 transition`}
                       placeholder="John Doe"
                     />
                     {formik.touched.name && formik.errors.name && (
@@ -136,11 +123,10 @@ export default function ConsultationCTA() {
                       id="email"
                       type="email"
                       {...formik.getFieldProps('email')}
-                      className={`w-full px-4 py-3 rounded-xl bg-overlay-strong border ${
-                        formik.touched.email && formik.errors.email
-                          ? 'border-danger'
-                          : 'border-border-light'
-                      } text-text placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary/50 transition`}
+                      className={`w-full px-4 py-3 rounded-xl bg-overlay-strong border ${formik.touched.email && formik.errors.email
+                        ? 'border-danger'
+                        : 'border-border-light'
+                        } text-text placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary/50 transition`}
                       placeholder="you@example.com"
                     />
                     {formik.touched.email && formik.errors.email && (
@@ -155,11 +141,10 @@ export default function ConsultationCTA() {
                     <select
                       id="goal"
                       {...formik.getFieldProps('goal')}
-                      className={`w-full px-4 py-3 rounded-xl bg-overlay-strong border ${
-                        formik.touched.goal && formik.errors.goal
-                          ? 'border-danger'
-                          : 'border-border-light'
-                      } text-text focus:outline-none focus:ring-2 focus:ring-primary/50 transition appearance-none`}
+                      className={`w-full px-4 py-3 rounded-xl bg-overlay-strong border ${formik.touched.goal && formik.errors.goal
+                        ? 'border-danger'
+                        : 'border-border-light'
+                        } text-text focus:outline-none focus:ring-2 focus:ring-primary/50 transition appearance-none`}
                     >
                       <option value="" className="bg-background">Select your goal</option>
                       <option value="build-muscle" className="bg-background">Build Muscle</option>
@@ -181,11 +166,10 @@ export default function ConsultationCTA() {
                       id="message"
                       rows="3"
                       {...formik.getFieldProps('message')}
-                      className={`w-full px-4 py-3 rounded-xl bg-overlay-strong border ${
-                        formik.touched.message && formik.errors.message
-                          ? 'border-danger'
-                          : 'border-border-light'
-                      } text-text placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary/50 transition resize-none`}
+                      className={`w-full px-4 py-3 rounded-xl bg-overlay-strong border ${formik.touched.message && formik.errors.message
+                        ? 'border-danger'
+                        : 'border-border-light'
+                        } text-text placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary/50 transition resize-none`}
                       placeholder="Any specific questions or preferences..."
                     />
                     {formik.touched.message && formik.errors.message && (
@@ -207,7 +191,7 @@ export default function ConsultationCTA() {
                 </form>
               )}
             </div>
-          </motion.div>
+          </div>
         </div>
       </div>
     </section>

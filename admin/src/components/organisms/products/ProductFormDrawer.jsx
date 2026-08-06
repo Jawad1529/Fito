@@ -1,20 +1,45 @@
-import { Drawer, Form, Input, InputNumber, Select, Button, Image } from 'antd';
-import { useEffect } from 'react';
+import { Drawer, Form, Input, InputNumber, Select, Button, Image, Upload } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
+import { useEffect, useState } from 'react';
 import { PRODUCT_CATEGORIES } from '../../../constants/productCategories';
+import imageUrl from '../../../utils/imageUrl';
 
-export default function ProductFormDrawer({ open, onClose, onSubmit, initialValues }) {
+// `uploadMode` is on when the panel talks to the real API: images are picked as
+// files and uploaded with the form. In testing mode a plain URL field is used
+// instead, matching the shape of the mock data.
+export default function ProductFormDrawer({
+    open,
+    onClose,
+    onSubmit,
+    initialValues,
+    uploadMode = false,
+    saving = false,
+}) {
     const [form] = Form.useForm();
-    const imageUrl = Form.useWatch('image', form);
+    const urlValue = Form.useWatch('image', form);
+
+    const [files, setFiles] = useState([]);
+    const [keptImages, setKeptImages] = useState([]);
 
     useEffect(() => {
-        if (open) {
-            form.resetFields();
-            if (initialValues) form.setFieldsValue(initialValues);
-        }
+        if (!open) return;
+        form.resetFields();
+        setFiles([]);
+        setKeptImages(initialValues?.images ?? []);
+        if (initialValues) form.setFieldsValue(initialValues);
     }, [open, initialValues, form]);
 
     const handleFinish = (values) => {
-        onSubmit({ ...initialValues, ...values });
+        if (!uploadMode) {
+            onSubmit({ ...initialValues, ...values });
+            return;
+        }
+        onSubmit({
+            ...values,
+            images: files.map((f) => f.originFileObj).filter(Boolean),
+            // Only meaningful on edit; the controller ignores it on create.
+            existingImages: initialValues ? keptImages : undefined,
+        });
     };
 
     return (
@@ -25,7 +50,7 @@ export default function ProductFormDrawer({ open, onClose, onSubmit, initialValu
             width={420}
             destroyOnHidden
             extra={
-                <Button type="primary" onClick={() => form.submit()}>
+                <Button type="primary" loading={saving} onClick={() => form.submit()}>
                     Save
                 </Button>
             }
@@ -39,7 +64,7 @@ export default function ProductFormDrawer({ open, onClose, onSubmit, initialValu
                     <Select options={PRODUCT_CATEGORIES.map((c) => ({ label: c, value: c }))} />
                 </Form.Item>
 
-                <Form.Item name="price" label="Price ($)" rules={[{ required: true }]}>
+                <Form.Item name="price" label="Price (Rs.)" rules={[{ required: true }]}>
                     <InputNumber min={0} step={0.01} className="w-full" />
                 </Form.Item>
 
@@ -57,14 +82,72 @@ export default function ProductFormDrawer({ open, onClose, onSubmit, initialValu
                     />
                 </Form.Item>
 
-                <Form.Item name="image" label="Image URL">
-                    <Input placeholder="https://..." />
-                </Form.Item>
+                {uploadMode ? (
+                    <>
+                        {keptImages.length > 0 && (
+                            <div className="mb-4">
+                                <div className="text-sm text-gray-500 mb-2">Current Images</div>
+                                <div className="flex flex-wrap gap-2">
+                                    {keptImages.map((src) => (
+                                        <div key={src} className="relative">
+                                            <Image
+                                                src={imageUrl(src)}
+                                                width={72}
+                                                height={72}
+                                                className="rounded-lg object-cover"
+                                            />
+                                            <Button
+                                                size="small"
+                                                danger
+                                                type="text"
+                                                className="absolute -top-2 -right-2 bg-white shadow"
+                                                onClick={() =>
+                                                    setKeptImages((prev) => prev.filter((s) => s !== src))
+                                                }
+                                            >
+                                                ✕
+                                            </Button>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
 
-                {imageUrl && (
-                    <div className="mb-4">
-                        <Image src={imageUrl} width={120} height={120} className="rounded-lg object-cover" fallback="" />
-                    </div>
+                        <Form.Item label="Add Images (max 6)">
+                            <Upload
+                                listType="picture-card"
+                                fileList={files}
+                                beforeUpload={() => false}
+                                onChange={({ fileList }) => setFiles(fileList.slice(0, 6))}
+                                accept="image/*"
+                                multiple
+                            >
+                                {files.length >= 6 ? null : (
+                                    <div>
+                                        <PlusOutlined />
+                                        <div className="mt-1 text-xs">Upload</div>
+                                    </div>
+                                )}
+                            </Upload>
+                        </Form.Item>
+                    </>
+                ) : (
+                    <>
+                        <Form.Item name="image" label="Image URL">
+                            <Input placeholder="https://..." />
+                        </Form.Item>
+                        {urlValue && (
+                            <div className="mb-4">
+                                <Image
+                                    src={urlValue}
+                                    width={120}
+                                    height={120}
+                                    className="rounded-lg object-cover"
+                                    fallback=""
+                                />
+                            </div>
+                        )}
+                    </>
                 )}
 
                 <Form.Item name="description" label="Description" rules={[{ required: true }]}>

@@ -1,8 +1,7 @@
-'use client';
-
-import { useState } from 'react';
-import { motion } from 'framer-motion';
+// Static section. The before/after reveal is CSS-only now, so this needs no
+// state, no framer-motion, and no client bundle.
 import Image from 'next/image';
+import Link from 'next/link';
 import { H2, Text } from '../../components/atoms/Typography';
 import Icon from '../../components/atoms/Icon';
 
@@ -46,86 +45,66 @@ const transformations = [
 ];
 
 export default function TransformationStories() {
-  const [hoveredCard, setHoveredCard] = useState(null);
-
   return (
-    <section className="relative py-20 overflow-hidden">
+    <section className="relative py-20 section-defer">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
-          className="text-center mb-12"
-        >
+        <div className="text-center mb-12 reveal">
           <H2>Transformation Stories</H2>
           <Text muted className="mt-3 max-w-xl mx-auto">
             Real results from real people who trusted Fito to help them reach their goals.
           </Text>
-        </motion.div>
+        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {transformations.map((story, index) => {
-            const isHovered = hoveredCard === story.id;
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 reveal">
+          {transformations.map((story) => {
+            const delta = story.beforeWeight - story.afterWeight;
 
             return (
-              <motion.div
+              <div
                 key={story.id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                onMouseEnter={() => setHoveredCard(story.id)}
-                onMouseLeave={() => setHoveredCard(null)}
-                className="group relative bg-overlay backdrop-blur-sm border border-border-light rounded-2xl overflow-hidden transition-all duration-500 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5"
+                className="story group relative glass border border-border-light rounded-2xl overflow-hidden hover-lift hover-lift-sm hover:border-primary/30"
               >
                 {/* Before/After Image Container */}
                 <div className="relative w-full aspect-[4/5] overflow-hidden">
-                  {/* Before Image (always visible) */}
+                  {/* Before — always visible underneath */}
                   <div className="absolute inset-0">
                     <Image
                       src={story.beforeImage}
                       alt={`${story.name} before transformation`}
                       fill
                       unoptimized
+                      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                       className="object-cover"
                     />
                     <div className="absolute inset-0 bg-background/20" />
-                    <span className="absolute top-3 left-3 bg-background/70 backdrop-blur-sm text-text text-xs font-medium px-3 py-1.5 rounded-full">
+                    <span className="absolute top-3 left-3 glass-strong text-text text-xs font-medium px-3 py-1.5 rounded-full">
                       Before
                     </span>
                   </div>
 
-                  {/* After Image (revealed on hover with clip) */}
-                  <motion.div
-                    className="absolute inset-0"
-                    initial={{ clipPath: 'inset(0 100% 0 0)' }}
-                    animate={{
-                      clipPath: isHovered ? 'inset(0 0% 0 0)' : 'inset(0 100% 0 0)',
-                    }}
-                    transition={{ duration: 0.6, ease: 'easeInOut' }}
-                  >
+                  {/* After — wiped in on hover.
+                      clip-path via a CSS transition instead of framer-motion:
+                      the old version drove clipPath off React state, so every
+                      frame of the 600ms wipe was a React render plus a full
+                      image repaint. Also gated behind a hover-capable pointer,
+                      since on touch it just flashed. */}
+                  <div className="story-after absolute inset-0">
                     <Image
                       src={story.afterImage}
                       alt={`${story.name} after transformation`}
                       fill
                       unoptimized
+                      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                       className="object-cover"
                     />
                     <div className="absolute inset-0 bg-background/20" />
                     <span className="absolute top-3 left-3 bg-primary/90 text-text-inverse text-xs font-medium px-3 py-1.5 rounded-full">
                       After
                     </span>
-                  </motion.div>
+                  </div>
 
-                  {/* Slider handle (visible on hover) */}
-                  <motion.div
-                    className="absolute top-0 bottom-0 w-0.5 bg-primary shadow-lg shadow-primary/50"
-                    animate={{
-                      left: isHovered ? '0%' : '100%',
-                    }}
-                    transition={{ duration: 0.6, ease: 'easeInOut' }}
-                  />
+                  {/* Wipe edge */}
+                  <div className="story-handle absolute top-0 bottom-0 w-0.5 bg-primary shadow-lg shadow-primary/50" />
                 </div>
 
                 {/* Content */}
@@ -150,47 +129,36 @@ export default function TransformationStories() {
                     <span className="text-xs text-text-muted">⏱ {story.duration}</span>
                     <div className="flex items-center gap-1 text-primary text-sm">
                       <span className="font-medium">
-                        {story.beforeWeight - story.afterWeight > 0
-                          ? `-${story.beforeWeight - story.afterWeight}kg`
-                          : `+${story.afterWeight - story.beforeWeight}kg`}
+                        {delta > 0 ? `-${delta}kg` : `+${Math.abs(delta)}kg`}
                       </span>
                       <Icon name="trending-up" className="w-4 h-4" />
                     </div>
                   </div>
                 </div>
 
-                {/* Hover instruction overlay */}
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: isHovered ? 0 : 0.6 }}
-                  transition={{ duration: 0.3 }}
-                  className="absolute inset-0 pointer-events-none flex items-center justify-center"
-                >
-                  <div className="bg-scrim backdrop-blur-sm text-text text-xs font-medium px-4 py-2 rounded-full border border-border-light">
+                {/* Hover hint — only rendered for hover-capable pointers, since
+                    "Hover to see transformation" is meaningless on a phone. */}
+                <div className="story-hint absolute inset-0 pointer-events-none hidden md:flex items-center justify-center">
+                  <div className="glass-strong text-text text-xs font-medium px-4 py-2 rounded-full border border-border-light">
                     Hover to see transformation →
                   </div>
-                </motion.div>
-              </motion.div>
+                </div>
+              </div>
             );
           })}
         </div>
 
         {/* CTA */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-          viewport={{ once: true }}
-          className="text-center mt-12"
-        >
-          <Text className="text-text-secondary">
-            Ready to write your own success story?
-          </Text>
-          <button className="mt-4 inline-flex items-center gap-2 text-primary font-semibold hover:text-primary-hover transition-colors group">
+        <div className="text-center mt-12 reveal">
+          <Text className="text-text-secondary">Ready to write your own success story?</Text>
+          <Link
+            href="/consultation"
+            className="mt-4 inline-flex items-center gap-2 text-primary font-semibold hover:text-primary-hover transition-colors group"
+          >
             Start Your Transformation Today
-            <span className="group-hover:translate-x-1 transition-transform">→</span>
-          </button>
-        </motion.div>
+            <span className="transition-transform md:group-hover:translate-x-1">→</span>
+          </Link>
+        </div>
       </div>
     </section>
   );

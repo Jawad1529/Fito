@@ -1,6 +1,5 @@
-'use client';
-
-import { motion } from 'framer-motion';
+// Entirely static content — no state, no handlers — so no 'use client' and no
+// JavaScript shipped for this section at all.
 import { H2, Text } from '../../components/atoms/Typography';
 
 // If you have an Icon component, you can use it.
@@ -83,31 +82,20 @@ const features = [
 
 export default function WhyChooseFito() {
   return (
-    <section className="relative py-20 overflow-hidden">
+    <section className="relative py-20 section-defer">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
-          className="text-center mb-12"
-        >
+        <div className="text-center mb-12 reveal">
           <H2>Why Choose Fito</H2>
           <Text muted className="mt-3 max-w-xl mx-auto">
             We combine science, quality, and care to deliver the best nutrition experience.
           </Text>
-        </motion.div>
+        </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {features.map((feature, index) => (
-            <motion.div
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 reveal">
+          {features.map((feature) => (
+            <div
               key={feature.id}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.08 }}
-              viewport={{ once: true }}
-              whileHover={{ y: -6, scale: 1.02 }}
-              className="group relative bg-overlay backdrop-blur-sm border border-border-light rounded-2xl p-6 transition-all duration-300 hover:border-primary/30 hover:bg-overlay-strong hover:shadow-lg hover:shadow-primary/5"
+              className="group relative glass border border-border-light rounded-2xl p-6 hover-lift hover-lift-sm hover:border-primary/30"
             >
               <div className="flex items-start gap-4">
                 <div className="flex-shrink-0 w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
@@ -120,7 +108,7 @@ export default function WhyChooseFito() {
                   </p>
                 </div>
               </div>
-            </motion.div>
+            </div>
           ))}
         </div>
       </div>

@@ -1,0 +1,38 @@
+import apiClient from './client';
+
+// Blogs take a single cover image, so the body is multipart/form-data with an
+// optional `image` File. `content` is sent as JSON so paragraph breaks survive.
+const toFormData = ({ image, content, ...fields }) => {
+    const formData = new FormData();
+
+    Object.entries(fields).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) formData.append(key, value);
+    });
+
+    if (content !== undefined) {
+        formData.append('content', Array.isArray(content) ? JSON.stringify(content) : content);
+    }
+    if (image instanceof File) formData.append('image', image);
+
+    return formData;
+};
+
+export const fetchBlogs = async () => {
+    const { data } = await apiClient.get('/admin/blogs');
+    return data.blogs;
+};
+
+export const createBlog = async (payload) => {
+    const { data } = await apiClient.post('/admin/blogs', toFormData(payload));
+    return data.blog;
+};
+
+export const updateBlog = async (id, payload) => {
+    const { data } = await apiClient.patch(`/admin/blogs/${id}`, toFormData(payload));
+    return data.blog;
+};
+
+export const deleteBlog = async (id) => {
+    const { data } = await apiClient.delete(`/admin/blogs/${id}`);
+    return data;
+};
