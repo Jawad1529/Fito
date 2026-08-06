@@ -40,7 +40,7 @@ export default function LoginPage() {
     >
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-text">Welcome Back</h1>
-        <p className="text-text-muted mt-2">Sign in to your Fito account</p>
+        <p className="text-text-muted mt-2">Sign in to your Fitoo account</p>
       </div>
 
       <Form

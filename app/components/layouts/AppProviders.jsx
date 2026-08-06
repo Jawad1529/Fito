@@ -1,9 +1,11 @@
 'use client';
 
+import { ConfigProvider } from 'antd';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { TestingModeProvider } from '@/context/TestingModeContext';
 import { AuthProvider } from '@/context/AuthContext';
 import { CartProvider } from '@/context/CartContext';
+import { antTheme } from '@/lib/antTheme';
 
 // All global providers in one place.
 //
@@ -11,14 +13,20 @@ import { CartProvider } from '@/context/CartContext';
 // navigating from /login to anywhere else tore it down and rebuilt it. It's
 // cheap and idempotent, so it wraps everything now and the tree stays stable
 // across navigations — no remounting of Auth/Cart state on route change.
+//
+// ConfigProvider was previously only applied inside (auth) and (dashboard),
+// so any antd component rendered elsewhere (Navbar's Switch/Tooltip/Popover)
+// fell back to antd's default light theme instead of the site's colors.
 export default function AppProviders({ children }) {
     return (
         <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID}>
-            <TestingModeProvider>
-                <AuthProvider>
-                    <CartProvider>{children}</CartProvider>
-                </AuthProvider>
-            </TestingModeProvider>
+            <ConfigProvider theme={antTheme}>
+                <TestingModeProvider>
+                    <AuthProvider>
+                        <CartProvider>{children}</CartProvider>
+                    </AuthProvider>
+                </TestingModeProvider>
+            </ConfigProvider>
         </GoogleOAuthProvider>
     );
 }

@@ -2,7 +2,7 @@ import Hero from '@/sections/home/Hero';
 import Certificates from '@/components/organisms/Certificates';
 import GoalsSection from '@/sections/home/GoalsSection';
 import FeaturedProducts from '@/components/organisms/FeaturedProducts';
-import WhyChooseFito from '@/sections/home/WhyChooseFito';
+import WhyChooseFitoo from '@/sections/home/WhyChooseFitoo';
 import ConsultationCTA from '@/sections/home/ConsultationCTA';
 import TransformationStories from '@/sections/home/TransformationStories';
 import LatestArticles from '@/sections/home/LatestArticles';
@@ -32,7 +32,7 @@ export default function HomePage() {
       <Certificates />
       <GoalsSection />
       <FeaturedProducts />
-      <WhyChooseFito />
+      <WhyChooseFitoo />
       <ConsultationCTA />
       <TransformationStories />
       <LatestArticles />

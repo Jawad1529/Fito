@@ -117,8 +117,8 @@ export default function useConsultation(initialGoal = null) {
       };
 
       // await consultationService.submit(record);
-      localStorage.setItem("Fito_consultation", JSON.stringify(record));
-      localStorage.removeItem("Fito_conversation");
+      localStorage.setItem("Fitoo_consultation", JSON.stringify(record));
+      localStorage.removeItem("Fitoo_conversation");
 
       return true;
     } catch (error) {

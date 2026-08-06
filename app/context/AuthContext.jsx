@@ -16,7 +16,7 @@ import {
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useLocalStorageState('Fito_app_auth', null);
+  const [user, setUser] = useLocalStorageState('Fitoo_app_auth', null);
   const { testingMode } = useTestingModeContext();
 
   const login = useCallback(

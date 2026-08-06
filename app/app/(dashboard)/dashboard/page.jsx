@@ -12,7 +12,7 @@ const { Title, Paragraph } = Typography;
 
 export default function DashboardPage() {
   const router = useRouter();
-  const [consultation] = useLocalStorageState('Fito_consultation', null);
+  const [consultation] = useLocalStorageState('Fitoo_consultation', null);
 
   return (
     <div className="py-12 md:py-16 px-4 sm:px-6 lg:px-8">

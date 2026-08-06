@@ -37,14 +37,13 @@ const blogSchema = new mongoose.Schema(
 // Fields the generated copy reads from; touching any of them invalidates the SEO block.
 const SEO_SOURCE_FIELDS = ['title', 'category', 'author', 'excerpt', 'content'];
 
-blogSchema.pre('save', function assignSeo(next) {
+blogSchema.pre('save', function assignSeo() {
     if (this.isNew || SEO_SOURCE_FIELDS.some((field) => this.isModified(field))) {
         this.seo = buildBlogSeo(this);
         // Only fill read time in when the admin left it blank, so a manually
         // entered value is never overwritten on later edits.
         if (!this.readTime) this.readTime = estimateReadTime(this.content, this.excerpt);
     }
-    next();
 });
 
 // Slug is derived from the title unless one was supplied explicitly. Uniqueness

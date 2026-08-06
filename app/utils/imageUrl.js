@@ -6,7 +6,7 @@ const API_ORIGIN = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/ap
     ''
 );
 
-const FALLBACK_IMAGE = 'https://placehold.co/600x600/1a1a1a/facc15?text=Fito';
+const FALLBACK_IMAGE = 'https://placehold.co/600x600/1a1a1a/facc15?text=Fitoo';
 
 export default function imageUrl(src) {
     if (!src) return FALLBACK_IMAGE;

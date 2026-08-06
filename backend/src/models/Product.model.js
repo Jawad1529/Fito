@@ -41,13 +41,12 @@ const productSchema = new mongoose.Schema(
 // Fields the generated copy reads from; touching any of them invalidates the SEO block.
 const SEO_SOURCE_FIELDS = ['name', 'category', 'price', 'stock', 'status', 'description'];
 
-productSchema.pre('save', function assignSeo(next) {
+productSchema.pre('save', function assignSeo() {
     if (this.isNew || SEO_SOURCE_FIELDS.some((field) => this.isModified(field))) {
         this.seo = buildProductSeo(this);
     }
     // Slug stays pinned to the original name so existing links keep resolving.
     if (!this.slug) this.slug = buildProductSlug(this);
-    next();
 });
 
 // Powers the shop page's text search without a full-text index scan per keystroke.

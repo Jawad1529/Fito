@@ -41,7 +41,7 @@ export const buildMetadata = ({
 
     return {
         metadataBase: new URL(SITE_URL),
-        // `absolute` opts out of the root layout's "%s | Fito" template, since
+        // `absolute` opts out of the root layout's "%s | Fitoo" template, since
         // the generated metaTitle already carries the brand name.
         title: { absolute: resolvedTitle },
         description: resolvedDescription,

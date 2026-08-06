@@ -5,7 +5,12 @@ import PCOSForm from "../components/organisms/forms/PCOSForm";
 import MotherWellnessForm from "../components/organisms/forms/MotherWellnessForm";
 import DiabetesForm from "../components/organisms/forms/DiabetesForm";
 
-import heroImage from "../assets/images/hero.png";
+import fatLossImage from "../assets/images/fat-loss.webp";
+import muscleGainImage from "../assets/images/muscle-gain.webp";
+import bodyRecompositionImage from "../assets/images/body-recomposition.webp";
+import pcosImage from "../assets/images/PCOS.webp";
+import motherWellnessImage from "../assets/images/mother-wellness-program.webp";
+import diabeticPatientsImage from "../assets/images/diabetic-patients.webp";
 
 // Placeholder pricing/features per goal — edit freely once real numbers are
 // confirmed. Each goal gets its own 1/3/6 month plans (id, price in PKR,
@@ -17,7 +22,7 @@ export const CONSULTATION_GOALS = [
     title: "Fat Loss",
     shortDescription: "Lose body fat with a personalized nutrition plan.",
     icon: "🔥",
-    image: heroImage,
+    image: fatLossImage,
     color: "#F59E0B",
     component: FatLossForm,
     plans: [
@@ -26,7 +31,7 @@ export const CONSULTATION_GOALS = [
         durationMonths: 1,
         label: "1 Month",
         price: 4500,
-        image: heroImage,
+        image: fatLossImage,
         bestFor: "Best for those who want a quick reset or trying it out before committing longer.",
         features: [
           "Personalized fat loss nutrition plan",
@@ -40,7 +45,7 @@ export const CONSULTATION_GOALS = [
         durationMonths: 3,
         label: "3 Months",
         price: 12000,
-        image: heroImage,
+        image: fatLossImage,
         badge: "Most Popular",
         bestFor: "Best for steady, sustainable fat loss with ongoing guidance and adjustments.",
         features: [
@@ -55,7 +60,7 @@ export const CONSULTATION_GOALS = [
         durationMonths: 6,
         label: "6 Months",
         price: 21000,
-        image: heroImage,
+        image: fatLossImage,
         badge: "Best Value",
         bestFor: "Best for long-term commitment and building lasting lifestyle changes.",
         features: [
@@ -72,7 +77,7 @@ export const CONSULTATION_GOALS = [
     title: "Muscle Gain",
     shortDescription: "Build lean muscle and increase strength.",
     icon: "💪",
-    image: heroImage,
+    image: muscleGainImage,
     color: "#3B82F6",
     component: MuscleGainForm,
     plans: [
@@ -81,7 +86,7 @@ export const CONSULTATION_GOALS = [
         durationMonths: 1,
         label: "1 Month",
         price: 5000,
-        image: heroImage,
+        image: muscleGainImage,
         bestFor: "Best for those who want a quick reset or trying it out before committing longer.",
         features: [
           "Personalized muscle gain nutrition plan",
@@ -95,7 +100,7 @@ export const CONSULTATION_GOALS = [
         durationMonths: 3,
         label: "3 Months",
         price: 13500,
-        image: heroImage,
+        image: muscleGainImage,
         badge: "Most Popular",
         bestFor: "Best for steady, sustainable muscle gain with ongoing guidance and adjustments.",
         features: [
@@ -110,7 +115,7 @@ export const CONSULTATION_GOALS = [
         durationMonths: 6,
         label: "6 Months",
         price: 24000,
-        image: heroImage,
+        image: muscleGainImage,
         badge: "Best Value",
         bestFor: "Best for long-term commitment and building lasting strength gains.",
         features: [
@@ -127,7 +132,7 @@ export const CONSULTATION_GOALS = [
     title: "Body Recomposition",
     shortDescription: "Build muscle while reducing body fat.",
     icon: "⚖️",
-    image: heroImage,
+    image: bodyRecompositionImage,
     color: "#10B981",
     component: BodyRecompositionForm,
     plans: [
@@ -136,7 +141,7 @@ export const CONSULTATION_GOALS = [
         durationMonths: 1,
         label: "1 Month",
         price: 5000,
-        image: heroImage,
+        image: bodyRecompositionImage,
         bestFor: "Best for those who want a quick reset or trying it out before committing longer.",
         features: [
           "Personalized body recomposition plan",
@@ -150,7 +155,7 @@ export const CONSULTATION_GOALS = [
         durationMonths: 3,
         label: "3 Months",
         price: 13500,
-        image: heroImage,
+        image: bodyRecompositionImage,
         badge: "Most Popular",
         bestFor: "Best for steady body recomposition with ongoing guidance and adjustments.",
         features: [
@@ -165,7 +170,7 @@ export const CONSULTATION_GOALS = [
         durationMonths: 6,
         label: "6 Months",
         price: 24000,
-        image: heroImage,
+        image: bodyRecompositionImage,
         badge: "Best Value",
         bestFor: "Best for long-term commitment and lasting body composition change.",
         features: [
@@ -182,7 +187,7 @@ export const CONSULTATION_GOALS = [
     title: "PCOS",
     shortDescription: "Nutrition guidance for managing PCOS symptoms.",
     icon: "🌸",
-    image: heroImage,
+    image: pcosImage,
     color: "#EC4899",
     component: PCOSForm,
     plans: [
@@ -191,7 +196,7 @@ export const CONSULTATION_GOALS = [
         durationMonths: 1,
         label: "1 Month",
         price: 5500,
-        image: heroImage,
+        image: pcosImage,
         bestFor: "Best for those newly diagnosed and wanting to understand what changes help first.",
         features: [
           "Personalized PCOS-friendly nutrition plan",
@@ -205,7 +210,7 @@ export const CONSULTATION_GOALS = [
         durationMonths: 3,
         label: "3 Months",
         price: 15000,
-        image: heroImage,
+        image: pcosImage,
         badge: "Most Popular",
         bestFor: "Best for managing symptoms consistently as hormonal changes take time to show.",
         features: [
@@ -220,7 +225,7 @@ export const CONSULTATION_GOALS = [
         durationMonths: 6,
         label: "6 Months",
         price: 27000,
-        image: heroImage,
+        image: pcosImage,
         badge: "Best Value",
         bestFor: "Best for long-term hormone balance and sustained symptom management.",
         features: [
@@ -237,7 +242,7 @@ export const CONSULTATION_GOALS = [
     title: "Mother Wellness Program",
     shortDescription: "Nutrition support for pregnancy, postpartum & breastfeeding.",
     icon: "🤱",
-    image: heroImage,
+    image: motherWellnessImage,
     color: "#8B5CF6",
     component: MotherWellnessForm,
     plans: [
@@ -246,7 +251,7 @@ export const CONSULTATION_GOALS = [
         durationMonths: 1,
         label: "1 Month",
         price: 6000,
-        image: heroImage,
+        image: motherWellnessImage,
         bestFor: "Best for a specific stage (e.g. a trimester or early postpartum) that needs short-term support.",
         features: [
           "Personalized maternal nutrition plan",
@@ -260,7 +265,7 @@ export const CONSULTATION_GOALS = [
         durationMonths: 3,
         label: "3 Months",
         price: 16500,
-        image: heroImage,
+        image: motherWellnessImage,
         badge: "Most Popular",
         bestFor: "Best for ongoing support across pregnancy or postpartum recovery.",
         features: [
@@ -275,7 +280,7 @@ export const CONSULTATION_GOALS = [
         durationMonths: 6,
         label: "6 Months",
         price: 30000,
-        image: heroImage,
+        image: motherWellnessImage,
         badge: "Best Value",
         bestFor: "Best for continuous support from pregnancy through breastfeeding.",
         features: [
@@ -292,7 +297,7 @@ export const CONSULTATION_GOALS = [
     title: "Diabetic Patients",
     shortDescription: "Nutrition guidance for managing blood sugar and diabetes.",
     icon: "🩸",
-    image: heroImage,
+    image: diabeticPatientsImage,
     color: "#EF4444",
     component: DiabetesForm,
     plans: [
@@ -301,7 +306,7 @@ export const CONSULTATION_GOALS = [
         durationMonths: 1,
         label: "1 Month",
         price: 5500,
-        image: heroImage,
+        image: diabeticPatientsImage,
         bestFor: "Best for those newly diagnosed and wanting a plan to start stabilizing blood sugar.",
         features: [
           "Personalized diabetic-friendly nutrition plan",
@@ -315,7 +320,7 @@ export const CONSULTATION_GOALS = [
         durationMonths: 3,
         label: "3 Months",
         price: 15000,
-        image: heroImage,
+        image: diabeticPatientsImage,
         badge: "Most Popular",
         bestFor: "Best for consistently tracking blood sugar trends and adjusting the plan as they improve.",
         features: [
@@ -330,7 +335,7 @@ export const CONSULTATION_GOALS = [
         durationMonths: 6,
         label: "6 Months",
         price: 27000,
-        image: heroImage,
+        image: diabeticPatientsImage,
         badge: "Best Value",
         bestFor: "Best for long-term blood sugar control and reducing reliance on medication over time.",
         features: [

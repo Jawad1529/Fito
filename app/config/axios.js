@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const AUTH_STORAGE_KEY = 'Fito_app_auth';
+const AUTH_STORAGE_KEY = 'Fitoo_app_auth';
 
 const apiClient = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api',

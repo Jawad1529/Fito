@@ -93,6 +93,21 @@ export const toPublicReply = (reply) => ({
     createdAt: reply.createdAt,
 });
 
+// `forUser` is the id of the requesting user (omitted for the admin panel,
+// which has no per-user read state to report).
+export const toPublicNotification = (notification, forUser) => ({
+    id: notification._id,
+    title: notification.title,
+    message: notification.message,
+    type: notification.type,
+    audience: notification.audience,
+    status: notification.status,
+    date: notification.sendDate?.toISOString().slice(0, 10),
+    sendDate: notification.sendDate,
+    isRead: forUser ? notification.readBy?.some((id) => String(id) === String(forUser)) ?? false : undefined,
+    createdAt: notification.createdAt,
+});
+
 export const toPublicReview = (review) => ({
     id: review._id,
     // Populated documents expose _id; unpopulated ones are the raw ObjectId.

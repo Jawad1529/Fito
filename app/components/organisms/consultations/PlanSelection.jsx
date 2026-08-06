@@ -10,6 +10,13 @@ function formatPrice(price) {
   return `Rs. ${price.toLocaleString('en-US')}`;
 }
 
+// Duration-based plan ids map to a tier name shown over the plan image.
+const PLAN_TIER_LABELS = {
+  '1-month': 'Basic',
+  '3-month': 'Pro',
+  '6-month': 'Premium',
+};
+
 export default function PlanSelection({
   goal,
   plans,
@@ -73,6 +80,14 @@ export default function PlanSelection({
                   fill
                   objectFit="contain"
                 />
+
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/5 to-transparent" />
+
+                {PLAN_TIER_LABELS[plan.id] && (
+                  <span className="absolute bottom-3 left-4 z-10 text-white text-2xl font-bold tracking-wide drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+                    {PLAN_TIER_LABELS[plan.id]}
+                  </span>
+                )}
               </div>
 
               <div className="p-6 flex flex-col grow">

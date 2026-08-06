@@ -6,7 +6,7 @@ import useLocalStorageState from '../hooks/useLocalStorageState';
 const CartContext = createContext(null);
 
 export function CartProvider({ children }) {
-  const [items, setItems] = useLocalStorageState('Fito_cart', []);
+  const [items, setItems] = useLocalStorageState('Fitoo_cart', []);
 
   const addToCart = useCallback(
     (product, quantity = 1) => {

@@ -21,7 +21,7 @@ const STATUS_VARIANT = {
 function loadLocalOrders() {
   if (typeof window === 'undefined') return [];
   try {
-    return JSON.parse(localStorage.getItem('Fito_orders') || '[]').reverse();
+    return JSON.parse(localStorage.getItem('Fitoo_orders') || '[]').reverse();
   } catch {
     return [];
   }

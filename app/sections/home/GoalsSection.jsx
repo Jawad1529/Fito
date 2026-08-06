@@ -2,44 +2,49 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { H2, Text } from '../../components/atoms/Typography';
 
-import heroImage from '../../assets/images/hero.png';
+import fatLossIcon from '../../assets/icons/fat-loss.svg';
+import muscleGainIcon from '../../assets/icons/muscle-gain.svg';
+import bodyRecompositionIcon from '../../assets/icons/body-recomposition.svg';
+import pcosIcon from '../../assets/icons/pcos .svg';
+import motherWellnessIcon from '../../assets/icons/mother-wellness.svg';
+import diabeticPatientsIcon from '../../assets/icons/diabetic-Patients.svg';
 
 // Kept in sync with CONSULTATION_GOALS ids in utils/consultationConfig.js —
 // clicking a card jumps straight into that goal's step in /consultation.
 const goals = [
   {
     id: 'fat-loss',
-    image: heroImage,
+    image: fatLossIcon,
     title: 'Fat Loss',
     description: 'Lose body fat with a personalized nutrition plan.',
   },
   {
     id: 'muscle-gain',
-    image: heroImage,
+    image: muscleGainIcon,
     title: 'Muscle Gain',
     description: 'Build lean muscle and increase strength.',
   },
   {
     id: 'body-recomposition',
-    image: heroImage,
+    image: bodyRecompositionIcon,
     title: 'Body Recomposition',
     description: 'Build muscle while reducing body fat.',
   },
   {
     id: 'pcos',
-    image: heroImage,
+    image: pcosIcon,
     title: 'PCOS',
     description: 'Nutrition guidance for managing PCOS symptoms.',
   },
   {
     id: 'mother-wellness',
-    image: heroImage,
+    image: motherWellnessIcon,
     title: 'Mother Wellness',
     description: 'Nutrition support for pregnancy, postpartum & breastfeeding.',
   },
   {
     id: 'diabetes',
-    image: heroImage,
+    image: diabeticPatientsIcon,
     title: 'Diabetic Patients',
     description: 'Nutrition guidance for managing blood sugar and diabetes.',
   },
@@ -70,17 +75,20 @@ export default function GoalsSection() {
               className="relative block group glass border border-border-light rounded-2xl p-6 text-center hover-lift hover-lift-sm hover:border-primary/30"
             >
               <div className="flex justify-center mb-4">
-                {/* Static import, so next/image knows the intrinsic size and
-                    generates a blur placeholder at build time — no need for the
-                    client-side skeleton wrapper in atoms/Image. `alt=""`
-                    because the heading right below already names the goal. */}
+                {/* Static import, so next/image knows the intrinsic size — no
+                    need for the client-side skeleton wrapper in atoms/Image.
+                    `unoptimized` because these are local SVG icons (each
+                    already has its own baked-in dark badge background), and
+                    Next's image optimizer doesn't process SVGs by default.
+                    `alt=""` because the heading right below already names the
+                    goal. */}
                 <Image
                   src={goal.image}
                   alt=""
                   width={56}
                   height={56}
-                  placeholder="blur"
-                  className="w-14 h-14 rounded-full object-contain"
+                  unoptimized
+                  className="w-14 h-14 rounded-xl object-contain"
                 />
               </div>
               <h3 className="text-lg font-semibold text-text">{goal.title}</h3>

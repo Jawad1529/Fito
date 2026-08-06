@@ -7,12 +7,8 @@ import Link from 'next/link';
 import Icon from '@/components/atoms/Icon';
 import Tag from '@/components/atoms/Tag';
 import { TEAM_MEMBERS as teamMembers, ABOUT_STATS as stats } from '@/constants/aboutContent';
-
-// Swap these for real photography/assets when available.
-const coachingImage =
-  'https://imgcdn.stablediffusionweb.com/2024/3/20/6c19cf22-f0a0-4c8c-ab9c-e63c909d31a6.jpg';
-const labImage =
-  'https://i.ebayimg.com/images/g/i14AAOSwH9lnAFas/s-l1200.jpg';
+import coachingImage from '@/assets/images/About 1.webp';
+import labImage from '@/assets/images/About 2.webp';
 
 // ---------------------------------------------------------------------
 // Local icons — self-contained, currentColor
@@ -93,7 +89,7 @@ const fadeUp = {
 const glowShadow = { boxShadow: '0 25px 60px -20px color-mix(in srgb, var(--primary) 30%, transparent)' };
 
 // Reusable image-left/right + content layout, local to this file.
-function Row({ image, imageAlt, reverse, children }) {
+function Row({ image, imageAlt, reverse, fit = 'cover', children }) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, amount: 0.3 });
 
@@ -108,9 +104,16 @@ function Row({ image, imageAlt, reverse, children }) {
         animate={isInView ? 'show' : 'hidden'}
         variants={fadeUp}
         style={glowShadow}
-        className="relative aspect-[4/5] sm:aspect-[4/3] rounded-3xl overflow-hidden ring-1 ring-border-light"
+        className={`relative aspect-[4/5] sm:aspect-[4/3] rounded-3xl overflow-hidden ring-1 ring-border-light ${fit === 'contain' ? 'bg-black' : ''
+          }`}
       >
-        <Image src={image} alt={imageAlt} fill unoptimized className="object-cover" />
+        <Image
+          src={image}
+          alt={imageAlt}
+          fill
+          unoptimized
+          className={fit === 'contain' ? 'object-contain' : 'object-cover'}
+        />
       </motion.div>
 
       <motion.div initial="hidden" animate={isInView ? 'show' : 'hidden'} variants={fadeUp}>
@@ -169,7 +172,7 @@ export default function AboutContent() {
         </Row>
 
         {/* Row 2 — image right, content left */}
-        <Row image={labImage} imageAlt="In-house formulation lab" reverse>
+        <Row image={labImage} imageAlt="In-house formulation lab" reverse fit="contain">
           <h2 className="text-3xl sm:text-4xl font-bold text-text leading-tight tracking-tight">
             Radically transparent,
             <br />

@@ -12,6 +12,8 @@ import blogsRoutes from './routes/blogs.routes.js';
 import adminBlogsRoutes from './routes/adminBlogs.routes.js';
 import reviewsRoutes from './routes/reviews.routes.js';
 import adminReviewsRoutes from './routes/adminReviews.routes.js';
+import notificationsRoutes from './routes/notifications.routes.js';
+import adminNotificationsRoutes from './routes/adminNotifications.routes.js';
 import { notFound, errorHandler } from './middleware/error.middleware.js';
 
 const app = express();
@@ -36,6 +38,8 @@ app.use('/api/blogs', blogsRoutes);
 app.use('/api/admin/blogs', adminBlogsRoutes);
 app.use('/api/reviews', reviewsRoutes);
 app.use('/api/admin/reviews', adminReviewsRoutes);
+app.use('/api/notifications', notificationsRoutes);
+app.use('/api/admin/notifications', adminNotificationsRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

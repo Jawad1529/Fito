@@ -138,6 +138,28 @@ const PATHS = {
       <path d="M8 12h8" />
     </>
   ),
+  truck: (
+    <>
+      <rect x="1" y="6" width="14" height="11" rx="1.5" />
+      <path d="M15 10h4l3 3.5V17h-7" />
+      <circle cx="6" cy="19" r="2" />
+      <circle cx="17.5" cy="19" r="2" />
+    </>
+  ),
+  package: (
+    <>
+      <path d="M21 8l-9-5-9 5 9 5 9-5z" />
+      <path d="M3 8v8l9 5 9-5V8" />
+      <path d="M12 13v8" />
+    </>
+  ),
+  helpCircle: (
+    <>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M9.5 9a2.5 2.5 0 014.9.8c0 1.7-2.4 2-2.4 3.7" />
+      <circle cx="12" cy="17.2" r="0.2" fill="currentColor" stroke="none" />
+    </>
+  ),
 };
 
 export default function Icon({ name, className = 'w-5 h-5', strokeWidth = 1.8 }) {

@@ -1,6 +1,11 @@
+import mongoose from 'mongoose';
 import asyncHandler from '../utils/asyncHandler.js';
 import Order from '../models/Order.model.js';
 import { toPublicOrder } from '../utils/serializers.js';
+
+// Digits only, so "0300-1234567" and "+92 300 1234567" both match what was
+// stored at checkout.
+const normalizePhone = (phone) => String(phone ?? '').replace(/\D/g, '');
 
 // POST /api/orders — accepts guest checkout; if a valid token is attached
 // (see attachUserIfPresent), the order is linked to that account.
@@ -37,4 +42,24 @@ export const createOrder = asyncHandler(async (req, res) => {
 export const getMyOrders = asyncHandler(async (req, res) => {
     const orders = await Order.find({ user: req.user._id }).sort({ createdAt: -1 });
     res.json({ orders: orders.map(toPublicOrder) });
+});
+
+// GET /api/orders/track?orderId=&phone= — no auth, so the phone used at
+// checkout doubles as the shared secret proving the requester owns the order.
+export const trackOrder = asyncHandler(async (req, res) => {
+    const { orderId, phone } = req.query;
+
+    if (!orderId || !phone || !mongoose.isValidObjectId(orderId)) {
+        res.status(400);
+        throw new Error('A valid order ID and phone number are required');
+    }
+
+    const order = await Order.findById(orderId);
+
+    if (!order || normalizePhone(order.shipping.phone) !== normalizePhone(phone)) {
+        res.status(404);
+        throw new Error('No order found for that order ID and phone number');
+    }
+
+    res.json({ order: toPublicOrder(order) });
 });

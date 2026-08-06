@@ -89,6 +89,20 @@ export const breadcrumbJsonLd = (trail = []) => ({
   })),
 });
 
+// `categories` is FAQ_CATEGORIES from constants/faqContent.js — flattened
+// since FAQPage expects a single mainEntity list, not grouped sections.
+export const faqPageJsonLd = (categories = []) => ({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: categories.flatMap((group) =>
+    group.questions.map((qa) => ({
+      '@type': 'Question',
+      name: qa.question,
+      acceptedAnswer: { '@type': 'Answer', text: qa.answer },
+    }))
+  ),
+});
+
 export const organizationJsonLd = () => ({
   '@context': 'https://schema.org',
   '@type': 'Organization',

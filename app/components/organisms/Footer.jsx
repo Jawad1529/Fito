@@ -76,7 +76,7 @@ export default function Footer() {
               href="/"
               className="text-2xl font-bold text-text tracking-tight"
             >
-              Fito
+              Fitoo
             </Link>
 
             <Text muted className="mt-3 max-w-xs text-sm">
@@ -140,7 +140,7 @@ export default function Footer() {
         <Divider className="mt-12 mb-6" />
 
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-text-muted">
-          <p>© {new Date().getFullYear()} Fito. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} Fitoo. All rights reserved.</p>
 
           <div className="flex items-center gap-6">
             {legalLinks.map((link) => (

@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import dayjs from 'dayjs';
 import { NOTIFICATION_TYPES, NOTIFICATION_AUDIENCES, NOTIFICATION_STATUSES } from '../../../data/notifications';
 
-export default function NotificationFormDrawer({ open, onClose, onSubmit, initialValues }) {
+export default function NotificationFormDrawer({ open, onClose, onSubmit, initialValues, saving = false }) {
     const [form] = Form.useForm();
 
     useEffect(() => {
@@ -27,7 +27,7 @@ export default function NotificationFormDrawer({ open, onClose, onSubmit, initia
             width={460}
             destroyOnHidden
             extra={
-                <Button type="primary" onClick={() => form.submit()}>
+                <Button type="primary" loading={saving} onClick={() => form.submit()}>
                     Save
                 </Button>
             }

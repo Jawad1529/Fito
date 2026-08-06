@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Modal, Descriptions, Button, message } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import PageHeading from '../../components/atoms/PageHeading';
@@ -8,17 +8,32 @@ import StatusTag from '../../components/atoms/StatusTag';
 import DataTable from '../../components/organisms/DataTable';
 import NotificationFormDrawer from '../../components/organisms/notifications/NotificationFormDrawer';
 import useTableQuery from '../../hooks/useTableQuery';
+import { useTestingMode } from '../../context/TestingModeContext';
 import {
     notifications as initialNotifications,
     NOTIFICATION_TYPES,
     NOTIFICATION_AUDIENCES,
 } from '../../data/notifications';
+import {
+    fetchNotifications,
+    createNotification as createNotificationApi,
+    updateNotification as updateNotificationApi,
+    deleteNotification as deleteNotificationApi,
+} from '../../api/adminNotifications.api';
 
 const typeLabel = (value) => NOTIFICATION_TYPES.find((t) => t.value === value)?.label ?? value;
 const audienceLabel = (value) => NOTIFICATION_AUDIENCES.find((a) => a.value === value)?.label ?? value;
+const apiError = (err, fallback) => err?.response?.data?.message || fallback;
 
 export default function NotificationManagementPage() {
-    const [notifications, setNotifications] = useState(initialNotifications);
+    const { testingMode } = useTestingMode();
+    return <NotificationManagementPageInner key={testingMode} testingMode={testingMode} />;
+}
+
+function NotificationManagementPageInner({ testingMode }) {
+    const [notifications, setNotifications] = useState(testingMode ? initialNotifications : []);
+    const [loading, setLoading] = useState(!testingMode);
+    const [saving, setSaving] = useState(false);
     const { searchText, setSearchText, filteredData } = useTableQuery(notifications, {
         searchKeys: ['title', 'message'],
     });
@@ -26,6 +41,24 @@ export default function NotificationManagementPage() {
     const [viewing, setViewing] = useState(null);
     const [drawerOpen, setDrawerOpen] = useState(false);
     const [editingNotification, setEditingNotification] = useState(null);
+
+    useEffect(() => {
+        if (testingMode) return undefined;
+        let cancelled = false;
+        fetchNotifications()
+            .then((data) => {
+                if (!cancelled) setNotifications(data);
+            })
+            .catch(() => {
+                if (!cancelled) message.error('Failed to load notifications');
+            })
+            .finally(() => {
+                if (!cancelled) setLoading(false);
+            });
+        return () => {
+            cancelled = true;
+        };
+    }, [testingMode]);
 
     const openCreate = () => {
         setEditingNotification(null);
@@ -37,26 +70,57 @@ export default function NotificationManagementPage() {
         setDrawerOpen(true);
     };
 
-    const handleSubmit = (values) => {
-        if (editingNotification) {
-            setNotifications((prev) =>
-                prev.map((n) => (n.id === editingNotification.id ? { ...n, ...values } : n))
-            );
-            message.success('Notification updated');
-        } else {
-            const newNotification = {
-                ...values,
-                id: Math.max(...notifications.map((n) => n.id), 0) + 1,
-            };
-            setNotifications((prev) => [newNotification, ...prev]);
-            message.success('Notification created');
+    const handleSubmit = async (values) => {
+        if (testingMode) {
+            if (editingNotification) {
+                setNotifications((prev) =>
+                    prev.map((n) => (n.id === editingNotification.id ? { ...n, ...values } : n))
+                );
+                message.success('Notification updated');
+            } else {
+                const newNotification = {
+                    ...values,
+                    id: Math.max(...notifications.map((n) => n.id), 0) + 1,
+                };
+                setNotifications((prev) => [newNotification, ...prev]);
+                message.success('Notification created');
+            }
+            setDrawerOpen(false);
+            return;
         }
-        setDrawerOpen(false);
+
+        setSaving(true);
+        try {
+            if (editingNotification) {
+                const updated = await updateNotificationApi(editingNotification.id, values);
+                setNotifications((prev) => prev.map((n) => (n.id === updated.id ? updated : n)));
+                message.success('Notification updated');
+            } else {
+                const created = await createNotificationApi(values);
+                setNotifications((prev) => [created, ...prev]);
+                message.success('Notification created');
+            }
+            setDrawerOpen(false);
+        } catch (err) {
+            message.error(apiError(err, 'Failed to save notification'));
+        } finally {
+            setSaving(false);
+        }
     };
 
-    const handleDelete = (id) => {
-        setNotifications((prev) => prev.filter((n) => n.id !== id));
-        message.success('Notification deleted');
+    const handleDelete = async (id) => {
+        if (testingMode) {
+            setNotifications((prev) => prev.filter((n) => n.id !== id));
+            message.success('Notification deleted');
+            return;
+        }
+        try {
+            await deleteNotificationApi(id);
+            setNotifications((prev) => prev.filter((n) => n.id !== id));
+            message.success('Notification deleted');
+        } catch (err) {
+            message.error(apiError(err, 'Failed to delete notification'));
+        }
     };
 
     const columns = [
@@ -85,7 +149,7 @@ export default function NotificationManagementPage() {
             onFilter: (value, record) => record.status === value,
             render: (status) => <StatusTag status={status} />,
         },
-        { title: 'Date', dataIndex: 'date', sorter: (a, b) => a.date.localeCompare(b.date) },
+        { title: 'Date', dataIndex: 'date', sorter: (a, b) => String(a.date ?? '').localeCompare(String(b.date ?? '')) },
         {
             title: 'Actions',
             key: 'actions',
@@ -114,7 +178,7 @@ export default function NotificationManagementPage() {
                 }
             />
 
-            <DataTable columns={columns} data={filteredData} />
+            <DataTable columns={columns} data={filteredData} loading={loading} />
 
             <Modal open={!!viewing} title="Notification Details" onCancel={() => setViewing(null)} footer={null}>
                 {viewing && (
@@ -134,6 +198,7 @@ export default function NotificationManagementPage() {
                 onClose={() => setDrawerOpen(false)}
                 onSubmit={handleSubmit}
                 initialValues={editingNotification}
+                saving={saving}
             />
         </div>
     );

@@ -8,7 +8,7 @@ const TestingModeContext = createContext(null);
 export function TestingModeProvider({ children }) {
   // Defaults to true (ON) so the app behaves exactly as it does today
   // (mock/localStorage-only, no network calls) until someone opts out.
-  const [testingMode, setStoredTestingMode] = useLocalStorageState('Fito_testingMode', true);
+  const [testingMode, setStoredTestingMode] = useLocalStorageState('Fitoo_testingMode', true);
 
   const setTestingMode = useCallback(
     (value) => {

@@ -51,12 +51,17 @@ export default function ConsultationFlow() {
 
   const planStepIndex = 1;
 
+  const handleSelectGoal = (goalId) => {
+    setSelectedGoal(goalId);
+    next();
+  };
+
   const steps = [
     <GoalSelection
       key="goal"
       goals={CONSULTATION_GOALS}
       selectedGoal={selectedGoal}
-      onSelect={setSelectedGoal}
+      onSelect={handleSelectGoal}
     />,
 
     <PlanSelection

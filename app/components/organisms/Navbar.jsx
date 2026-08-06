@@ -2,14 +2,18 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Switch, Tooltip } from 'antd';
+import { Switch, Tooltip, Popover, Empty, Spin } from 'antd';
 import Icon from '../atoms/Icon';
 import Button from '../atoms/Button';
 import Badge from '../atoms/Badge';
+import { Text } from '../atoms/Typography';
+import NotificationItem from '../molecules/NotificationItem';
 import useCart from '../../hooks/useCart';
 import useAuth from '../../hooks/useAuth';
 import useTestingMode from '../../hooks/useTestingMode';
+import useNotifications from '../../hooks/useNotifications';
 
 const navLinks = [
   { label: 'Home', href: '/' },
@@ -21,11 +25,22 @@ const navLinks = [
 ];
 
 export default function Navbar() {
+  const pathname = usePathname();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const { totalItems } = useCart();
   const { user, isAuthenticated, logout } = useAuth();
   const { testingMode, setTestingMode } = useTestingMode();
+  const {
+    notifications,
+    unreadCount,
+    loading: notificationsLoading,
+    markAsRead,
+    markAllAsRead,
+  } = useNotifications();
+  // Notifications only exist for a signed-in user; testing mode previews the
+  // bell with mock data so it's still reviewable without logging in.
+  const canSeeNotifications = isAuthenticated || testingMode;
 
   // A sentinel + IntersectionObserver instead of a scroll listener.
   //
@@ -56,6 +71,53 @@ export default function Navbar() {
     };
   }, [mobileOpen]);
 
+  const notificationsPanel = (
+    <div className="w-80 max-w-[85vw]">
+      <div className="flex items-center justify-between px-1 pb-3">
+        <span className="font-semibold text-text">Notifications</span>
+        {unreadCount > 0 && (
+          <button
+            onClick={markAllAsRead}
+            className="text-xs text-primary hover:underline"
+          >
+            Mark all as read
+          </button>
+        )}
+      </div>
+
+      <div className="flex flex-col gap-2 max-h-96 overflow-y-auto">
+        {notificationsLoading ? (
+          <div className="flex justify-center py-8">
+            <Spin size="small" />
+          </div>
+        ) : notifications.length === 0 ? (
+          <Empty
+            description={<Text muted className="text-sm">No notifications yet</Text>}
+            image={Empty.PRESENTED_IMAGE_SIMPLE}
+            className="py-4"
+          />
+        ) : (
+          notifications.map((notification) => (
+            <NotificationItem
+              key={notification.id}
+              notification={notification}
+              onRead={markAsRead}
+            />
+          ))
+        )}
+      </div>
+
+      {notifications.length > 0 && (
+        <Link
+          href="/notifications"
+          className="block text-center text-sm text-primary hover:underline mt-3 pt-3 border-t border-border-light"
+        >
+          View all
+        </Link>
+      )}
+    </div>
+  );
+
   return (
     <>
       {/* Zero-height marker 50px down the document. Whether it's in view is
@@ -73,24 +135,27 @@ export default function Navbar() {
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <Link href="/" className="text-2xl font-bold text-text tracking-tight shrink-0">
-              Fito
+              Fitoo
             </Link>
 
             {/* Desktop nav — only from lg up, so tablets don't get crammed */}
             <div className="hidden lg:flex items-center space-x-1">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.label}
-                  href={link.href}
-                  className="relative text-text/80 hover:text-text px-3 py-2 text-sm font-medium transition-colors group"
-                >
-                  {link.label}
-                  <span
-                    className={`absolute left-0 right-0 bottom-0 h-0.5 bg-primary origin-left transition-transform ${link.label === 'Home' ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
-                      }`}
-                  />
-                </Link>
-              ))}
+              {navLinks.map((link) => {
+                const isActive = link.href === '/' ? pathname === '/' : pathname.startsWith(link.href);
+                return (
+                  <Link
+                    key={link.label}
+                    href={link.href}
+                    className="relative text-text/80 hover:text-text px-3 py-2 text-sm font-medium transition-colors group"
+                  >
+                    {link.label}
+                    <span
+                      className={`absolute left-0 right-0 bottom-0 h-0.5 bg-primary origin-left transition-transform ${isActive ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
+                        }`}
+                    />
+                  </Link>
+                );
+              })}
             </div>
 
             {/* Right side */}
@@ -110,11 +175,20 @@ export default function Navbar() {
               <button aria-label="Search" className="text-text-secondary hover:text-text transition-colors">
                 <Icon name="search" className="w-5 h-5" />
               </button>
-              <Badge count={3}>
-                <button aria-label="Notifications" className="text-text-secondary hover:text-text transition-colors">
-                  <Icon name="bell" className="w-5 h-5" />
-                </button>
-              </Badge>
+              {canSeeNotifications && (
+                <Badge count={unreadCount}>
+                  <Popover
+                    trigger="click"
+                    placement="bottomRight"
+                    content={notificationsPanel}
+                    arrow={false}
+                  >
+                    <button aria-label="Notifications" className="text-text-secondary hover:text-text transition-colors">
+                      <Icon name="bell" className="w-5 h-5" />
+                    </button>
+                  </Popover>
+                </Badge>
+              )}
               <Badge count={totalItems}>
                 <Link href="/cart" aria-label="Cart" className="text-text-secondary hover:text-text transition-colors">
                   <Icon name="cart" className="w-5 h-5" />
@@ -189,11 +263,18 @@ export default function Navbar() {
                 </div>
 
                 <div className="flex items-center space-x-5 pt-5">
-                  <Badge count={3}>
-                    <button aria-label="Notifications" className="text-text-secondary hover:text-text">
-                      <Icon name="bell" className="w-5 h-5" />
-                    </button>
-                  </Badge>
+                  {canSeeNotifications && (
+                    <Badge count={unreadCount}>
+                      <Link
+                        href="/notifications"
+                        aria-label="Notifications"
+                        onClick={() => setMobileOpen(false)}
+                        className="text-text-secondary hover:text-text"
+                      >
+                        <Icon name="bell" className="w-5 h-5" />
+                      </Link>
+                    </Badge>
+                  )}
                   <Badge count={totalItems}>
                     <Link
                       href="/cart"

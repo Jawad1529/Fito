@@ -286,7 +286,7 @@ export default function ReviewSection({
                           </span>
                           {reply.authorType === 'admin' && (
                             <span className="text-[10px] uppercase tracking-wide bg-primary/20 text-primary px-2 py-0.5 rounded-full">
-                              Fito Team
+                              Fitoo Team
                             </span>
                           )}
                         </div>

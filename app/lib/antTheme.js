@@ -41,5 +41,21 @@ export const antTheme = {
     Form: {
       labelColor: 'var(--text-secondary)',
     },
+    // Floating panels (dropdowns, tooltips) read as page background rather
+    // than a card unless pinned to --surface explicitly — colorBgBase alone
+    // isn't enough since Popover derives its own elevated-surface token.
+    Popover: {
+      colorBgElevated: 'var(--surface)',
+      colorText: 'var(--text)',
+      colorTextHeading: 'var(--text)',
+    },
+    Tooltip: {
+      colorBgSpotlight: 'var(--surface)',
+      colorTextLightSolid: 'var(--text)',
+    },
+    Empty: {
+      colorText: 'var(--text-secondary)',
+      colorTextDescription: 'var(--text-muted)',
+    },
   },
 };

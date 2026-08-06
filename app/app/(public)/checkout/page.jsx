@@ -78,8 +78,8 @@ export default function CheckoutPage() {
           screenshotAttached: screenshot.length > 0,
         };
 
-        const existingOrders = JSON.parse(localStorage.getItem('Fito_orders') || '[]');
-        localStorage.setItem('Fito_orders', JSON.stringify([...existingOrders, orderRecord]));
+        const existingOrders = JSON.parse(localStorage.getItem('Fitoo_orders') || '[]');
+        localStorage.setItem('Fitoo_orders', JSON.stringify([...existingOrders, orderRecord]));
 
         setOrder(orderRecord);
       } else {
@@ -240,7 +240,7 @@ export default function CheckoutPage() {
                   </div>
                   <div>
                     <Text muted>Account Title</Text>
-                    <div className="text-text font-medium">Fito Nutrition</div>
+                    <div className="text-text font-medium">Fitoo Nutrition</div>
                   </div>
                   <div>
                     <Text muted>Account Number</Text>

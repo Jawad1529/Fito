@@ -9,8 +9,7 @@ import { H2, Text } from '../../components/atoms/Typography';
 import Button from '../../components/atoms/Button';
 import Icon from '../../components/atoms/Icon';
 
-// Placeholder image – replace with your own
-import consultationImage from '@/assets/images/diet.webp'; // adjust path
+import consultationImage from '@/assets/images/About 2.webp';
 
 const validationSchema = Yup.object({
   name: Yup.string()
