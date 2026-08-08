@@ -13,7 +13,7 @@ const productSchema = new mongoose.Schema(
         stock: { type: Number, default: 0, min: 0 },
         description: { type: String, required: true, trim: true },
         // First entry of `images` is the primary/thumbnail image. Stored as
-        // relative URLs (/uploads/...) served by express.static.
+        // absolute Cloudinary URLs (see upload.middleware.js).
         images: [{ type: String }],
         rating: { type: Number, default: 0, min: 0, max: 5 },
         reviewCount: { type: Number, default: 0, min: 0 },

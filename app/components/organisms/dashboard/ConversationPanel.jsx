@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { Card, Typography, Input, Button, Avatar } from 'antd';
+import { Card, Typography, Input, Button, Avatar, message as antdMessage } from 'antd';
 import {
   SendOutlined,
   UserOutlined,
@@ -9,6 +9,7 @@ import {
 } from '@ant-design/icons';
 
 import useLocalStorageState from '@/hooks/useLocalStorageState';
+import { sendConsultationMessage } from '@/services/consultation.service';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -21,37 +22,65 @@ const makeWelcomeMessage = () => ({
   timestamp: new Date().toISOString(),
 });
 
-export default function ConversationPanel() {
-  const [messages, setMessages] = useLocalStorageState(
+// The real API's conversation entries use authorType: 'admin' | 'user'; this
+// panel only ever dealt with sender: 'dietitian' | 'user', so bridge the two.
+const toView = (entry) => ({
+  id: entry.id,
+  sender: entry.authorType === 'admin' ? 'dietitian' : 'user',
+  text: entry.message,
+  timestamp: entry.createdAt,
+});
+
+export default function ConversationPanel({ consultation, testingMode }) {
+  const [localMessages, setLocalMessages] = useLocalStorageState(
     'Fitoo_conversation',
     null
   );
+  const [remoteMessages, setRemoteMessages] = useState(() =>
+    (consultation.conversation || []).map(toView)
+  );
+  const [sending, setSending] = useState(false);
   const bottomRef = useRef(null);
   const [draft, setDraft] = useState('');
 
+  const messages = testingMode ? localMessages : remoteMessages;
+
   useEffect(() => {
-    if (messages === null) {
-      setMessages([makeWelcomeMessage()]);
+    if (testingMode && localMessages === null) {
+      setLocalMessages([makeWelcomeMessage()]);
     }
-  }, [messages, setMessages]);
+  }, [testingMode, localMessages, setLocalMessages]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const sendMessage = () => {
+  const sendMessage = async () => {
     const text = draft.trim();
     if (!text) return;
 
-    const message = {
-      id: crypto.randomUUID?.() ?? `${Date.now()}`,
-      sender: 'user',
-      text,
-      timestamp: new Date().toISOString(),
-    };
+    if (testingMode) {
+      const nextMessage = {
+        id: crypto.randomUUID?.() ?? `${Date.now()}`,
+        sender: 'user',
+        text,
+        timestamp: new Date().toISOString(),
+      };
+      setLocalMessages([...(localMessages || []), nextMessage]);
+      setDraft('');
+      return;
+    }
 
-    setMessages([...(messages || []), message]);
-    setDraft('');
+    setSending(true);
+    try {
+      const updated = await sendConsultationMessage(consultation.id, text);
+      setRemoteMessages((updated.conversation || []).map(toView));
+      setDraft('');
+    } catch {
+      antdMessage.error('Failed to send message');
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
@@ -110,8 +139,9 @@ export default function ConversationPanel() {
           value={draft}
           onChange={(event) => setDraft(event.target.value)}
           onPressEnter={sendMessage}
+          disabled={sending}
         />
-        <Button type="primary" icon={<SendOutlined />} onClick={sendMessage}>
+        <Button type="primary" icon={<SendOutlined />} onClick={sendMessage} loading={sending}>
           Send
         </Button>
       </div>

@@ -2,8 +2,12 @@
 
 import { useRef, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
+import Link from 'next/link';
+import { message } from 'antd';
 
 import useConsultation from '../../../hooks/useConsultation';
+import useAuth from '../../../hooks/useAuth';
+import useTestingMode from '../../../hooks/useTestingMode';
 import { CONSULTATION_GOALS } from '../../../utils/consultationConfig';
 
 import GoalSelection from './GoalSelection';
@@ -17,8 +21,13 @@ import SuccessStep from '../../organisms/steps/SuccessStep';
 
 import ConsultationStepper from './ConsultationStepper';
  import NavigationButtons from './NavigationButtons';
+import Button from '../../atoms/Button';
+import { H3, Text } from '../../atoms/Typography';
 
 export default function ConsultationFlow() {
+  const { isAuthenticated } = useAuth();
+  const { testingMode } = useTestingMode();
+
   const searchParams = useSearchParams();
   const goalParam = searchParams.get('goal');
   const initialGoal = CONSULTATION_GOALS.some((goal) => goal.id === goalParam)
@@ -98,7 +107,7 @@ export default function ConsultationFlow() {
       selectedPlan={selectedPlan}
     />,
 
-    <SuccessStep key="success" />,
+    <SuccessStep key="success" goal={selectedGoalConfig} plan={selectedPlan} />,
   ];
 
   const isSuccessStep = currentStep === steps.length - 1;
@@ -126,12 +135,33 @@ export default function ConsultationFlow() {
   const handleNext = async () => {
     if (isFinalFormStep) {
       const success = await submitConsultation();
-      if (success) next();
+      if (success) {
+        next();
+      } else {
+        message.error('Something went wrong submitting your consultation. Please try again.');
+      }
       return;
     }
 
     next();
   };
+
+  if (!testingMode && !isAuthenticated) {
+    return (
+      <div className="max-w-xl mx-auto text-center py-16">
+        <H3>Sign in to start your consultation</H3>
+        <Text muted className="mt-2">
+          We tie your consultation to your account so you can track its status
+          and chat with your dietitian anytime.
+        </Text>
+        <Link href="/login">
+          <Button variant="primary" size="lg" className="mt-6">
+            Log In
+          </Button>
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div ref={flowRef} className="max-w-4xl mx-auto">
@@ -140,7 +170,10 @@ export default function ConsultationFlow() {
         currentStep={currentStep}
       />
 
-      <div className="mt-8 bg-surface border border-border rounded-3xl p-5 sm:p-6 md:p-8">
+      <div
+        className="mt-8 glass border border-border-light rounded-3xl p-5 sm:p-6 md:p-8 border-t-4 shadow-xl transition-colors"
+        style={{ borderTopColor: selectedGoalConfig?.color }}
+      >
 
         {steps[currentStep]}
 

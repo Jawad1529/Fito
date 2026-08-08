@@ -26,7 +26,7 @@ export default function FatLossForm({
     <div className="space-y-6!">
 
       {/* Current Body */}
-      <Card className="bg-surface border border-border">
+      <Card className="glass border border-border-light">
 
         <H4 className="mb-5">Current Body (موجودہ جسم)</H4>
 
@@ -67,7 +67,7 @@ export default function FatLossForm({
 
       {/* Lifestyle */}
 
-      <Card className="bg-surface border border-border">
+      <Card className="glass border border-border-light">
 
         <H4 className="mb-5">Lifestyle (طرز زندگی)</H4>
 
@@ -129,7 +129,7 @@ export default function FatLossForm({
 
       {/* Eating Habits */}
 
-      <Card className="bg-surface border border-border">
+      <Card className="glass border border-border-light">
 
         <H4 className="mb-5">
           Eating Habits (کھانے کی عادات)

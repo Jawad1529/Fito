@@ -7,6 +7,7 @@ import AdminLayout from './components/templates/AdminLayout';
 import { BRAND } from './constants/theme';
 
 import LoginPage from './pages/Login/LoginPage';
+import SignupPage from './pages/Signup/SignupPage';
 import DashboardPage from './pages/Dashboard/DashboardPage';
 import UserManagementPage from './pages/Users/UserManagementPage';
 import ConsultationManagementPage from './pages/Consultations/ConsultationManagementPage';
@@ -61,6 +62,7 @@ export default function App() {
           <BrowserRouter>
             <Routes>
               <Route path={ROUTES.LOGIN} element={<LoginPage />} />
+              <Route path={ROUTES.SIGNUP} element={<SignupPage />} />
 
               <Route element={<RequireAuth />}>
                 <Route element={<AdminLayout />}>

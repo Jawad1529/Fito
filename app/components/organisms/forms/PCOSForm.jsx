@@ -28,7 +28,7 @@ export default function PCOSForm({
 
       {/* Medical Information */}
 
-      <Card className="bg-surface border border-border">
+      <Card className="glass border border-border-light">
 
         <H4 className="mb-5">
           Medical Information (طبی معلومات)
@@ -82,7 +82,7 @@ export default function PCOSForm({
 
       {/* Symptoms */}
 
-      <Card className="bg-surface border border-border">
+      <Card className="glass border border-border-light">
 
         <H4 className="mb-5">
           Symptoms (علامات)
@@ -110,7 +110,7 @@ export default function PCOSForm({
 
       {/* Menstrual Cycle */}
 
-      <Card className="bg-surface border border-border">
+      <Card className="glass border border-border-light">
 
         <H4 className="mb-5">
           Menstrual Cycle (ماہواری کا سائیکل)
@@ -159,7 +159,7 @@ export default function PCOSForm({
 
       {/* Lifestyle */}
 
-      <Card className="bg-surface border border-border">
+      <Card className="glass border border-border-light">
 
         <H4 className="mb-5">
           Lifestyle (طرز زندگی)
@@ -206,7 +206,7 @@ export default function PCOSForm({
 
       {/* Goals */}
 
-      <Card className="bg-surface border border-border">
+      <Card className="glass border border-border-light">
 
         <H4 className="mb-5">
           Consultation Goals (مشاورت کے اہداف)
@@ -231,7 +231,7 @@ export default function PCOSForm({
 
       {/* Notes */}
 
-      <Card className="bg-surface border border-border">
+      <Card className="glass border border-border-light">
 
         <H4 className="mb-5">
           Additional Notes (اضافی نوٹس)

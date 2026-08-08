@@ -22,6 +22,10 @@ const formatValue = (value) => {
   return String(value);
 };
 
+// Uploads are file-URL arrays from the real API, but a plain count in the
+// testing-mode local record (which never has real files to reference).
+const fileCount = (value) => (Array.isArray(value) ? value.length : value ?? 0);
+
 const KeyValueGrid = ({ data }) => (
   <Row gutter={[16, 16]}>
     {Object.entries(data).map(([key, value]) => (
@@ -101,7 +105,7 @@ export default function ConsultationSummaryCard({ consultation }) {
             Body Photos
           </Text>
           <Text className="!text-white">
-            {uploads.bodyPhotos ?? 0} file(s)
+            {fileCount(uploads.bodyPhotos)} file(s)
           </Text>
         </Col>
         <Col xs={12} sm={8}>
@@ -109,7 +113,7 @@ export default function ConsultationSummaryCard({ consultation }) {
             Medical Reports
           </Text>
           <Text className="!text-white">
-            {uploads.reports ?? 0} file(s)
+            {fileCount(uploads.reports)} file(s)
           </Text>
         </Col>
         <Col xs={12} sm={8}>
@@ -117,7 +121,7 @@ export default function ConsultationSummaryCard({ consultation }) {
             Payment Screenshot
           </Text>
           <Text className="!text-white">
-            {uploads.paymentScreenshot ?? 0} file(s)
+            {fileCount(uploads.paymentScreenshot)} file(s)
           </Text>
         </Col>
       </Row>

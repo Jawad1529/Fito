@@ -1,0 +1,64 @@
+import mongoose from 'mongoose';
+import { REPLY_AUTHOR } from '../constants/contentStatus.js';
+import { CONSULTATION_STATUS } from '../constants/consultationStatus.js';
+import { CONSULTATION_GOALS } from '../constants/consultationGoals.js';
+
+// Same shape as Review.model.js's replySchema — a message thread between the
+// customer and whichever admin is handling the consultation.
+const messageSchema = new mongoose.Schema(
+    {
+        authorType: { type: String, enum: Object.values(REPLY_AUTHOR), required: true },
+        user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+        admin: { type: mongoose.Schema.Types.ObjectId, ref: 'Admin' },
+        authorName: { type: String, required: true, trim: true },
+        message: { type: String, required: true, trim: true },
+    },
+    { timestamps: true }
+);
+
+// Consultations require login (see routes/consultations.routes.js), so `user`
+// is always present, unlike the guest-friendly Order model.
+const consultationSchema = new mongoose.Schema(
+    {
+        user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, index: true },
+        goal: { type: String, enum: CONSULTATION_GOALS, required: true },
+        plan: {
+            id: String,
+            label: String,
+            durationMonths: Number,
+            price: Number,
+        },
+        personalInfo: {
+            fullName: { type: String, required: true, trim: true },
+            email: { type: String, required: true, trim: true, lowercase: true },
+            phone: { type: String, required: true, trim: true },
+            dob: Date,
+            gender: String,
+            activityLevel: String,
+            height: Number,
+            weight: Number,
+        },
+        // Fields vary per goal (see admin/src/data/consultations.js and
+        // app/components/organisms/forms/*Form.jsx), so this is stored as-is
+        // rather than modeled field-by-field.
+        goalData: { type: mongoose.Schema.Types.Mixed, default: {} },
+        uploads: {
+            bodyPhotos: [{ type: String }],
+            reports: [{ type: String }],
+            paymentScreenshot: [{ type: String }],
+        },
+        transactionId: { type: String, trim: true },
+        status: {
+            type: String,
+            enum: Object.values(CONSULTATION_STATUS),
+            default: CONSULTATION_STATUS.PENDING,
+        },
+        // Defaults to submission time; an admin can move it when they actually
+        // pick the case up (see ConsultationTable's "Assigned Date" field).
+        assignedDate: { type: Date, default: Date.now },
+        conversation: [messageSchema],
+    },
+    { timestamps: true }
+);
+
+export default mongoose.model('Consultation', consultationSchema);

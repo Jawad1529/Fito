@@ -24,13 +24,21 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/**',
       },
-      // Product/blog images uploaded through the admin panel are served by the
-      // API's /uploads static route.
+      // Legacy pre-Cloudinary uploads, still resolvable via the API's
+      // /uploads static route (see backend/src/app.js).
       {
         protocol: 'http',
         hostname: 'localhost',
         port: '5000',
         pathname: '/uploads/**',
+      },
+      // Product/blog images and consultation uploads now go straight to
+      // Cloudinary (see backend/src/middleware/upload.middleware.js).
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
+        port: '',
+        pathname: '/**',
       },
     ],
   },

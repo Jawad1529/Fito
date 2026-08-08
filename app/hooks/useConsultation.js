@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { submitConsultation as submitConsultationRequest } from "../services/consultation.service";
+import useTestingMode from "./useTestingMode";
 
 const INITIAL_FORM_DATA = {
   // Personal Information
@@ -26,6 +28,7 @@ const INITIAL_FORM_DATA = {
 };
 
 export default function useConsultation(initialGoal = null) {
+  const { testingMode } = useTestingMode();
   const [currentStep, setCurrentStep] = useState(initialGoal ? 1 : 0);
   const [selectedGoal, setSelectedGoal] = useState(initialGoal);
   const [selectedPlan, setSelectedPlan] = useState(null);
@@ -79,46 +82,60 @@ export default function useConsultation(initialGoal = null) {
     try {
       setIsSubmitting(true);
 
+      const plan = selectedPlan
+        ? {
+            id: selectedPlan.id,
+            label: selectedPlan.label,
+            durationMonths: selectedPlan.durationMonths,
+            price: selectedPlan.price,
+          }
+        : null;
+      const personalInfo = {
+        fullName: formData.fullName,
+        email: formData.email,
+        phone: formData.phone,
+        dob: formData.dob,
+        gender: formData.gender,
+        activityLevel: formData.activityLevel,
+        height: formData.height,
+        weight: formData.weight,
+      };
       const uploads = formData.uploads || {};
 
-      const record = {
-        id:
-          typeof crypto !== "undefined" && crypto.randomUUID
-            ? crypto.randomUUID()
-            : `${Date.now()}`,
-        status: "pending",
-        submittedAt: new Date().toISOString(),
-        goal: selectedGoal,
-        plan: selectedPlan
-          ? {
-              id: selectedPlan.id,
-              label: selectedPlan.label,
-              durationMonths: selectedPlan.durationMonths,
-              price: selectedPlan.price,
-            }
-          : null,
-        personalInfo: {
-          fullName: formData.fullName,
-          email: formData.email,
-          phone: formData.phone,
-          dob: formData.dob,
-          gender: formData.gender,
-          activityLevel: formData.activityLevel,
-          height: formData.height,
-          weight: formData.weight,
-        },
-        goalData: formData.goalData,
-        uploads: {
-          bodyPhotos: (uploads.bodyPhotos || []).length,
-          reports: (uploads.reports || []).length,
-          paymentScreenshot: (uploads.paymentScreenshot || []).length,
-        },
-        transactionId: formData.transactionId,
-      };
+      if (testingMode) {
+        // No backend in testing mode — persist a lightweight record locally,
+        // same as the dashboard/checkout testing-mode paths.
+        const record = {
+          id:
+            typeof crypto !== "undefined" && crypto.randomUUID
+              ? crypto.randomUUID()
+              : `${Date.now()}`,
+          status: "pending",
+          submittedAt: new Date().toISOString(),
+          goal: selectedGoal,
+          plan,
+          personalInfo,
+          goalData: formData.goalData,
+          uploads: {
+            bodyPhotos: (uploads.bodyPhotos || []).length,
+            reports: (uploads.reports || []).length,
+            paymentScreenshot: (uploads.paymentScreenshot || []).length,
+          },
+          transactionId: formData.transactionId,
+        };
+        localStorage.setItem("Fitoo_consultation", JSON.stringify(record));
+        localStorage.removeItem("Fitoo_conversation");
+        return true;
+      }
 
-      // await consultationService.submit(record);
-      localStorage.setItem("Fitoo_consultation", JSON.stringify(record));
-      localStorage.removeItem("Fitoo_conversation");
+      await submitConsultationRequest({
+        goal: selectedGoal,
+        plan,
+        personalInfo,
+        goalData: formData.goalData,
+        uploads,
+        transactionId: formData.transactionId,
+      });
 
       return true;
     } catch (error) {

@@ -14,6 +14,8 @@ export const toPublicAdmin = (admin) => ({
     name: admin.name,
     email: admin.email,
     role: admin.role,
+    status: admin.status,
+    createdAt: admin.createdAt,
 });
 
 export const toPublicOrder = (order) => ({
@@ -106,6 +108,25 @@ export const toPublicNotification = (notification, forUser) => ({
     sendDate: notification.sendDate,
     isRead: forUser ? notification.readBy?.some((id) => String(id) === String(forUser)) ?? false : undefined,
     createdAt: notification.createdAt,
+});
+
+// Reuses the same shape as review replies — both are just
+// {authorType, authorName, message, createdAt} threads.
+export const toPublicConsultation = (consultation) => ({
+    id: consultation._id,
+    user: consultation.user,
+    goal: consultation.goal,
+    plan: consultation.plan,
+    personalInfo: consultation.personalInfo,
+    goalData: consultation.goalData,
+    uploads: consultation.uploads,
+    transactionId: consultation.transactionId,
+    status: consultation.status,
+    assignedDate: consultation.assignedDate,
+    conversation: (consultation.conversation ?? []).map(toPublicReply),
+    submittedAt: consultation.createdAt,
+    createdAt: consultation.createdAt,
+    updatedAt: consultation.updatedAt,
 });
 
 export const toPublicReview = (review) => ({

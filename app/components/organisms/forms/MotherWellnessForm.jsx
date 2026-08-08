@@ -27,7 +27,7 @@ export default function MotherWellnessForm({
     <div className="space-y-6!">
 
       {/* Stage */}
-      <Card className="bg-surface border border-border">
+      <Card className="glass border border-border-light">
 
         <H4 className="mb-5">
           Motherhood Stage (ماں بننے کا مرحلہ)
@@ -98,7 +98,7 @@ export default function MotherWellnessForm({
       </Card>
 
       {/* Health & Medical */}
-      <Card className="bg-surface border border-border">
+      <Card className="glass border border-border-light">
 
         <H4 className="mb-5">
           Health &amp; Medical (صحت اور طبی معلومات)
@@ -155,7 +155,7 @@ export default function MotherWellnessForm({
       </Card>
 
       {/* Nutrition & Lifestyle */}
-      <Card className="bg-surface border border-border">
+      <Card className="glass border border-border-light">
 
         <H4 className="mb-5">
           Nutrition &amp; Lifestyle (غذائیت اور طرز زندگی)
@@ -217,7 +217,7 @@ export default function MotherWellnessForm({
       </Card>
 
       {/* Goals */}
-      <Card className="bg-surface border border-border">
+      <Card className="glass border border-border-light">
 
         <H4 className="mb-5">
           Consultation Goals (مشاورت کے اہداف)
@@ -242,7 +242,7 @@ export default function MotherWellnessForm({
       </Card>
 
       {/* Notes */}
-      <Card className="bg-surface border border-border">
+      <Card className="glass border border-border-light">
 
         <H4 className="mb-5">
           Additional Notes (اضافی نوٹس)

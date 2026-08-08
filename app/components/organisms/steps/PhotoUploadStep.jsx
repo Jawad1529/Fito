@@ -1,6 +1,6 @@
 'use client';
 
-import { PlusOutlined } from '@ant-design/icons';
+import { CameraOutlined, FileTextOutlined, PlusOutlined } from '@ant-design/icons';
 
 import Card from '../../atoms/Card';
 import { H3, H5, Text } from '../../atoms/Typography';
@@ -12,6 +12,8 @@ export default function PhotoUploadStep({
   updateField,
 }) {
   const uploads = formData.uploads || {};
+  const bodyPhotoCount = (uploads.bodyPhotos || []).length;
+  const reportCount = (uploads.reports || []).length;
 
   const updatePhotos = (files) => {
     updateField("uploads", {
@@ -54,9 +56,21 @@ export default function PhotoUploadStep({
         }
       />
 
-      <Card className="bg-surface border border-border">
+      <Card className="glass border border-border-light">
 
-        <H5>Body Photos</H5>
+        <div className="flex items-center justify-between mb-1">
+          <div className="flex items-center gap-2">
+            <span className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
+              <CameraOutlined />
+            </span>
+            <H5>Body Photos</H5>
+          </div>
+          {bodyPhotoCount > 0 && (
+            <span className="text-xs font-medium text-primary bg-primary/10 rounded-full px-2.5 py-1">
+              {bodyPhotoCount} added
+            </span>
+          )}
+        </div>
 
         <Text muted className="block mb-4">
           Upload Front, Side and Back photos.
@@ -68,18 +82,29 @@ export default function PhotoUploadStep({
           accept="image/*"
           value={uploads.bodyPhotos || []}
           onChange={updatePhotos}
+          triggerClassName="w-24 h-24 flex flex-col items-center justify-center gap-1 rounded-xl border-2 border-dashed border-border-light text-text-secondary hover:border-primary hover:text-primary hover:bg-primary/5 transition-colors text-xs"
         >
-          <PlusOutlined />
+          <PlusOutlined className="text-lg" />
           <div className="mt-1 text-xs">Upload</div>
         </Upload>
 
       </Card>
 
-      <Card className="bg-surface border border-border">
+      <Card className="glass border border-border-light">
 
-        <H5 className="mb-2">
-          Medical Reports (Optional)
-        </H5>
+        <div className="flex items-center justify-between mb-1">
+          <div className="flex items-center gap-2">
+            <span className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
+              <FileTextOutlined />
+            </span>
+            <H5>Medical Reports (Optional)</H5>
+          </div>
+          {reportCount > 0 && (
+            <span className="text-xs font-medium text-primary bg-primary/10 rounded-full px-2.5 py-1">
+              {reportCount} added
+            </span>
+          )}
+        </div>
 
         <Text muted className="block mb-4">
           Upload blood work, hormone reports or any medical reports if available.
@@ -89,8 +114,10 @@ export default function PhotoUploadStep({
           multiple
           value={uploads.reports || []}
           onChange={updateReports}
+          triggerClassName="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg border-2 border-dashed border-border-light text-text-secondary hover:border-primary hover:text-primary hover:bg-primary/5 transition-colors"
         >
-          Upload Reports
+          <FileTextOutlined />
+          <span>Upload Reports</span>
         </Upload>
 
       </Card>

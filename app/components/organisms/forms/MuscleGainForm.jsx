@@ -25,7 +25,7 @@ export default function MuscleGainForm({
     <div className="space-y-6!">
 
       {/* Goal */}
-      <Card className="bg-surface border border-border">
+      <Card className="glass border border-border-light">
         <H4 className="mb-5">Muscle Building Goal (پٹھے بنانے کا ہدف)</H4>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -54,7 +54,7 @@ export default function MuscleGainForm({
       </Card>
 
       {/* Training */}
-      <Card className="bg-surface border border-border">
+      <Card className="glass border border-border-light">
         <H4 className="mb-5">Training (تربیت)</H4>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -104,7 +104,7 @@ export default function MuscleGainForm({
       </Card>
 
       {/* Nutrition */}
-      <Card className="bg-surface border border-border">
+      <Card className="glass border border-border-light">
 
         <H4 className="mb-5">Nutrition (غذائیت)</H4>
 
@@ -153,7 +153,7 @@ export default function MuscleGainForm({
       </Card>
 
       {/* Recovery */}
-      <Card className="bg-surface border border-border">
+      <Card className="glass border border-border-light">
 
         <H4 className="mb-5">Recovery (بحالی)</H4>
 

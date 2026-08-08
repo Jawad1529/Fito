@@ -25,7 +25,7 @@ export default function BodyRecompositionForm({
     <div className="space-y-6!">
 
       {/* Goals */}
-      <Card className="bg-surface border border-border">
+      <Card className="glass border border-border-light">
         <H4 className="mb-5">Body Goals (جسمانی اہداف)</H4>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -63,7 +63,7 @@ export default function BodyRecompositionForm({
       </Card>
 
       {/* Training */}
-      <Card className="bg-surface border border-border">
+      <Card className="glass border border-border-light">
         <H4 className="mb-5">Training (تربیت)</H4>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -110,7 +110,7 @@ export default function BodyRecompositionForm({
       </Card>
 
       {/* Nutrition */}
-      <Card className="bg-surface border border-border">
+      <Card className="glass border border-border-light">
         <H4 className="mb-5">Nutrition (غذائیت)</H4>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -162,7 +162,7 @@ export default function BodyRecompositionForm({
       </Card>
 
       {/* Lifestyle */}
-      <Card className="bg-surface border border-border">
+      <Card className="glass border border-border-light">
         <H4 className="mb-5">Lifestyle (طرز زندگی)</H4>
 
         <div className="grid grid-cols-1 gap-5">

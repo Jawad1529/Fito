@@ -28,7 +28,7 @@ export default function DiabetesForm({
 
       {/* Medical Information */}
 
-      <Card className="bg-surface border border-border">
+      <Card className="glass border border-border-light">
 
         <H4 className="mb-5">
           Medical Information (طبی معلومات)
@@ -96,7 +96,7 @@ export default function DiabetesForm({
 
       {/* Blood Sugar Levels */}
 
-      <Card className="bg-surface border border-border">
+      <Card className="glass border border-border-light">
 
         <H4 className="mb-5">
           Blood Sugar Levels (بلڈ شوگر لیول)
@@ -152,7 +152,7 @@ export default function DiabetesForm({
 
       {/* Symptoms */}
 
-      <Card className="bg-surface border border-border">
+      <Card className="glass border border-border-light">
 
         <H4 className="mb-5">
           Symptoms (علامات)
@@ -179,7 +179,7 @@ export default function DiabetesForm({
 
       {/* Lifestyle */}
 
-      <Card className="bg-surface border border-border">
+      <Card className="glass border border-border-light">
 
         <H4 className="mb-5">
           Lifestyle (طرز زندگی)
@@ -226,7 +226,7 @@ export default function DiabetesForm({
 
       {/* Goals */}
 
-      <Card className="bg-surface border border-border">
+      <Card className="glass border border-border-light">
 
         <H4 className="mb-5">
           Consultation Goals (مشاورت کے اہداف)
@@ -251,7 +251,7 @@ export default function DiabetesForm({
 
       {/* Notes */}
 
-      <Card className="bg-surface border border-border">
+      <Card className="glass border border-border-light">
 
         <H4 className="mb-5">
           Additional Notes (اضافی نوٹس)

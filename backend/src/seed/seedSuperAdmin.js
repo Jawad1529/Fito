@@ -5,6 +5,7 @@ import mongoose from 'mongoose';
 import connectDB from '../config/db.js';
 import Admin from '../models/Admin.model.js';
 import { ROLES } from '../constants/roles.js';
+import { ADMIN_STATUS } from '../constants/adminStatus.js';
 
 const run = async () => {
     await connectDB();
@@ -22,6 +23,7 @@ const run = async () => {
         email,
         password: process.env.SEED_SUPER_ADMIN_PASSWORD || 'password',
         role: ROLES.SUPER_ADMIN,
+        status: ADMIN_STATUS.ACTIVE,
     });
 
     console.log(`Super admin created: ${email}`);

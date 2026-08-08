@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 import { ROLES } from '../constants/roles.js';
+import { ADMIN_STATUS } from '../constants/adminStatus.js';
 
 const adminSchema = new mongoose.Schema(
     {
@@ -11,6 +12,13 @@ const adminSchema = new mongoose.Schema(
             type: String,
             enum: Object.values(ROLES),
             default: ROLES.ADMIN,
+        },
+        // Self-serve signups start inactive and can't log in until a super
+        // admin activates them (see requireSuperAdmin-gated status route).
+        status: {
+            type: String,
+            enum: Object.values(ADMIN_STATUS),
+            default: ADMIN_STATUS.INACTIVE,
         },
     },
     { timestamps: true }

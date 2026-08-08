@@ -44,7 +44,7 @@ export default function GoalSelection({
                 ${
                   isSelected
                     ? 'border-primary bg-primary/10'
-                    : 'border-border bg-surface hover:border-primary/40'
+                    : 'border-border-light glass hover:border-primary/40'
                 }
               `}
             >

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Form, Input, Button, Alert, Card } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useTestingMode } from '../../context/TestingModeContext';
 import TestingModeToggle from '../../components/atoms/TestingModeToggle';
@@ -83,6 +83,13 @@ export default function LoginPage() {
                             Demo: super@Fito.com / admin@Fito.com — password: password
                         </p>
                     )}
+
+                    <p className="text-sm text-gray-500 text-center mt-6">
+                        Need an account?{' '}
+                        <Link to={ROUTES.SIGNUP} className="text-primary font-medium">
+                            Sign up
+                        </Link>
+                    </p>
                 </Card>
             </motion.div>
         </div>

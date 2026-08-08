@@ -7,10 +7,13 @@ import RowActions from '../../molecules/RowActions';
 import StatusTag from '../../atoms/StatusTag';
 import DataTable from '../DataTable';
 import useTableQuery from '../../../hooks/useTableQuery';
-import { CONSULTATION_STATUSES } from '../../../constants/consultationGoals';
+import { CONSULTATION_GOALS, CONSULTATION_STATUSES } from '../../../constants/consultationGoals';
 import { consultationDetailPath } from '../../../constants/routes';
+import { useAuth } from '../../../context/AuthContext';
+import { updateConsultation, deleteConsultation } from '../../../api/consultations.api';
 
-export default function ConsultationTable({ initialData }) {
+export default function ConsultationTable({ initialData, testingMode = true, loading = false, showGoal = false }) {
+    const { isSuperAdmin } = useAuth();
     const [data, setData] = useState(initialData);
     const { searchText, setSearchText, filteredData } = useTableQuery(data, {
         searchKeys: ['id', 'user'],
@@ -27,25 +30,67 @@ export default function ConsultationTable({ initialData }) {
 
     const handleSaveEdit = async () => {
         const values = await form.validateFields();
-        setData((prev) =>
-            prev.map((r) =>
-                r.id === editing.id
-                    ? { ...r, ...values, assignedDate: values.assignedDate.format('YYYY-MM-DD') }
-                    : r
-            )
-        );
-        message.success('Consultation updated');
-        setEditing(null);
+        const assignedDate = values.assignedDate.format('YYYY-MM-DD');
+
+        if (testingMode) {
+            setData((prev) => prev.map((r) => (r.id === editing.id ? { ...r, ...values, assignedDate } : r)));
+            message.success('Consultation updated');
+            setEditing(null);
+            return;
+        }
+
+        try {
+            const updated = await updateConsultation(editing.id, { status: values.status, assignedDate });
+            setData((prev) =>
+                prev.map((r) => (r.id === editing.id ? { ...updated, user: updated.personalInfo?.fullName } : r))
+            );
+            message.success('Consultation updated');
+            setEditing(null);
+        } catch {
+            message.error('Failed to update consultation');
+        }
     };
 
-    const handleDelete = (id) => {
-        setData((prev) => prev.filter((r) => r.id !== id));
-        message.success('Consultation deleted');
+    const handleDelete = async (id) => {
+        if (testingMode) {
+            setData((prev) => prev.filter((r) => r.id !== id));
+            message.success('Consultation deleted');
+            return;
+        }
+
+        try {
+            await deleteConsultation(id);
+            setData((prev) => prev.filter((r) => r.id !== id));
+            message.success('Consultation deleted');
+        } catch {
+            message.error('Failed to delete consultation');
+        }
     };
+
+    // Deletion is super-admin-only on the backend once wired to the real API.
+    const canDelete = testingMode || isSuperAdmin;
 
     const columns = [
         { title: 'Consultation ID', dataIndex: 'id' },
         { title: 'User', dataIndex: 'user', sorter: (a, b) => a.user.localeCompare(b.user) },
+        ...(showGoal
+            ? [
+                  {
+                      title: 'Goal',
+                      dataIndex: 'goal',
+                      filters: CONSULTATION_GOALS.map((g) => ({ text: g.title, value: g.id })),
+                      onFilter: (value, record) => record.goal === value,
+                      render: (goal) => {
+                          const goalConfig = CONSULTATION_GOALS.find((g) => g.id === goal);
+                          return (
+                              <span>
+                                  {goalConfig?.icon} {goalConfig?.title ?? goal}
+                              </span>
+                          );
+                      },
+                  },
+              ]
+            : []),
         {
             title: 'Status',
             dataIndex: 'status',
@@ -62,7 +107,7 @@ export default function ConsultationTable({ initialData }) {
                 <RowActions
                     onView={() => navigate(consultationDetailPath(record.id))}
                     onEdit={() => openEdit(record)}
-                    onDelete={() => handleDelete(record.id)}
+                    onDelete={canDelete ? () => handleDelete(record.id) : undefined}
                 />
             ),
         },
@@ -73,7 +118,7 @@ export default function ConsultationTable({ initialData }) {
             <div className="flex justify-end mb-4">
                 <SearchBar value={searchText} onChange={setSearchText} placeholder="Search consultations..." />
             </div>
-            <DataTable columns={columns} data={filteredData} />
+            <DataTable columns={columns} data={filteredData} loading={loading} />
 
             <Modal
                 open={!!editing}

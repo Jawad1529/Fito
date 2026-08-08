@@ -1,12 +1,24 @@
 import express from 'express';
-import { loginAdmin, getMeAdmin, createAdmin } from '../controllers/adminAuth.controller.js';
+import {
+    loginAdmin,
+    signupAdmin,
+    getMeAdmin,
+    createAdmin,
+    listAdmins,
+    updateAdminStatus,
+} from '../controllers/adminAuth.controller.js';
 import { protectAdmin, requireSuperAdmin } from '../middleware/adminAuth.middleware.js';
 
 const router = express.Router();
 
 router.post('/login', loginAdmin);
+// Public self-serve signup — always creates an inactive plain admin, see
+// signupAdmin. Anyone can call this; login is blocked until activated.
+router.post('/signup', signupAdmin);
 router.get('/me', protectAdmin, getMeAdmin);
 // Only an authenticated super admin can create new admin accounts.
 router.post('/create', protectAdmin, requireSuperAdmin, createAdmin);
+router.get('/', protectAdmin, requireSuperAdmin, listAdmins);
+router.patch('/:id/status', protectAdmin, requireSuperAdmin, updateAdminStatus);
 
 export default router;
