@@ -92,12 +92,24 @@ export const registerUser = asyncHandler(async (req, res) => {
 
     const existing = await User.findOne({ email });
     if (existing) {
-        res.status(409);
-        throw new Error('An account with this email already exists');
+        if (existing.isEmailVerified) {
+            res.status(409);
+            throw new Error('An account with this email already exists');
+        }
+        // A prior signup attempt never got its OTP verified — most likely the
+        // email send itself failed. Let this attempt replace it instead of
+        // permanently blocking the address with a 409 it can never clear.
+        await existing.deleteOne();
     }
 
     const user = await User.create({ name, email, password, phone });
-    await issueOtp(user, OTP_PURPOSE.VERIFY_EMAIL);
+    try {
+        await issueOtp(user, OTP_PURPOSE.VERIFY_EMAIL);
+    } catch (err) {
+        // Don't leave an orphaned, OTP-less user behind to block the next attempt.
+        await user.deleteOne();
+        throw err;
+    }
 
     res.status(201).json({
         user: toPublicUser(user),
