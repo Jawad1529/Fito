@@ -204,6 +204,11 @@ export default function Navbar() {
                   <Icon name="cart" className="w-5 h-5" />
                 </Link>
               </Badge>
+              {isAuthenticated && (
+                <Link href="/dashboard" aria-label="Dashboard" className="text-text-secondary hover:text-text transition-colors">
+                  <Icon name="dashboard" className="w-5 h-5" />
+                </Link>
+              )}
               {isAuthenticated ? (
                 <div className="flex items-center gap-3">
                   <span className="text-sm text-text-secondary">Hi, {user?.name}</span>
@@ -295,6 +300,16 @@ export default function Navbar() {
                       <Icon name="cart" className="w-5 h-5" />
                     </Link>
                   </Badge>
+                  {isAuthenticated && (
+                    <Link
+                      href="/dashboard"
+                      aria-label="Dashboard"
+                      onClick={() => setMobileOpen(false)}
+                      className="text-text-secondary hover:text-text"
+                    >
+                      <Icon name="dashboard" className="w-5 h-5" />
+                    </Link>
+                  )}
                 </div>
 
                 <div className="flex items-center justify-between pt-5">

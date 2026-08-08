@@ -215,8 +215,8 @@ function ConsultationDetailPageInner({ id, testingMode }) {
                 )}
             </Card>
 
-            <Card className="rounded-2xl border border-gray-100 shadow-sm mt-6">
-                <Title level={5} className="!mb-3">Conversation with User</Title>
+            <Card className="rounded-2xl border border-gray-100 shadow-sm mt-6!">
+                <Title level={5} className="!mb-3">Conversation with {consultation.personalInfo?.fullName || 'User'}</Title>
                 <ConsultationConversation
                     messages={toConversationView(consultation.conversation, testingMode)}
                     onSend={handleSendMessage}

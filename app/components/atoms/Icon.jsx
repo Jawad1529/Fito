@@ -70,6 +70,14 @@ const PATHS = {
       <path d="M4 21c0-4 3.5-7 8-7s8 3 8 7" />
     </>
   ),
+  dashboard: (
+    <>
+      <rect x="3" y="3" width="8" height="8" rx="1.5" />
+      <rect x="13" y="3" width="8" height="5" rx="1.5" />
+      <rect x="13" y="11" width="8" height="10" rx="1.5" />
+      <rect x="3" y="14" width="8" height="7" rx="1.5" />
+    </>
+  ),
   facebook: <path d="M14 9h3V6h-3c-1.7 0-3 1.3-3 3v2H9v3h2v7h3v-7h3l1-3h-4v-2c0-.6.4-1 1-1z" fill="currentColor" stroke="none" />,
   instagram: (
     <>

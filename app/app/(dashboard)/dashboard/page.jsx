@@ -109,7 +109,9 @@ function DashboardPageInner({ testingMode, isAuthenticated }) {
           consultations.map((consultation) => (
             <div key={consultation.id} className="mb-8">
               <ConsultationSummaryCard consultation={consultation} />
+              <div className="my-4 " > 
               <ConversationPanel consultation={consultation} testingMode={testingMode} />
+              </div>
             </div>
           ))}
 
