@@ -1,8 +1,8 @@
 import apiClient from './client';
 
-export const fetchNotifications = async () => {
-    const { data } = await apiClient.get('/admin/notifications');
-    return data.notifications;
+export const fetchNotifications = async (params = {}) => {
+    const { data } = await apiClient.get('/admin/notifications', { params });
+    return data;
 };
 
 export const createNotification = async (payload) => {

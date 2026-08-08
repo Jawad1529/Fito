@@ -17,9 +17,9 @@ const toFormData = ({ image, content, ...fields }) => {
     return formData;
 };
 
-export const fetchBlogs = async () => {
-    const { data } = await apiClient.get('/admin/blogs');
-    return data.blogs;
+export const fetchBlogs = async (params = {}) => {
+    const { data } = await apiClient.get('/admin/blogs', { params });
+    return data;
 };
 
 export const createBlog = async (payload) => {

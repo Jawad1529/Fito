@@ -4,6 +4,7 @@ import Admin from '../models/Admin.model.js';
 import { ROLES } from '../constants/roles.js';
 import { ADMIN_STATUS } from '../constants/adminStatus.js';
 import { toPublicAdmin } from '../utils/serializers.js';
+import { parsePagination, buildSearchFilter } from '../utils/queryHelpers.js';
 
 // POST /api/admin/auth/login
 export const loginAdmin = asyncHandler(async (req, res) => {
@@ -59,10 +60,21 @@ export const signupAdmin = asyncHandler(async (req, res) => {
     });
 });
 
-// GET /api/admin/auth — super admin only, lists all admin accounts.
+// GET /api/admin/auth?page=&limit=&search=&status=&role= — super admin only,
+// lists all admin accounts.
 export const listAdmins = asyncHandler(async (req, res) => {
-    const admins = await Admin.find().sort({ createdAt: -1 });
-    res.json({ admins: admins.map(toPublicAdmin) });
+    const { page, limit, skip } = parsePagination(req.query);
+    const { search, status, role } = req.query;
+
+    const filter = buildSearchFilter(search, ['name', 'email']);
+    if (Object.values(ADMIN_STATUS).includes(status)) filter.status = status;
+    if (Object.values(ROLES).includes(role)) filter.role = role;
+
+    const [admins, total] = await Promise.all([
+        Admin.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit),
+        Admin.countDocuments(filter),
+    ]);
+    res.json({ items: admins.map(toPublicAdmin), total, page, limit });
 });
 
 // PATCH /api/admin/auth/:id/status — this is how a super admin activates a

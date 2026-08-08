@@ -37,3 +37,16 @@ body {
   background: var(--color-primary-light);
   color: var(--color-primary-active);
 }
+
+@keyframes row-highlight-fade {
+  from {
+    background-color: var(--color-primary-light);
+  }
+  to {
+    background-color: transparent;
+  }
+}
+
+.row-highlight > td {
+  animation: row-highlight-fade 2.5s ease-out forwards;
+}

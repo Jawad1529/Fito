@@ -1,15 +1,36 @@
 import asyncHandler from '../utils/asyncHandler.js';
 import Review from '../models/Review.model.js';
+import Product from '../models/Product.model.js';
 import { toPublicReview } from '../utils/serializers.js';
 import { REPLY_AUTHOR } from '../constants/contentStatus.js';
+import { parsePagination, searchRegex } from '../utils/queryHelpers.js';
 
 // Populated so the table can show which product each review belongs to.
 const withProduct = (query) => query.populate('product', 'name');
 
-// GET /api/admin/reviews
+// GET /api/admin/reviews?page=&limit=&search=
 export const listReviews = asyncHandler(async (req, res) => {
-    const reviews = await withProduct(Review.find()).sort({ createdAt: -1 });
-    res.json({ reviews: reviews.map(toPublicReview) });
+    const { page, limit, skip } = parsePagination(req.query);
+    const { search } = req.query;
+
+    const filter = {};
+    if (search?.trim()) {
+        const regex = searchRegex(search);
+        // `productName` isn't stored on Review, so matching it means finding
+        // the product ids whose name matches and OR-ing those in too.
+        const matchingProducts = await Product.find({ name: regex }).select('_id');
+        filter.$or = [
+            { userName: regex },
+            { comment: regex },
+            { product: { $in: matchingProducts.map((p) => p._id) } },
+        ];
+    }
+
+    const [reviews, total] = await Promise.all([
+        withProduct(Review.find(filter)).sort({ createdAt: -1 }).skip(skip).limit(limit),
+        Review.countDocuments(filter),
+    ]);
+    res.json({ items: reviews.map(toPublicReview), total, page, limit });
 });
 
 // POST /api/admin/reviews/:id/replies — admin answering a customer review.

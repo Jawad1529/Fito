@@ -7,19 +7,36 @@ import RowActions from '../../molecules/RowActions';
 import StatusTag from '../../atoms/StatusTag';
 import DataTable from '../DataTable';
 import useTableQuery from '../../../hooks/useTableQuery';
+import useServerTableQuery from '../../../hooks/useServerTableQuery';
 import { CONSULTATION_GOALS, CONSULTATION_STATUSES } from '../../../constants/consultationGoals';
 import { consultationDetailPath } from '../../../constants/routes';
 import { useAuth } from '../../../context/AuthContext';
-import { updateConsultation, deleteConsultation } from '../../../api/consultations.api';
+import { fetchConsultations, updateConsultation, deleteConsultation } from '../../../api/consultations.api';
 
-export default function ConsultationTable({ initialData, testingMode = true, loading = false, showGoal = false }) {
+const toRow = (c) => ({ ...c, user: c.personalInfo?.fullName });
+
+// `goal` fixes this table to one goal category (used by the per-goal tabs);
+// omit it for the "All" tab, where the Goal column's own filter applies instead.
+export default function ConsultationTable({ initialData, testingMode = true, goal, showGoal = false }) {
     const { isSuperAdmin } = useAuth();
-    const [data, setData] = useState(initialData);
-    const { searchText, setSearchText, filteredData } = useTableQuery(data, {
-        searchKeys: ['id', 'user'],
-    });
-
     const navigate = useNavigate();
+
+    const [mockData, setMockData] = useState(initialData);
+    const clientQuery = useTableQuery(mockData, { searchKeys: ['id', 'user'] });
+    const serverQuery = useServerTableQuery(
+        (params) =>
+            fetchConsultations({ ...params, goal: goal ?? params.goal }).then((data) => ({
+                ...data,
+                items: data.items.map(toRow),
+            })),
+        { enabled: !testingMode }
+    );
+
+    const data = testingMode ? clientQuery.filteredData : serverQuery.items;
+    const searchText = testingMode ? clientQuery.searchText : serverQuery.searchInput;
+    const setSearchText = testingMode ? clientQuery.setSearchText : serverQuery.setSearchInput;
+    const loading = !testingMode && serverQuery.loading;
+
     const [editing, setEditing] = useState(null);
     const [form] = Form.useForm();
 
@@ -33,17 +50,15 @@ export default function ConsultationTable({ initialData, testingMode = true, loa
         const assignedDate = values.assignedDate.format('YYYY-MM-DD');
 
         if (testingMode) {
-            setData((prev) => prev.map((r) => (r.id === editing.id ? { ...r, ...values, assignedDate } : r)));
+            setMockData((prev) => prev.map((r) => (r.id === editing.id ? { ...r, ...values, assignedDate } : r)));
             message.success('Consultation updated');
             setEditing(null);
             return;
         }
 
         try {
-            const updated = await updateConsultation(editing.id, { status: values.status, assignedDate });
-            setData((prev) =>
-                prev.map((r) => (r.id === editing.id ? { ...updated, user: updated.personalInfo?.fullName } : r))
-            );
+            await updateConsultation(editing.id, { status: values.status, assignedDate });
+            serverQuery.refetch();
             message.success('Consultation updated');
             setEditing(null);
         } catch {
@@ -53,14 +68,14 @@ export default function ConsultationTable({ initialData, testingMode = true, loa
 
     const handleDelete = async (id) => {
         if (testingMode) {
-            setData((prev) => prev.filter((r) => r.id !== id));
+            setMockData((prev) => prev.filter((r) => r.id !== id));
             message.success('Consultation deleted');
             return;
         }
 
         try {
             await deleteConsultation(id);
-            setData((prev) => prev.filter((r) => r.id !== id));
+            serverQuery.refetch();
             message.success('Consultation deleted');
         } catch {
             message.error('Failed to delete consultation');
@@ -72,19 +87,20 @@ export default function ConsultationTable({ initialData, testingMode = true, loa
 
     const columns = [
         { title: 'Consultation ID', dataIndex: 'id' },
-        { title: 'User', dataIndex: 'user', sorter: (a, b) => a.user.localeCompare(b.user) },
+        { title: 'User', dataIndex: 'user', sorter: testingMode ? (a, b) => a.user.localeCompare(b.user) : undefined },
         ...(showGoal
             ? [
                   {
                       title: 'Goal',
                       dataIndex: 'goal',
                       filters: CONSULTATION_GOALS.map((g) => ({ text: g.title, value: g.id })),
-                      onFilter: (value, record) => record.goal === value,
-                      render: (goal) => {
-                          const goalConfig = CONSULTATION_GOALS.find((g) => g.id === goal);
+                      filteredValue: testingMode ? undefined : [serverQuery.filters.goal].filter(Boolean),
+                      onFilter: testingMode ? (value, record) => record.goal === value : undefined,
+                      render: (goalId) => {
+                          const goalConfig = CONSULTATION_GOALS.find((g) => g.id === goalId);
                           return (
                               <span>
-                                  {goalConfig?.icon} {goalConfig?.title ?? goal}
+                                  {goalConfig?.icon} {goalConfig?.title ?? goalId}
                               </span>
                           );
                       },
@@ -95,11 +111,20 @@ export default function ConsultationTable({ initialData, testingMode = true, loa
             title: 'Status',
             dataIndex: 'status',
             filters: CONSULTATION_STATUSES.map((s) => ({ text: s, value: s })),
-            onFilter: (value, record) => record.status === value,
+            filteredValue: testingMode ? undefined : [serverQuery.filters.status].filter(Boolean),
+            onFilter: testingMode ? (value, record) => record.status === value : undefined,
             render: (status) => <StatusTag status={status} />,
         },
-        { title: 'Assigned Date', dataIndex: 'assignedDate', sorter: (a, b) => a.assignedDate.localeCompare(b.assignedDate) },
-        { title: 'Created At', dataIndex: 'createdAt', sorter: (a, b) => a.createdAt.localeCompare(b.createdAt) },
+        {
+            title: 'Assigned Date',
+            dataIndex: 'assignedDate',
+            sorter: testingMode ? (a, b) => a.assignedDate.localeCompare(b.assignedDate) : undefined,
+        },
+        {
+            title: 'Created At',
+            dataIndex: 'createdAt',
+            sorter: testingMode ? (a, b) => a.createdAt.localeCompare(b.createdAt) : undefined,
+        },
         {
             title: 'Actions',
             key: 'actions',
@@ -118,7 +143,13 @@ export default function ConsultationTable({ initialData, testingMode = true, loa
             <div className="flex justify-end mb-4">
                 <SearchBar value={searchText} onChange={setSearchText} placeholder="Search consultations..." />
             </div>
-            <DataTable columns={columns} data={filteredData} loading={loading} />
+            <DataTable
+                columns={columns}
+                data={data}
+                loading={loading}
+                pagination={testingMode ? undefined : { ...serverQuery.pagination, total: serverQuery.total }}
+                onChange={testingMode ? undefined : serverQuery.handleTableChange}
+            />
 
             <Modal
                 open={!!editing}

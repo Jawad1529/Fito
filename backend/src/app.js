@@ -16,6 +16,7 @@ import consultationsRoutes from './routes/consultations.routes.js';
 import adminConsultationsRoutes from './routes/adminConsultations.routes.js';
 import notificationsRoutes from './routes/notifications.routes.js';
 import adminNotificationsRoutes from './routes/adminNotifications.routes.js';
+import adminDashboardRoutes from './routes/adminDashboard.routes.js';
 import { notFound, errorHandler } from './middleware/error.middleware.js';
 
 const app = express();
@@ -45,6 +46,7 @@ app.use('/api/consultations', consultationsRoutes);
 app.use('/api/admin/consultations', adminConsultationsRoutes);
 app.use('/api/notifications', notificationsRoutes);
 app.use('/api/admin/notifications', adminNotificationsRoutes);
+app.use('/api/admin/dashboard', adminDashboardRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

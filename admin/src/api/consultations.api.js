@@ -1,8 +1,8 @@
 import apiClient from './client';
 
-export const fetchConsultations = async () => {
-    const { data } = await apiClient.get('/admin/consultations');
-    return data.consultations;
+export const fetchConsultations = async (params = {}) => {
+    const { data } = await apiClient.get('/admin/consultations', { params });
+    return data;
 };
 
 export const fetchConsultation = async (id) => {

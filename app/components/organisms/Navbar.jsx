@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Switch, Tooltip, Popover, Empty, Spin } from 'antd';
 import Icon from '../atoms/Icon';
@@ -26,6 +26,7 @@ const navLinks = [
 
 export default function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const { totalItems } = useCart();
@@ -70,6 +71,15 @@ export default function Navbar() {
       document.body.style.overflow = '';
     };
   }, [mobileOpen]);
+
+  // Clears the session and sends the user back to the hero section. A plain
+  // router.push('/') doesn't scroll on same-route navigation, so the scroll
+  // is done explicitly for the case where logout happens while already on '/'.
+  const handleLogout = () => {
+    logout();
+    router.push('/');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   const notificationsPanel = (
     <div className="w-80 max-w-[85vw]">
@@ -197,7 +207,7 @@ export default function Navbar() {
               {isAuthenticated ? (
                 <div className="flex items-center gap-3">
                   <span className="text-sm text-text-secondary">Hi, {user?.name}</span>
-                  <Button variant="outline" onClick={logout}>
+                  <Button variant="outline" onClick={handleLogout}>
                     Logout
                   </Button>
                 </div>
@@ -299,7 +309,7 @@ export default function Navbar() {
                       variant="outline"
                       fullWidth
                       onClick={() => {
-                        logout();
+                        handleLogout();
                         setMobileOpen(false);
                       }}
                     >

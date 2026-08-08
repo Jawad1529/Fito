@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Modal, Input, Button, message, Tag, Empty } from 'antd';
 import { MessageOutlined } from '@ant-design/icons';
 import PageHeading from '../../components/atoms/PageHeading';
@@ -7,6 +7,7 @@ import ConfirmDeleteButton from '../../components/molecules/ConfirmDeleteButton'
 import RatingStars from '../../components/atoms/RatingStars';
 import DataTable from '../../components/organisms/DataTable';
 import useTableQuery from '../../hooks/useTableQuery';
+import useServerTableQuery from '../../hooks/useServerTableQuery';
 import { reviews as initialReviews } from '../../data/reviews';
 import { useTestingMode } from '../../context/TestingModeContext';
 import {
@@ -30,38 +31,25 @@ export default function ReviewManagementPage() {
 }
 
 function ReviewManagementPageInner({ testingMode }) {
-    const [reviews, setReviews] = useState(testingMode ? initialReviews : []);
-    const [loading, setLoading] = useState(!testingMode);
+    const [mockReviews, setMockReviews] = useState(initialReviews);
+    const clientQuery = useTableQuery(mockReviews, { searchKeys: ['name', 'productName', 'comment'] });
+    const serverQuery = useServerTableQuery(fetchReviews, { enabled: !testingMode });
+
+    const reviews = testingMode ? clientQuery.filteredData : serverQuery.items;
+    const searchText = testingMode ? clientQuery.searchText : serverQuery.searchInput;
+    const setSearchText = testingMode ? clientQuery.setSearchText : serverQuery.setSearchInput;
+    const loading = !testingMode && serverQuery.loading;
     const [saving, setSaving] = useState(false);
-    const { searchText, setSearchText, filteredData } = useTableQuery(reviews, {
-        searchKeys: ['name', 'productName', 'comment'],
-    });
 
     const [replying, setReplying] = useState(null);
     const [replyText, setReplyText] = useState('');
 
-    useEffect(() => {
-        if (testingMode) return undefined;
-        let cancelled = false;
-        fetchReviews()
-            .then((data) => {
-                if (!cancelled) setReviews(data);
-            })
-            .catch(() => {
-                if (!cancelled) message.error('Failed to load reviews');
-            })
-            .finally(() => {
-                if (!cancelled) setLoading(false);
-            });
-        return () => {
-            cancelled = true;
-        };
-    }, [testingMode]);
-
-    // Keeps the modal in sync after a reply is added, edited, or removed.
+    // Keeps the modal in sync after a reply is added, edited, or removed, and
+    // refreshes the table's current page in the background.
     const applyUpdated = (updated) => {
-        setReviews((prev) => prev.map((r) => (r.id === updated.id ? updated : r)));
+        setMockReviews((prev) => prev.map((r) => (r.id === updated.id ? updated : r)));
         setReplying(updated);
+        if (!testingMode) serverQuery.refetch();
     };
 
     const openReply = (record) => {
@@ -76,7 +64,7 @@ function ReviewManagementPageInner({ testingMode }) {
         }
 
         if (testingMode) {
-            setReviews((prev) =>
+            setMockReviews((prev) =>
                 prev.map((r) => (r.id === replying.id ? { ...r, adminReply: replyText } : r))
             );
             message.success('Reply saved');
@@ -119,13 +107,13 @@ function ReviewManagementPageInner({ testingMode }) {
 
     const handleDelete = async (id) => {
         if (testingMode) {
-            setReviews((prev) => prev.filter((r) => r.id !== id));
+            setMockReviews((prev) => prev.filter((r) => r.id !== id));
             message.success('Review deleted');
             return;
         }
         try {
             await deleteReviewApi(id);
-            setReviews((prev) => prev.filter((r) => r.id !== id));
+            serverQuery.refetch();
             message.success('Review deleted');
         } catch (err) {
             message.error(apiError(err, 'Failed to delete review'));
@@ -138,14 +126,14 @@ function ReviewManagementPageInner({ testingMode }) {
         {
             title: 'Rating',
             dataIndex: 'rating',
-            sorter: (a, b) => a.rating - b.rating,
+            sorter: testingMode ? (a, b) => a.rating - b.rating : undefined,
             render: (r) => <RatingStars rating={r} />,
         },
         { title: 'Review', dataIndex: 'comment', ellipsis: true },
         {
             title: 'Created At',
             dataIndex: 'date',
-            sorter: (a, b) => String(a.date ?? '').localeCompare(String(b.date ?? '')),
+            sorter: testingMode ? (a, b) => String(a.date ?? '').localeCompare(String(b.date ?? '')) : undefined,
         },
         {
             title: 'Admin Reply',
@@ -176,7 +164,13 @@ function ReviewManagementPageInner({ testingMode }) {
                 actions={<SearchBar value={searchText} onChange={setSearchText} placeholder="Search reviews..." />}
             />
 
-            <DataTable columns={columns} data={filteredData} loading={loading} />
+            <DataTable
+                columns={columns}
+                data={reviews}
+                loading={loading}
+                pagination={testingMode ? undefined : { ...serverQuery.pagination, total: serverQuery.total }}
+                onChange={testingMode ? undefined : serverQuery.handleTableChange}
+            />
 
             <Modal
                 open={!!replying}
@@ -184,6 +178,8 @@ function ReviewManagementPageInner({ testingMode }) {
                 onCancel={() => setReplying(null)}
                 footer={null}
                 width={560}
+                centered
+                styles={{ body: { maxHeight: '70vh', overflowY: 'auto', paddingRight: 8 } }}
             >
                 {replying && (
                     <>

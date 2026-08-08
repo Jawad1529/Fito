@@ -4,6 +4,7 @@ import Review from '../models/Review.model.js';
 import { toPublicProduct } from '../utils/serializers.js';
 import { PRODUCT_STATUS } from '../constants/contentStatus.js';
 import { toImageUrl } from '../middleware/upload.middleware.js';
+import { parsePagination, buildSearchFilter } from '../utils/queryHelpers.js';
 
 // Multipart bodies arrive as strings, so numeric fields need coercing.
 const parseNumber = (value, fallback) => {
@@ -12,10 +13,21 @@ const parseNumber = (value, fallback) => {
     return Number.isFinite(parsed) ? parsed : fallback;
 };
 
-// GET /api/admin/products — includes drafts, unlike the public listing.
+// GET /api/admin/products?page=&limit=&search=&category=&status= — includes
+// drafts, unlike the public listing.
 export const listProducts = asyncHandler(async (req, res) => {
-    const products = await Product.find().sort({ createdAt: -1 });
-    res.json({ products: products.map(toPublicProduct) });
+    const { page, limit, skip } = parsePagination(req.query);
+    const { search, category, status } = req.query;
+
+    const filter = buildSearchFilter(search, ['name', 'category']);
+    if (category) filter.category = category;
+    if (Object.values(PRODUCT_STATUS).includes(status)) filter.status = status;
+
+    const [products, total] = await Promise.all([
+        Product.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit),
+        Product.countDocuments(filter),
+    ]);
+    res.json({ items: products.map(toPublicProduct), total, page, limit });
 });
 
 // POST /api/admin/products (multipart/form-data, field name: images)

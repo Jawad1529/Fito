@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Modal, Descriptions, Form, Input, Select, message } from 'antd';
 import PageHeading from '../../atoms/PageHeading';
 import SearchBar from '../../molecules/SearchBar';
@@ -6,6 +6,7 @@ import RowActions from '../../molecules/RowActions';
 import StatusTag from '../../atoms/StatusTag';
 import DataTable from '../DataTable';
 import useTableQuery from '../../../hooks/useTableQuery';
+import useServerTableQuery from '../../../hooks/useServerTableQuery';
 import { adminUsers as initialAdminUsers } from '../../../data/adminUsers';
 import { ROLE_LABELS, ROLES } from '../../../constants/roles';
 import { ADMIN_STATUS, ADMIN_STATUS_LABELS } from '../../../constants/adminStatus';
@@ -25,33 +26,17 @@ export default function AdminUsersTable() {
 }
 
 function AdminUsersTableInner({ testingMode }) {
-    const [users, setUsers] = useState(testingMode ? initialAdminUsers : []);
-    const [loading, setLoading] = useState(!testingMode);
-    const { searchText, setSearchText, filteredData } = useTableQuery(users, {
-        searchKeys: ['name', 'email'],
-    });
+    const [mockUsers, setMockUsers] = useState(initialAdminUsers);
+    const clientQuery = useTableQuery(mockUsers, { searchKeys: ['name', 'email'] });
+    const serverQuery = useServerTableQuery(fetchAdmins, { enabled: !testingMode });
+
+    const users = testingMode ? clientQuery.filteredData : serverQuery.items;
+    const searchText = testingMode ? clientQuery.searchText : serverQuery.searchInput;
+    const setSearchText = testingMode ? clientQuery.setSearchText : serverQuery.setSearchInput;
 
     const [viewing, setViewing] = useState(null);
     const [editing, setEditing] = useState(null);
     const [form] = Form.useForm();
-
-    useEffect(() => {
-        if (testingMode) return;
-        let cancelled = false;
-        fetchAdmins()
-            .then((data) => {
-                if (!cancelled) setUsers(data);
-            })
-            .catch(() => {
-                if (!cancelled) message.error('Failed to load admin users');
-            })
-            .finally(() => {
-                if (!cancelled) setLoading(false);
-            });
-        return () => {
-            cancelled = true;
-        };
-    }, [testingMode]);
 
     const openEdit = (user) => {
         setEditing(user);
@@ -62,15 +47,15 @@ function AdminUsersTableInner({ testingMode }) {
         const values = await form.validateFields();
 
         if (testingMode) {
-            setUsers((prev) => prev.map((u) => (u.id === editing.id ? { ...u, ...values } : u)));
+            setMockUsers((prev) => prev.map((u) => (u.id === editing.id ? { ...u, ...values } : u)));
             message.success('Admin user updated');
             setEditing(null);
             return;
         }
 
         try {
-            const updated = await updateAdminStatus(editing.id, values.status);
-            setUsers((prev) => prev.map((u) => (u.id === editing.id ? updated : u)));
+            await updateAdminStatus(editing.id, values.status);
+            serverQuery.refetch();
             message.success('Admin status updated');
             setEditing(null);
         } catch {
@@ -79,28 +64,34 @@ function AdminUsersTableInner({ testingMode }) {
     };
 
     const handleDelete = (id) => {
-        setUsers((prev) => prev.filter((u) => u.id !== id));
+        setMockUsers((prev) => prev.filter((u) => u.id !== id));
         message.success('Admin user deleted');
     };
 
     const columns = [
-        { title: 'Name', dataIndex: 'name', sorter: (a, b) => a.name.localeCompare(b.name) },
+        { title: 'Name', dataIndex: 'name', sorter: testingMode ? (a, b) => a.name.localeCompare(b.name) : undefined },
         { title: 'Email', dataIndex: 'email' },
         {
             title: 'Role',
             dataIndex: 'role',
             filters: Object.values(ROLES).map((r) => ({ text: ROLE_LABELS[r], value: r })),
-            onFilter: (value, record) => record.role === value,
+            filteredValue: testingMode ? undefined : [serverQuery.filters.role].filter(Boolean),
+            onFilter: testingMode ? (value, record) => record.role === value : undefined,
             render: (role) => ROLE_LABELS[role],
         },
         {
             title: 'Status',
             dataIndex: 'status',
             filters: STATUS_OPTIONS.map(({ label, value }) => ({ text: label, value })),
-            onFilter: (value, record) => record.status === value,
+            filteredValue: testingMode ? undefined : [serverQuery.filters.status].filter(Boolean),
+            onFilter: testingMode ? (value, record) => record.status === value : undefined,
             render: (status) => <StatusTag status={status} />,
         },
-        { title: 'Created At', dataIndex: 'createdAt', sorter: (a, b) => (a.createdAt ?? '').localeCompare(b.createdAt ?? '') },
+        {
+            title: 'Created At',
+            dataIndex: 'createdAt',
+            sorter: testingMode ? (a, b) => (a.createdAt ?? '').localeCompare(b.createdAt ?? '') : undefined,
+        },
         {
             title: 'Actions',
             key: 'actions',
@@ -120,7 +111,13 @@ function AdminUsersTableInner({ testingMode }) {
                 title="Admin Users"
                 actions={<SearchBar value={searchText} onChange={setSearchText} placeholder="Search admins..." />}
             />
-            <DataTable columns={columns} data={filteredData} loading={loading} />
+            <DataTable
+                columns={columns}
+                data={users}
+                loading={!testingMode && serverQuery.loading}
+                pagination={testingMode ? undefined : { ...serverQuery.pagination, total: serverQuery.total }}
+                onChange={testingMode ? undefined : serverQuery.handleTableChange}
+            />
 
             <Modal open={!!viewing} title="Admin User Details" onCancel={() => setViewing(null)} footer={null}>
                 {viewing && (

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Modal, Descriptions, Form, Input, Select, Tag, message } from 'antd';
 import PageHeading from '../../atoms/PageHeading';
 import SearchBar from '../../molecules/SearchBar';
@@ -6,6 +6,7 @@ import RowActions from '../../molecules/RowActions';
 import StatusTag from '../../atoms/StatusTag';
 import DataTable from '../DataTable';
 import useTableQuery from '../../../hooks/useTableQuery';
+import useServerTableQuery from '../../../hooks/useServerTableQuery';
 import { appUsers as initialAppUsers } from '../../../data/appUsers';
 import { useTestingMode } from '../../../context/TestingModeContext';
 import { fetchAppUsers, updateAppUserStatus } from '../../../api/adminUsers.api';
@@ -37,33 +38,22 @@ export default function AppUsersTable() {
 }
 
 function AppUsersTableInner({ testingMode }) {
-    const [users, setUsers] = useState(testingMode ? initialAppUsers : []);
-    const [loading, setLoading] = useState(!testingMode);
-    const { searchText, setSearchText, filteredData } = useTableQuery(users, {
-        searchKeys: ['name', 'email', 'phone'],
-    });
+    // Testing mode: a mutable local copy of the mock data, filtered/paginated
+    // client-side. Real mode: backend-driven pagination/search/filters.
+    const [mockUsers, setMockUsers] = useState(initialAppUsers);
+    const clientQuery = useTableQuery(mockUsers, { searchKeys: ['name', 'email', 'phone'] });
+    const serverQuery = useServerTableQuery(
+        (params) => fetchAppUsers(params).then((data) => ({ ...data, items: data.items.map(toRow) })),
+        { enabled: !testingMode }
+    );
+
+    const users = testingMode ? clientQuery.filteredData : serverQuery.items;
+    const searchText = testingMode ? clientQuery.searchText : serverQuery.searchInput;
+    const setSearchText = testingMode ? clientQuery.setSearchText : serverQuery.setSearchInput;
 
     const [viewing, setViewing] = useState(null);
     const [editing, setEditing] = useState(null);
     const [form] = Form.useForm();
-
-    useEffect(() => {
-        if (testingMode) return;
-        let cancelled = false;
-        fetchAppUsers()
-            .then((data) => {
-                if (!cancelled) setUsers(data.map(toRow));
-            })
-            .catch(() => {
-                if (!cancelled) message.error('Failed to load users');
-            })
-            .finally(() => {
-                if (!cancelled) setLoading(false);
-            });
-        return () => {
-            cancelled = true;
-        };
-    }, [testingMode]);
 
     const openEdit = (user) => {
         setEditing(user);
@@ -74,15 +64,15 @@ function AppUsersTableInner({ testingMode }) {
         const values = await form.validateFields();
 
         if (testingMode) {
-            setUsers((prev) => prev.map((u) => (u.id === editing.id ? { ...u, ...values } : u)));
+            setMockUsers((prev) => prev.map((u) => (u.id === editing.id ? { ...u, ...values } : u)));
             message.success('User updated');
             setEditing(null);
             return;
         }
 
         try {
-            const updated = await updateAppUserStatus(editing.id, values.status);
-            setUsers((prev) => prev.map((u) => (u.id === editing.id ? toRow(updated) : u)));
+            await updateAppUserStatus(editing.id, values.status);
+            serverQuery.refetch();
             message.success('User status updated');
             setEditing(null);
         } catch {
@@ -91,27 +81,33 @@ function AppUsersTableInner({ testingMode }) {
     };
 
     const handleDelete = (id) => {
-        setUsers((prev) => prev.filter((u) => u.id !== id));
+        setMockUsers((prev) => prev.filter((u) => u.id !== id));
         message.success('User deleted');
     };
 
     const columns = [
-        { title: 'Name', dataIndex: 'name', sorter: (a, b) => a.name.localeCompare(b.name) },
+        { title: 'Name', dataIndex: 'name', sorter: testingMode ? (a, b) => a.name.localeCompare(b.name) : undefined },
         { title: 'Email', dataIndex: 'email' },
         { title: 'Phone', dataIndex: 'phone' },
-        { title: 'Joined Date', dataIndex: 'joinedDate', sorter: (a, b) => (a.joinedDate ?? '').localeCompare(b.joinedDate ?? '') },
+        {
+            title: 'Joined Date',
+            dataIndex: 'joinedDate',
+            sorter: testingMode ? (a, b) => (a.joinedDate ?? '').localeCompare(b.joinedDate ?? '') : undefined,
+        },
         {
             title: 'Login Via',
             dataIndex: 'provider',
             filters: PROVIDER_OPTIONS.map(({ label, value }) => ({ text: label, value })),
-            onFilter: (value, record) => record.provider === value,
+            filteredValue: testingMode ? undefined : [serverQuery.filters.provider].filter(Boolean),
+            onFilter: testingMode ? (value, record) => record.provider === value : undefined,
             render: (provider) => <ProviderTag provider={provider} />,
         },
         {
             title: 'Status',
             dataIndex: 'status',
             filters: STATUS_OPTIONS.map(({ label, value }) => ({ text: label, value })),
-            onFilter: (value, record) => record.status === value,
+            filteredValue: testingMode ? undefined : [serverQuery.filters.status].filter(Boolean),
+            onFilter: testingMode ? (value, record) => record.status === value : undefined,
             render: (status) => <StatusTag status={status} />,
         },
         {
@@ -133,7 +129,13 @@ function AppUsersTableInner({ testingMode }) {
                 title="App Users"
                 actions={<SearchBar value={searchText} onChange={setSearchText} placeholder="Search users..." />}
             />
-            <DataTable columns={columns} data={filteredData} loading={loading} />
+            <DataTable
+                columns={columns}
+                data={users}
+                loading={!testingMode && serverQuery.loading}
+                pagination={testingMode ? undefined : { ...serverQuery.pagination, total: serverQuery.total }}
+                onChange={testingMode ? undefined : serverQuery.handleTableChange}
+            />
 
             <Modal open={!!viewing} title="User Details" onCancel={() => setViewing(null)} footer={null}>
                 {viewing && (

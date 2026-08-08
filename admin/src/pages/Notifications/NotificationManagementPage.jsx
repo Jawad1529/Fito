@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Modal, Descriptions, Button, message } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import PageHeading from '../../components/atoms/PageHeading';
@@ -8,6 +8,7 @@ import StatusTag from '../../components/atoms/StatusTag';
 import DataTable from '../../components/organisms/DataTable';
 import NotificationFormDrawer from '../../components/organisms/notifications/NotificationFormDrawer';
 import useTableQuery from '../../hooks/useTableQuery';
+import useServerTableQuery from '../../hooks/useServerTableQuery';
 import { useTestingMode } from '../../context/TestingModeContext';
 import {
     notifications as initialNotifications,
@@ -31,34 +32,19 @@ export default function NotificationManagementPage() {
 }
 
 function NotificationManagementPageInner({ testingMode }) {
-    const [notifications, setNotifications] = useState(testingMode ? initialNotifications : []);
-    const [loading, setLoading] = useState(!testingMode);
+    const [mockNotifications, setMockNotifications] = useState(initialNotifications);
+    const clientQuery = useTableQuery(mockNotifications, { searchKeys: ['title', 'message'] });
+    const serverQuery = useServerTableQuery(fetchNotifications, { enabled: !testingMode });
+
+    const notifications = testingMode ? clientQuery.filteredData : serverQuery.items;
+    const searchText = testingMode ? clientQuery.searchText : serverQuery.searchInput;
+    const setSearchText = testingMode ? clientQuery.setSearchText : serverQuery.setSearchInput;
+    const loading = !testingMode && serverQuery.loading;
     const [saving, setSaving] = useState(false);
-    const { searchText, setSearchText, filteredData } = useTableQuery(notifications, {
-        searchKeys: ['title', 'message'],
-    });
 
     const [viewing, setViewing] = useState(null);
     const [drawerOpen, setDrawerOpen] = useState(false);
     const [editingNotification, setEditingNotification] = useState(null);
-
-    useEffect(() => {
-        if (testingMode) return undefined;
-        let cancelled = false;
-        fetchNotifications()
-            .then((data) => {
-                if (!cancelled) setNotifications(data);
-            })
-            .catch(() => {
-                if (!cancelled) message.error('Failed to load notifications');
-            })
-            .finally(() => {
-                if (!cancelled) setLoading(false);
-            });
-        return () => {
-            cancelled = true;
-        };
-    }, [testingMode]);
 
     const openCreate = () => {
         setEditingNotification(null);
@@ -73,16 +59,16 @@ function NotificationManagementPageInner({ testingMode }) {
     const handleSubmit = async (values) => {
         if (testingMode) {
             if (editingNotification) {
-                setNotifications((prev) =>
+                setMockNotifications((prev) =>
                     prev.map((n) => (n.id === editingNotification.id ? { ...n, ...values } : n))
                 );
                 message.success('Notification updated');
             } else {
                 const newNotification = {
                     ...values,
-                    id: Math.max(...notifications.map((n) => n.id), 0) + 1,
+                    id: Math.max(...mockNotifications.map((n) => n.id), 0) + 1,
                 };
-                setNotifications((prev) => [newNotification, ...prev]);
+                setMockNotifications((prev) => [newNotification, ...prev]);
                 message.success('Notification created');
             }
             setDrawerOpen(false);
@@ -92,14 +78,13 @@ function NotificationManagementPageInner({ testingMode }) {
         setSaving(true);
         try {
             if (editingNotification) {
-                const updated = await updateNotificationApi(editingNotification.id, values);
-                setNotifications((prev) => prev.map((n) => (n.id === updated.id ? updated : n)));
+                await updateNotificationApi(editingNotification.id, values);
                 message.success('Notification updated');
             } else {
-                const created = await createNotificationApi(values);
-                setNotifications((prev) => [created, ...prev]);
+                await createNotificationApi(values);
                 message.success('Notification created');
             }
+            serverQuery.refetch();
             setDrawerOpen(false);
         } catch (err) {
             message.error(apiError(err, 'Failed to save notification'));
@@ -110,13 +95,13 @@ function NotificationManagementPageInner({ testingMode }) {
 
     const handleDelete = async (id) => {
         if (testingMode) {
-            setNotifications((prev) => prev.filter((n) => n.id !== id));
+            setMockNotifications((prev) => prev.filter((n) => n.id !== id));
             message.success('Notification deleted');
             return;
         }
         try {
             await deleteNotificationApi(id);
-            setNotifications((prev) => prev.filter((n) => n.id !== id));
+            serverQuery.refetch();
             message.success('Notification deleted');
         } catch (err) {
             message.error(apiError(err, 'Failed to delete notification'));
@@ -124,13 +109,14 @@ function NotificationManagementPageInner({ testingMode }) {
     };
 
     const columns = [
-        { title: 'Title', dataIndex: 'title', sorter: (a, b) => a.title.localeCompare(b.title) },
+        { title: 'Title', dataIndex: 'title', sorter: testingMode ? (a, b) => a.title.localeCompare(b.title) : undefined },
         { title: 'Message', dataIndex: 'message', ellipsis: true },
         {
             title: 'Type',
             dataIndex: 'type',
             filters: NOTIFICATION_TYPES.map((t) => ({ text: t.label, value: t.value })),
-            onFilter: (value, record) => record.type === value,
+            filteredValue: testingMode ? undefined : [serverQuery.filters.type].filter(Boolean),
+            onFilter: testingMode ? (value, record) => record.type === value : undefined,
             render: (type) => <StatusTag status={type} />,
         },
         {
@@ -146,10 +132,15 @@ function NotificationManagementPageInner({ testingMode }) {
                 { text: 'Scheduled', value: 'scheduled' },
                 { text: 'Draft', value: 'draft' },
             ],
-            onFilter: (value, record) => record.status === value,
+            filteredValue: testingMode ? undefined : [serverQuery.filters.status].filter(Boolean),
+            onFilter: testingMode ? (value, record) => record.status === value : undefined,
             render: (status) => <StatusTag status={status} />,
         },
-        { title: 'Date', dataIndex: 'date', sorter: (a, b) => String(a.date ?? '').localeCompare(String(b.date ?? '')) },
+        {
+            title: 'Date',
+            dataIndex: 'date',
+            sorter: testingMode ? (a, b) => String(a.date ?? '').localeCompare(String(b.date ?? '')) : undefined,
+        },
         {
             title: 'Actions',
             key: 'actions',
@@ -178,9 +169,22 @@ function NotificationManagementPageInner({ testingMode }) {
                 }
             />
 
-            <DataTable columns={columns} data={filteredData} loading={loading} />
+            <DataTable
+                columns={columns}
+                data={notifications}
+                loading={loading}
+                pagination={testingMode ? undefined : { ...serverQuery.pagination, total: serverQuery.total }}
+                onChange={testingMode ? undefined : serverQuery.handleTableChange}
+            />
 
-            <Modal open={!!viewing} title="Notification Details" onCancel={() => setViewing(null)} footer={null}>
+            <Modal
+                open={!!viewing}
+                title="Notification Details"
+                onCancel={() => setViewing(null)}
+                footer={null}
+                centered
+                styles={{ body: { maxHeight: '70vh', overflowY: 'auto', paddingRight: 8 } }}
+            >
                 {viewing && (
                     <Descriptions column={1} bordered size="small">
                         <Descriptions.Item label="Title">{viewing.title}</Descriptions.Item>

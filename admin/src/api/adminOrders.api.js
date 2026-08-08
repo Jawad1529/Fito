@@ -1,8 +1,8 @@
 import apiClient from './client';
 
-export const fetchOrders = async () => {
-    const { data } = await apiClient.get('/admin/orders');
-    return data.orders;
+export const fetchOrders = async (params = {}) => {
+    const { data } = await apiClient.get('/admin/orders', { params });
+    return data;
 };
 
 export const updateOrderStatus = async (id, status) => {

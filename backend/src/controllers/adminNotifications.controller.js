@@ -2,11 +2,23 @@ import asyncHandler from '../utils/asyncHandler.js';
 import Notification from '../models/Notification.model.js';
 import { toPublicNotification } from '../utils/serializers.js';
 import { NOTIFICATION_TYPE, NOTIFICATION_STATUS } from '../constants/notification.js';
+import { parsePagination, buildSearchFilter } from '../utils/queryHelpers.js';
 
-// GET /api/admin/notifications — includes drafts and scheduled.
+// GET /api/admin/notifications?page=&limit=&search=&type=&status= — includes
+// drafts and scheduled.
 export const listNotifications = asyncHandler(async (req, res) => {
-    const notifications = await Notification.find().sort({ createdAt: -1 });
-    res.json({ notifications: notifications.map((n) => toPublicNotification(n)) });
+    const { page, limit, skip } = parsePagination(req.query);
+    const { search, type, status } = req.query;
+
+    const filter = buildSearchFilter(search, ['title', 'message']);
+    if (Object.values(NOTIFICATION_TYPE).includes(type)) filter.type = type;
+    if (Object.values(NOTIFICATION_STATUS).includes(status)) filter.status = status;
+
+    const [notifications, total] = await Promise.all([
+        Notification.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit),
+        Notification.countDocuments(filter),
+    ]);
+    res.json({ items: notifications.map((n) => toPublicNotification(n)), total, page, limit });
 });
 
 // POST /api/admin/notifications

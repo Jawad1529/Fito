@@ -1,9 +1,9 @@
 import apiClient from './client';
 
 // Every endpoint here is super-admin only (enforced by the backend router).
-export const fetchReviews = async () => {
-    const { data } = await apiClient.get('/admin/reviews');
-    return data.reviews;
+export const fetchReviews = async (params = {}) => {
+    const { data } = await apiClient.get('/admin/reviews', { params });
+    return data;
 };
 
 export const addReply = async (reviewId, message) => {

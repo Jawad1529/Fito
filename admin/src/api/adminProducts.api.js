@@ -22,9 +22,9 @@ const toFormData = ({ images = [], existingImages, ...fields }) => {
     return formData;
 };
 
-export const fetchProducts = async () => {
-    const { data } = await apiClient.get('/admin/products');
-    return data.products;
+export const fetchProducts = async (params = {}) => {
+    const { data } = await apiClient.get('/admin/products', { params });
+    return data;
 };
 
 export const createProduct = async (payload) => {

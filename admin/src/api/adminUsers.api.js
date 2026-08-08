@@ -1,8 +1,8 @@
 import apiClient from './client';
 
-export const fetchAppUsers = async () => {
-    const { data } = await apiClient.get('/admin/users');
-    return data.users;
+export const fetchAppUsers = async (params = {}) => {
+    const { data } = await apiClient.get('/admin/users', { params });
+    return data;
 };
 
 export const updateAppUserStatus = async (id, status) => {

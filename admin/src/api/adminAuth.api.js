@@ -10,9 +10,9 @@ export const signupAdmin = async ({ name, email, password }) => {
     return data;
 };
 
-export const fetchAdmins = async () => {
-    const { data } = await apiClient.get('/admin/auth');
-    return data.admins;
+export const fetchAdmins = async (params = {}) => {
+    const { data } = await apiClient.get('/admin/auth', { params });
+    return data;
 };
 
 export const updateAdminStatus = async (id, status) => {

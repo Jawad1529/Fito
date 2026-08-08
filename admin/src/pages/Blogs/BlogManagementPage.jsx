@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Modal, Descriptions, Image, Button, message } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import PageHeading from '../../components/atoms/PageHeading';
@@ -8,6 +8,7 @@ import StatusTag from '../../components/atoms/StatusTag';
 import DataTable from '../../components/organisms/DataTable';
 import BlogFormDrawer from '../../components/organisms/blogs/BlogFormDrawer';
 import useTableQuery from '../../hooks/useTableQuery';
+import useServerTableQuery from '../../hooks/useServerTableQuery';
 import { blogs as initialBlogs, BLOG_CATEGORIES } from '../../data/blogs';
 import { useTestingMode } from '../../context/TestingModeContext';
 import imageUrl from '../../utils/imageUrl';
@@ -26,34 +27,19 @@ export default function BlogManagementPage() {
 }
 
 function BlogManagementPageInner({ testingMode }) {
-    const [blogs, setBlogs] = useState(testingMode ? initialBlogs : []);
-    const [loading, setLoading] = useState(!testingMode);
+    const [mockBlogs, setMockBlogs] = useState(initialBlogs);
+    const clientQuery = useTableQuery(mockBlogs, { searchKeys: ['title', 'author', 'category'] });
+    const serverQuery = useServerTableQuery(fetchBlogs, { enabled: !testingMode });
+
+    const blogs = testingMode ? clientQuery.filteredData : serverQuery.items;
+    const searchText = testingMode ? clientQuery.searchText : serverQuery.searchInput;
+    const setSearchText = testingMode ? clientQuery.setSearchText : serverQuery.setSearchInput;
+    const loading = !testingMode && serverQuery.loading;
     const [saving, setSaving] = useState(false);
-    const { searchText, setSearchText, filteredData } = useTableQuery(blogs, {
-        searchKeys: ['title', 'author', 'category'],
-    });
 
     const [viewing, setViewing] = useState(null);
     const [drawerOpen, setDrawerOpen] = useState(false);
     const [editingBlog, setEditingBlog] = useState(null);
-
-    useEffect(() => {
-        if (testingMode) return undefined;
-        let cancelled = false;
-        fetchBlogs()
-            .then((data) => {
-                if (!cancelled) setBlogs(data);
-            })
-            .catch(() => {
-                if (!cancelled) message.error('Failed to load blogs');
-            })
-            .finally(() => {
-                if (!cancelled) setLoading(false);
-            });
-        return () => {
-            cancelled = true;
-        };
-    }, [testingMode]);
 
     const openCreate = () => {
         setEditingBlog(null);
@@ -68,10 +54,10 @@ function BlogManagementPageInner({ testingMode }) {
     const handleSubmit = async (values) => {
         if (testingMode) {
             if (editingBlog) {
-                setBlogs((prev) => prev.map((b) => (b.id === editingBlog.id ? { ...b, ...values } : b)));
+                setMockBlogs((prev) => prev.map((b) => (b.id === editingBlog.id ? { ...b, ...values } : b)));
                 message.success('Blog updated');
             } else {
-                setBlogs((prev) => [
+                setMockBlogs((prev) => [
                     {
                         ...values,
                         id: Math.max(...prev.map((b) => b.id), 0) + 1,
@@ -88,14 +74,13 @@ function BlogManagementPageInner({ testingMode }) {
         setSaving(true);
         try {
             if (editingBlog) {
-                const updated = await updateBlogApi(editingBlog.id, values);
-                setBlogs((prev) => prev.map((b) => (b.id === updated.id ? updated : b)));
+                await updateBlogApi(editingBlog.id, values);
                 message.success('Blog updated');
             } else {
-                const created = await createBlogApi(values);
-                setBlogs((prev) => [created, ...prev]);
+                await createBlogApi(values);
                 message.success('Blog created');
             }
+            serverQuery.refetch();
             setDrawerOpen(false);
         } catch (err) {
             message.error(apiError(err, 'Failed to save blog'));
@@ -106,13 +91,13 @@ function BlogManagementPageInner({ testingMode }) {
 
     const handleDelete = async (id) => {
         if (testingMode) {
-            setBlogs((prev) => prev.filter((b) => b.id !== id));
+            setMockBlogs((prev) => prev.filter((b) => b.id !== id));
             message.success('Blog deleted');
             return;
         }
         try {
             await deleteBlogApi(id);
-            setBlogs((prev) => prev.filter((b) => b.id !== id));
+            serverQuery.refetch();
             message.success('Blog deleted');
         } catch (err) {
             message.error(apiError(err, 'Failed to delete blog'));
@@ -127,24 +112,26 @@ function BlogManagementPageInner({ testingMode }) {
                 <Image src={imageUrl(image)} width={48} height={48} className="rounded-lg object-cover" fallback="" />
             ),
         },
-        { title: 'Title', dataIndex: 'title', sorter: (a, b) => a.title.localeCompare(b.title) },
+        { title: 'Title', dataIndex: 'title', sorter: testingMode ? (a, b) => a.title.localeCompare(b.title) : undefined },
         {
             title: 'Category',
             dataIndex: 'category',
             filters: BLOG_CATEGORIES.map((c) => ({ text: c, value: c })),
-            onFilter: (value, record) => record.category === value,
+            filteredValue: testingMode ? undefined : [serverQuery.filters.category].filter(Boolean),
+            onFilter: testingMode ? (value, record) => record.category === value : undefined,
         },
         { title: 'Author', dataIndex: 'author' },
         {
             title: 'Date',
             dataIndex: 'date',
-            sorter: (a, b) => String(a.date ?? '').localeCompare(String(b.date ?? '')),
+            sorter: testingMode ? (a, b) => String(a.date ?? '').localeCompare(String(b.date ?? '')) : undefined,
         },
         {
             title: 'Status',
             dataIndex: 'status',
             filters: [{ text: 'Published', value: 'published' }, { text: 'Draft', value: 'draft' }],
-            onFilter: (value, record) => record.status === value,
+            filteredValue: testingMode ? undefined : [serverQuery.filters.status].filter(Boolean),
+            onFilter: testingMode ? (value, record) => record.status === value : undefined,
             render: (status) => <StatusTag status={status} />,
         },
         {
@@ -175,9 +162,22 @@ function BlogManagementPageInner({ testingMode }) {
                 }
             />
 
-            <DataTable columns={columns} data={filteredData} loading={loading} />
+            <DataTable
+                columns={columns}
+                data={blogs}
+                loading={loading}
+                pagination={testingMode ? undefined : { ...serverQuery.pagination, total: serverQuery.total }}
+                onChange={testingMode ? undefined : serverQuery.handleTableChange}
+            />
 
-            <Modal open={!!viewing} title="Blog Details" onCancel={() => setViewing(null)} footer={null}>
+            <Modal
+                open={!!viewing}
+                title="Blog Details"
+                onCancel={() => setViewing(null)}
+                footer={null}
+                centered
+                styles={{ body: { maxHeight: '70vh', overflowY: 'auto', paddingRight: 8 } }}
+            >
                 {viewing && (
                     <div>
                         <Image

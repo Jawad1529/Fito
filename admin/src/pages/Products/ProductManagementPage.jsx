@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Modal, Descriptions, Image, Button, message } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import PageHeading from '../../components/atoms/PageHeading';
@@ -9,6 +9,7 @@ import RatingStars from '../../components/atoms/RatingStars';
 import DataTable from '../../components/organisms/DataTable';
 import ProductFormDrawer from '../../components/organisms/products/ProductFormDrawer';
 import useTableQuery from '../../hooks/useTableQuery';
+import useServerTableQuery from '../../hooks/useServerTableQuery';
 import { products as initialProducts } from '../../data/products';
 import { PRODUCT_CATEGORIES } from '../../constants/productCategories';
 import { useTestingMode } from '../../context/TestingModeContext';
@@ -29,34 +30,19 @@ export default function ProductManagementPage() {
 }
 
 function ProductManagementPageInner({ testingMode }) {
-    const [products, setProducts] = useState(testingMode ? initialProducts : []);
-    const [loading, setLoading] = useState(!testingMode);
+    const [mockProducts, setMockProducts] = useState(initialProducts);
+    const clientQuery = useTableQuery(mockProducts, { searchKeys: ['name', 'category'] });
+    const serverQuery = useServerTableQuery(fetchProducts, { enabled: !testingMode });
+
+    const products = testingMode ? clientQuery.filteredData : serverQuery.items;
+    const searchText = testingMode ? clientQuery.searchText : serverQuery.searchInput;
+    const setSearchText = testingMode ? clientQuery.setSearchText : serverQuery.setSearchInput;
+    const loading = !testingMode && serverQuery.loading;
     const [saving, setSaving] = useState(false);
-    const { searchText, setSearchText, filteredData } = useTableQuery(products, {
-        searchKeys: ['name', 'category'],
-    });
 
     const [viewing, setViewing] = useState(null);
     const [drawerOpen, setDrawerOpen] = useState(false);
     const [editingProduct, setEditingProduct] = useState(null);
-
-    useEffect(() => {
-        if (testingMode) return undefined;
-        let cancelled = false;
-        fetchProducts()
-            .then((data) => {
-                if (!cancelled) setProducts(data);
-            })
-            .catch(() => {
-                if (!cancelled) message.error('Failed to load products');
-            })
-            .finally(() => {
-                if (!cancelled) setLoading(false);
-            });
-        return () => {
-            cancelled = true;
-        };
-    }, [testingMode]);
 
     const openCreate = () => {
         setEditingProduct(null);
@@ -71,12 +57,12 @@ function ProductManagementPageInner({ testingMode }) {
     const handleSubmit = async (values) => {
         if (testingMode) {
             if (editingProduct) {
-                setProducts((prev) =>
+                setMockProducts((prev) =>
                     prev.map((p) => (p.id === editingProduct.id ? { ...p, ...values } : p))
                 );
                 message.success('Product updated');
             } else {
-                setProducts((prev) => [
+                setMockProducts((prev) => [
                     { ...values, id: Math.max(...prev.map((p) => p.id), 0) + 1, rating: 0, reviews: 0 },
                     ...prev,
                 ]);
@@ -89,14 +75,13 @@ function ProductManagementPageInner({ testingMode }) {
         setSaving(true);
         try {
             if (editingProduct) {
-                const updated = await updateProductApi(editingProduct.id, values);
-                setProducts((prev) => prev.map((p) => (p.id === updated.id ? updated : p)));
+                await updateProductApi(editingProduct.id, values);
                 message.success('Product updated');
             } else {
-                const created = await createProductApi(values);
-                setProducts((prev) => [created, ...prev]);
+                await createProductApi(values);
                 message.success('Product created');
             }
+            serverQuery.refetch();
             setDrawerOpen(false);
         } catch (err) {
             message.error(apiError(err, 'Failed to save product'));
@@ -107,13 +92,13 @@ function ProductManagementPageInner({ testingMode }) {
 
     const handleDelete = async (id) => {
         if (testingMode) {
-            setProducts((prev) => prev.filter((p) => p.id !== id));
+            setMockProducts((prev) => prev.filter((p) => p.id !== id));
             message.success('Product deleted');
             return;
         }
         try {
             await deleteProductApi(id);
-            setProducts((prev) => prev.filter((p) => p.id !== id));
+            serverQuery.refetch();
             message.success('Product deleted');
         } catch (err) {
             message.error(apiError(err, 'Failed to delete product'));
@@ -128,15 +113,21 @@ function ProductManagementPageInner({ testingMode }) {
                 <Image src={imageUrl(image)} width={48} height={48} className="rounded-lg object-cover" fallback="" />
             ),
         },
-        { title: 'Name', dataIndex: 'name', sorter: (a, b) => a.name.localeCompare(b.name) },
+        { title: 'Name', dataIndex: 'name', sorter: testingMode ? (a, b) => a.name.localeCompare(b.name) : undefined },
         {
             title: 'Category',
             dataIndex: 'category',
             filters: PRODUCT_CATEGORIES.map((c) => ({ text: c, value: c })),
-            onFilter: (value, record) => record.category === value,
+            filteredValue: testingMode ? undefined : [serverQuery.filters.category].filter(Boolean),
+            onFilter: testingMode ? (value, record) => record.category === value : undefined,
         },
-        { title: 'Price', dataIndex: 'price', sorter: (a, b) => a.price - b.price, render: (p) => `Rs. ${p.toFixed(2)}` },
-        { title: 'Stock', dataIndex: 'stock', sorter: (a, b) => a.stock - b.stock },
+        {
+            title: 'Price',
+            dataIndex: 'price',
+            sorter: testingMode ? (a, b) => a.price - b.price : undefined,
+            render: (p) => `Rs. ${p.toFixed(2)}`,
+        },
+        { title: 'Stock', dataIndex: 'stock', sorter: testingMode ? (a, b) => a.stock - b.stock : undefined },
         { title: 'Rating', dataIndex: 'rating', render: (r) => <RatingStars rating={r ?? 0} /> },
         {
             title: 'Status',
@@ -146,7 +137,8 @@ function ProductManagementPageInner({ testingMode }) {
                 { text: 'Draft', value: 'draft' },
                 { text: 'Out of Stock', value: 'out_of_stock' },
             ],
-            onFilter: (value, record) => record.status === value,
+            filteredValue: testingMode ? undefined : [serverQuery.filters.status].filter(Boolean),
+            onFilter: testingMode ? (value, record) => record.status === value : undefined,
             render: (status) => <StatusTag status={status} />,
         },
         {
@@ -177,9 +169,22 @@ function ProductManagementPageInner({ testingMode }) {
                 }
             />
 
-            <DataTable columns={columns} data={filteredData} loading={loading} />
+            <DataTable
+                columns={columns}
+                data={products}
+                loading={loading}
+                pagination={testingMode ? undefined : { ...serverQuery.pagination, total: serverQuery.total }}
+                onChange={testingMode ? undefined : serverQuery.handleTableChange}
+            />
 
-            <Modal open={!!viewing} title="Product Details" onCancel={() => setViewing(null)} footer={null}>
+            <Modal
+                open={!!viewing}
+                title="Product Details"
+                onCancel={() => setViewing(null)}
+                footer={null}
+                centered
+                styles={{ body: { maxHeight: '70vh', overflowY: 'auto', paddingRight: 8 } }}
+            >
                 {viewing && (
                     <div>
                         <Image

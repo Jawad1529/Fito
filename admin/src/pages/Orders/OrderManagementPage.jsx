@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Modal, Descriptions, Select, Table, message } from 'antd';
 import PageHeading from '../../components/atoms/PageHeading';
 import SearchBar from '../../components/molecules/SearchBar';
@@ -6,6 +7,7 @@ import RowActions from '../../components/molecules/RowActions';
 import StatusTag from '../../components/atoms/StatusTag';
 import DataTable from '../../components/organisms/DataTable';
 import useTableQuery from '../../hooks/useTableQuery';
+import useServerTableQuery from '../../hooks/useServerTableQuery';
 import { orders as initialOrders, ORDER_STATUSES, PAYMENT_METHODS } from '../../data/orders';
 import { useTestingMode } from '../../context/TestingModeContext';
 import { fetchOrders, updateOrderStatus as updateOrderStatusApi } from '../../api/adminOrders.api';
@@ -21,36 +23,32 @@ export default function OrderManagementPage() {
 }
 
 function OrderManagementPageInner({ testingMode }) {
-    const [orders, setOrders] = useState(testingMode ? initialOrders : []);
-    const [loading, setLoading] = useState(!testingMode);
-    const { searchText, setSearchText, filteredData } = useTableQuery(orders, {
-        searchKeys: ['id', 'transactionId'],
-    });
+    const [mockOrders, setMockOrders] = useState(initialOrders);
+    const clientQuery = useTableQuery(mockOrders, { searchKeys: ['id', 'transactionId'] });
+    const serverQuery = useServerTableQuery(fetchOrders, { enabled: !testingMode });
+
+    const orders = testingMode ? clientQuery.filteredData : serverQuery.items;
+    const searchText = testingMode ? clientQuery.searchText : serverQuery.searchInput;
+    const setSearchText = testingMode ? clientQuery.setSearchText : serverQuery.setSearchInput;
+    const loading = !testingMode && serverQuery.loading;
 
     const [viewing, setViewing] = useState(null);
     const [statusEditing, setStatusEditing] = useState(null);
 
+    // Set when arriving from the dashboard's "Recent Orders" list — highlights
+    // and scrolls to the order that was clicked.
+    const location = useLocation();
+    const highlightOrderId = location.state?.highlightOrderId;
+
     useEffect(() => {
-        if (testingMode) return;
-        let cancelled = false;
-        fetchOrders()
-            .then((data) => {
-                if (!cancelled) setOrders(data);
-            })
-            .catch(() => {
-                if (!cancelled) message.error('Failed to load orders');
-            })
-            .finally(() => {
-                if (!cancelled) setLoading(false);
-            });
-        return () => {
-            cancelled = true;
-        };
-    }, [testingMode]);
+        if (!highlightOrderId || loading) return;
+        const row = document.querySelector(`tr[data-row-key="${highlightOrderId}"]`);
+        row?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, [highlightOrderId, loading]);
 
     const handleStatusChange = async (status) => {
         if (testingMode) {
-            setOrders((prev) =>
+            setMockOrders((prev) =>
                 prev.map((o) => (o.id === statusEditing.id ? { ...o, status } : o))
             );
             message.success('Order status updated');
@@ -59,8 +57,8 @@ function OrderManagementPageInner({ testingMode }) {
         }
 
         try {
-            const updated = await updateOrderStatusApi(statusEditing.id, status);
-            setOrders((prev) => prev.map((o) => (o.id === statusEditing.id ? updated : o)));
+            await updateOrderStatusApi(statusEditing.id, status);
+            serverQuery.refetch();
             message.success('Order status updated');
             setStatusEditing(null);
         } catch {
@@ -69,7 +67,7 @@ function OrderManagementPageInner({ testingMode }) {
     };
 
     const handleDelete = (id) => {
-        setOrders((prev) => prev.filter((o) => o.id !== id));
+        setMockOrders((prev) => prev.filter((o) => o.id !== id));
         message.success('Order deleted');
     };
 
@@ -85,7 +83,7 @@ function OrderManagementPageInner({ testingMode }) {
         {
             title: 'Total',
             dataIndex: 'total',
-            sorter: (a, b) => a.total - b.total,
+            sorter: testingMode ? (a, b) => a.total - b.total : undefined,
             render: (total) => `Rs. ${total.toFixed(2)}`,
         },
         {
@@ -96,14 +94,15 @@ function OrderManagementPageInner({ testingMode }) {
         {
             title: 'Placed At',
             dataIndex: 'placedAt',
-            sorter: (a, b) => a.placedAt.localeCompare(b.placedAt),
+            sorter: testingMode ? (a, b) => a.placedAt.localeCompare(b.placedAt) : undefined,
             render: (date) => new Date(date).toLocaleDateString(),
         },
         {
             title: 'Status',
             dataIndex: 'status',
             filters: ORDER_STATUSES.map((s) => ({ text: capitalize(s), value: s })),
-            onFilter: (value, record) => record.status === value,
+            filteredValue: testingMode ? undefined : [serverQuery.filters.status].filter(Boolean),
+            onFilter: testingMode ? (value, record) => record.status === value : undefined,
             render: (status) => <StatusTag status={status} />,
         },
         {
@@ -133,7 +132,14 @@ function OrderManagementPageInner({ testingMode }) {
                 actions={<SearchBar value={searchText} onChange={setSearchText} placeholder="Search orders..." />}
             />
 
-            <DataTable columns={columns} data={filteredData} loading={loading} />
+            <DataTable
+                columns={columns}
+                data={orders}
+                loading={loading}
+                rowClassName={(record) => (record.id === highlightOrderId ? 'row-highlight' : '')}
+                pagination={testingMode ? undefined : { ...serverQuery.pagination, total: serverQuery.total }}
+                onChange={testingMode ? undefined : serverQuery.handleTableChange}
+            />
 
             <Modal open={!!viewing} title="Order Details" onCancel={() => setViewing(null)} footer={null} width={560}>
                 {viewing && (

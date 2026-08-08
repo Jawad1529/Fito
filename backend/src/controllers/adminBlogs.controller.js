@@ -4,6 +4,7 @@ import { toPublicBlog } from '../utils/serializers.js';
 import { BLOG_STATUS } from '../constants/contentStatus.js';
 import { toImageUrl } from '../middleware/upload.middleware.js';
 import slugify from '../utils/slugify.js';
+import { parsePagination, buildSearchFilter } from '../utils/queryHelpers.js';
 
 // The panel sends body paragraphs either as a JSON array or as one textarea
 // blob; both normalize to the array shape the app renders.
@@ -22,10 +23,20 @@ const parseContent = (content) => {
         .filter(Boolean);
 };
 
-// GET /api/admin/blogs — includes drafts.
+// GET /api/admin/blogs?page=&limit=&search=&category=&status= — includes drafts.
 export const listBlogs = asyncHandler(async (req, res) => {
-    const blogs = await Blog.find().sort({ createdAt: -1 });
-    res.json({ blogs: blogs.map(toPublicBlog) });
+    const { page, limit, skip } = parsePagination(req.query);
+    const { search, category, status } = req.query;
+
+    const filter = buildSearchFilter(search, ['title', 'author', 'category']);
+    if (category) filter.category = category;
+    if (Object.values(BLOG_STATUS).includes(status)) filter.status = status;
+
+    const [blogs, total] = await Promise.all([
+        Blog.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit),
+        Blog.countDocuments(filter),
+    ]);
+    res.json({ items: blogs.map(toPublicBlog), total, page, limit });
 });
 
 // POST /api/admin/blogs (multipart/form-data, field name: image)
