@@ -1,22 +1,19 @@
-import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 import { OTP_PURPOSE } from '../constants/otpPurpose.js';
 
-// Free Gmail SMTP (no paid email provider) — needs a Google Account with
-// 2-Step Verification and an App Password, not the normal login password.
-// https://myaccount.google.com/apppasswords
-let transporter;
-const getTransporter = () => {
-    if (!transporter) {
-        transporter = nodemailer.createTransport({
-            service: 'gmail',
-            auth: {
-                user: process.env.GMAIL_USER,
-                pass: process.env.GMAIL_APP_PASSWORD,
-            },
-        });
+// Resend's API is plain HTTPS, so it isn't subject to the outbound-SMTP
+// blocking/dropping that made raw Gmail SMTP hang for minutes on Railway.
+// RESEND_FROM defaults to the sandbox address, which works with no domain
+// verification — swap it for a verified domain address once one is set up.
+let resend;
+const getResend = () => {
+    if (!resend) {
+        resend = new Resend(process.env.RESEND_API_KEY);
     }
-    return transporter;
+    return resend;
 };
+
+const FROM_ADDRESS = process.env.RESEND_FROM || 'Fito <onboarding@resend.dev>';
 
 const OTP_SUBJECT = {
     [OTP_PURPOSE.VERIFY_EMAIL]: 'Verify your email — Fito',
@@ -29,8 +26,8 @@ const OTP_INTRO = {
 };
 
 export const sendOtpEmail = async ({ to, otp, purpose }) => {
-    await getTransporter().sendMail({
-        from: `"Fito" <${process.env.GMAIL_USER}>`,
+    const { error } = await getResend().emails.send({
+        from: FROM_ADDRESS,
         to,
         subject: OTP_SUBJECT[purpose],
         html: `
@@ -39,4 +36,9 @@ export const sendOtpEmail = async ({ to, otp, purpose }) => {
             <p>This code expires in 10 minutes. If you didn't request this, you can ignore this email.</p>
         `,
     });
+    if (error) {
+        const err = new Error(error.message || 'Failed to send verification email');
+        err.statusCode = 502;
+        throw err;
+    }
 };
