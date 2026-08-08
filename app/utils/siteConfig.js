@@ -2,4 +2,4 @@
 // TODO: replace with real contact details
 export const CONTACT_EMAIL = 'support@Fitoo.com';
 export const WHATSAPP_NUMBER = '923000000000';
-export const WHATSAPP_DISPLAY = '+92 300 0000000';
+export const WHATSAPP_DISPLAY = '+92 336 7312010';

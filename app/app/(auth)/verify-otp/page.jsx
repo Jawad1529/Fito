@@ -3,11 +3,12 @@
 import { Suspense, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Form, message } from 'antd';
-import { MailOutlined, NumberOutlined } from '@ant-design/icons';
+import { message } from 'antd';
+import { MailOutlined, EditOutlined } from '@ant-design/icons';
 import { motion } from 'framer-motion';
 
 import Input from '@/components/atoms/Input';
+import OtpInput from '@/components/atoms/OtpInput';
 import Button from '@/components/atoms/Button';
 import useAuth from '@/hooks/useAuth';
 
@@ -16,16 +17,16 @@ const RESEND_COOLDOWN_SECONDS = 60;
 function VerifyOtpForm() {
   const searchParams = useSearchParams();
   const emailParam = searchParams.get('email') || '';
+
+  const [email, setEmail] = useState(emailParam);
+  const [editingEmail, setEditingEmail] = useState(!emailParam);
+  const [otp, setOtp] = useState('');
+  const [otpError, setOtpError] = useState(false);
   const [loading, setLoading] = useState(false);
   const [resending, setResending] = useState(false);
   const [cooldown, setCooldown] = useState(0);
   const router = useRouter();
   const { verifyOtp, resendOtp } = useAuth();
-  const [form] = Form.useForm();
-
-  useEffect(() => {
-    if (emailParam) form.setFieldsValue({ email: emailParam });
-  }, [emailParam, form]);
 
   useEffect(() => {
     if (cooldown <= 0) return;
@@ -33,13 +34,26 @@ function VerifyOtpForm() {
     return () => clearInterval(timer);
   }, [cooldown]);
 
-  const onFinish = async (values) => {
+  const handleVerify = async (e) => {
+    e.preventDefault();
+    if (!email) {
+      message.error('Please enter your email');
+      return;
+    }
+    if (otp.length !== 6) {
+      setOtpError(true);
+      message.error('Please enter the full 6-digit code');
+      return;
+    }
+
+    setOtpError(false);
     setLoading(true);
     try {
-      await verifyOtp({ email: values.email, otp: values.otp });
+      await verifyOtp({ email, otp });
       message.success('Email verified! You are now logged in.');
       router.push('/');
     } catch (error) {
+      setOtpError(true);
       message.error(error?.response?.data?.message || 'Invalid or expired code. Please try again.');
     } finally {
       setLoading(false);
@@ -47,7 +61,6 @@ function VerifyOtpForm() {
   };
 
   const onResend = async () => {
-    const email = form.getFieldValue('email');
     if (!email) {
       message.error('Please enter your email first');
       return;
@@ -71,37 +84,58 @@ function VerifyOtpForm() {
       transition={{ duration: 0.5 }}
     >
       <div className="text-center mb-8">
+        <div className="w-14 h-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mx-auto mb-4 text-2xl">
+          <MailOutlined />
+        </div>
         <h1 className="text-3xl font-bold text-text">Verify Your Email</h1>
-        <p className="text-text-muted mt-2">Enter the 6-digit code we emailed you</p>
+
+        {editingEmail ? (
+          <p className="text-text-muted mt-2">Enter your email to get a 6-digit code</p>
+        ) : (
+          <p className="text-text-muted mt-2">
+            We sent a 6-digit code to <span className="text-text font-medium">{email}</span>
+          </p>
+        )}
       </div>
 
-      <Form
-        form={form}
-        name="verify-otp"
-        layout="vertical"
-        onFinish={onFinish}
-        autoComplete="off"
-        requiredMark={false}
-      >
-        <Form.Item
-          name="email"
-          rules={[
-            { required: true, message: 'Please enter your email' },
-            { type: 'email', message: 'Please enter a valid email' },
-          ]}
-        >
-          <Input icon={<MailOutlined />} placeholder="Email address" />
-        </Form.Item>
+      <form onSubmit={handleVerify}>
+        {editingEmail ? (
+          <div className="mb-6">
+            <Input
+              icon={<MailOutlined />}
+              placeholder="Email address"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              type="email"
+            />
+            {emailParam && (
+              <button
+                type="button"
+                onClick={() => { setEmail(emailParam); setEditingEmail(false); }}
+                className="text-xs text-text-muted hover:text-text-secondary mt-2"
+              >
+                ← Use {emailParam}
+              </button>
+            )}
+          </div>
+        ) : (
+          <div className="text-center mb-6">
+            <button
+              type="button"
+              onClick={() => setEditingEmail(true)}
+              className="inline-flex items-center gap-1.5 text-xs text-text-muted hover:text-primary transition-colors"
+            >
+              <EditOutlined /> Not your email? Change it
+            </button>
+          </div>
+        )}
 
-        <Form.Item
-          name="otp"
-          rules={[
-            { required: true, message: 'Please enter the code' },
-            { len: 6, message: 'Code must be 6 digits' },
-          ]}
-        >
-          <Input icon={<NumberOutlined />} placeholder="6-digit code" maxLength={6} inputMode="numeric" />
-        </Form.Item>
+        <OtpInput
+          value={otp}
+          onChange={(value) => { setOtp(value); setOtpError(false); }}
+          error={otpError}
+          className="mb-8"
+        />
 
         <Button type="submit" size="lg" fullWidth loading={loading}>
           Verify
@@ -124,7 +158,7 @@ function VerifyOtpForm() {
             ← Back to login
           </Link>
         </div>
-      </Form>
+      </form>
     </motion.div>
   );
 }
