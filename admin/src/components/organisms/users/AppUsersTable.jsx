@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Modal, Descriptions, Form, Input, Select, message } from 'antd';
+import { Modal, Descriptions, Form, Input, Select, Tag, message } from 'antd';
 import PageHeading from '../../atoms/PageHeading';
 import SearchBar from '../../molecules/SearchBar';
 import RowActions from '../../molecules/RowActions';
@@ -15,6 +15,17 @@ const STATUS_OPTIONS = [
     { label: 'Inactive', value: 'inactive' },
     { label: 'Blocked', value: 'blocked' },
 ];
+
+const PROVIDER_OPTIONS = [
+    { label: 'App', value: 'app' },
+    { label: 'Google', value: 'google' },
+];
+
+const ProviderTag = ({ provider }) => (
+    <Tag color={provider === 'google' ? 'blue' : 'default'} className="capitalize">
+        {provider === 'google' ? 'Google' : 'App'}
+    </Tag>
+);
 
 const toRow = (user) => ({ ...user, joinedDate: user.createdAt?.slice(0, 10) });
 
@@ -90,6 +101,13 @@ function AppUsersTableInner({ testingMode }) {
         { title: 'Phone', dataIndex: 'phone' },
         { title: 'Joined Date', dataIndex: 'joinedDate', sorter: (a, b) => (a.joinedDate ?? '').localeCompare(b.joinedDate ?? '') },
         {
+            title: 'Login Via',
+            dataIndex: 'provider',
+            filters: PROVIDER_OPTIONS.map(({ label, value }) => ({ text: label, value })),
+            onFilter: (value, record) => record.provider === value,
+            render: (provider) => <ProviderTag provider={provider} />,
+        },
+        {
             title: 'Status',
             dataIndex: 'status',
             filters: STATUS_OPTIONS.map(({ label, value }) => ({ text: label, value })),
@@ -124,6 +142,7 @@ function AppUsersTableInner({ testingMode }) {
                         <Descriptions.Item label="Email">{viewing.email}</Descriptions.Item>
                         <Descriptions.Item label="Phone">{viewing.phone || '—'}</Descriptions.Item>
                         <Descriptions.Item label="Joined Date">{viewing.joinedDate}</Descriptions.Item>
+                        <Descriptions.Item label="Login Via"><ProviderTag provider={viewing.provider} /></Descriptions.Item>
                         <Descriptions.Item label="Status"><StatusTag status={viewing.status} /></Descriptions.Item>
                     </Descriptions>
                 )}

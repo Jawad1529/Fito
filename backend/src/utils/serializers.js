@@ -6,6 +6,9 @@ export const toPublicUser = (user) => ({
     email: user.email,
     phone: user.phone,
     status: user.status,
+    // Derived rather than stored: accounts with a googleId signed up (or later
+    // linked) via "Sign in with Google"; everyone else registered in-app.
+    provider: user.googleId ? 'google' : 'app',
     createdAt: user.createdAt,
 });
 

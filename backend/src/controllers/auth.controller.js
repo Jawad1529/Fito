@@ -304,7 +304,9 @@ export const googleAuth = asyncHandler(async (req, res) => {
             await user.save();
         } else {
             user = await User.create({
-                name: payload.name || payload.email.split('@')[0],
+                // Use the email's local part rather than Google's display name so
+                // app-user names stay consistent/scannable in the admin panel.
+                name: payload.email.split('@')[0],
                 email: payload.email,
                 googleId: payload.sub,
                 isEmailVerified: true,
