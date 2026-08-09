@@ -10,6 +10,7 @@ import Button from '../atoms/Button';
 import Badge from '../atoms/Badge';
 import { Text } from '../atoms/Typography';
 import NotificationItem from '../molecules/NotificationItem';
+import SearchBar from '../molecules/SearchBar';
 import useCart from '../../hooks/useCart';
 import useAuth from '../../hooks/useAuth';
 import useTestingMode from '../../hooks/useTestingMode';
@@ -182,9 +183,7 @@ export default function Navbar() {
                   <Switch size="small" checked={testingMode} onChange={setTestingMode} />
                 </div>
               </Tooltip>
-              <button aria-label="Search" className="text-text-secondary hover:text-text transition-colors">
-                <Icon name="search" className="w-5 h-5" />
-              </button>
+              <SearchBar />
               {canSeeNotifications && (
                 <Badge count={unreadCount}>
                   <Popover
@@ -227,9 +226,7 @@ export default function Navbar() {
 
             {/* Compact controls below lg: search + menu only */}
             <div className="flex lg:hidden items-center space-x-4">
-              <button aria-label="Search" className="text-text-secondary hover:text-text transition-colors">
-                <Icon name="search" className="w-5 h-5" />
-              </button>
+              <SearchBar />
               <button aria-label="Open menu" className="text-text" onClick={() => setMobileOpen(true)}>
                 <Icon name="menu" className="w-6 h-6" />
               </button>
