@@ -58,18 +58,18 @@ function StarIcon({ className }) {
 }
 
 const trustSignals = [
-  { Icon: ShieldIcon, label: 'Certified Experts' },
-  { Icon: FlaskIcon, label: 'Lab-Tested Formulas' },
-  { Icon: UsersIcon, label: 'Clients Coached', stat: '10,000+' },
-  { Icon: StarIcon, label: 'Avg. Rating', stat: '4.9/5' },
+  { Icon: UsersIcon, label: 'Clients Transformed', stat: '1,000+' },
+  { Icon: FlaskIcon, label: 'Clinical & Coaching Experience', stat: '8+ Years' },
+  { Icon: ShieldIcon, label: 'Home & Gym Program Options' },
+  { Icon: StarIcon, label: 'Titles Won by Our Coaching Team', stat: 'Multiple' },
 ];
 
-const goals = ['Fat Loss', 'Muscle Gain', 'PCOS Management', 'Weight Gain', 'Peak Performance'];
+const goals = ['Fat Loss', 'Muscle Gain', 'Diabetes Reversal', 'PCOS & More'];
 
 const processSteps = [
-  { n: '01', label: 'Consult', desc: 'Talk to a certified coach' },
-  { n: '02', label: 'Personalize', desc: 'Get your plan and your stack' },
-  { n: '03', label: 'Deliver', desc: 'Track results, adjust fast' },
+  { n: '01', label: 'Consult', desc: 'Talk to a certified coach or clinical dietitian' },
+  { n: '02', label: 'Personalize', desc: 'Get a plan built around your body, goals, and lifestyle' },
+  { n: '03', label: 'Transform', desc: 'Train, eat, and recover with ongoing check-ins' },
 ];
 
 function GoalRotator({ reduceMotion }) {
@@ -166,7 +166,7 @@ export default function Hero() {
             <motion.div variants={fadeUp}>
               <Tag variant="outline" className="mb-6">
                 <Icon name="bolt" className="w-3.5 h-3.5" />
-                Two Disciplines. One Standard.
+                One Ecosystem. Every Goal.
               </Tag>
             </motion.div>
 
@@ -189,15 +189,15 @@ export default function Hero() {
                   animate={reduceMotion ? { opacity: 1 } : { y: '0%' }}
                   transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1], delay: 0.4 }}
                 >
-                  Elite-Grade Fuel.
+                  Elite-Grade Fitoo Fuel.
                 </motion.span>
               </span>
             </h1>
 
             <motion.p variants={fadeUp} className="mt-5 text-lg text-text-secondary max-w-md">
-              A certified nutrition coach in your corner, and lab-tested
-              supplements in your pantry — built by the same team, held to
-              the same standard.
+              Fitoo brings fitness coaching, clinical nutrition, and
+              aesthetic guidance together — so you stop piecing your health
+              together from five different places.
             </motion.p>
 
             <GoalRotator reduceMotion={reduceMotion} />
@@ -212,13 +212,13 @@ export default function Hero() {
                   Book a Consultation
                 </Button>
               </Link>
-              <Link href="/shop" className="sm:flex-1">
+              <Link href="#programs" className="sm:flex-1">
                 <Button
                   variant="primary"
                   size="lg"
                   className="w-full justify-center min-w-[200px] bg-transparent text-primary font-semibold border border-primary/40 hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
                 >
-                  Shop Supplements
+                  Explore Programs
                 </Button>
               </Link>
             </motion.div>
@@ -315,7 +315,7 @@ export default function Hero() {
                 transition={{ duration: 0.5, delay: 1.2 }}
                 className="relative z-10 bg-card border border-primary/30 rounded-full px-4 py-1.5 text-[10px] sm:text-[11px] tracking-[0.18em] uppercase text-primary font-mono whitespace-nowrap"
               >
-                One Standard
+                One Ecosystem
               </motion.div>
             </div>
 

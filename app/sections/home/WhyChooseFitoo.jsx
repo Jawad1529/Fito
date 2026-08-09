@@ -24,6 +24,12 @@ const FeatureIcon = ({ name }) => {
     'headset': (
       <path d="M12 1C7.03 1 3 5.03 3 10v4c0 2.21 1.79 4 4 4h1c.55 0 1-.45 1-1v-5c0-.55-.45-1-1-1H5v-1c0-3.87 3.13-7 7-7s7 3.13 7 7v1h-3c-.55 0-1 .45-1 1v5c0 .55.45 1 1 1h1c2.21 0 4-1.79 4-4v-4c0-4.97-4.03-9-9-9z" />
     ),
+    'home': (
+      <path d="M4 11.5L12 4l8 7.5V20a1 1 0 01-1 1h-4v-6H9v6H5a1 1 0 01-1-1v-8.5z" />
+    ),
+    'leaf': (
+      <path d="M20 4C10 4 4 10 4 18v2h2c8 0 14-6 14-16V4zM6 20c0-4 2-8 8-10" />
+    ),
   };
 
   return (
@@ -43,40 +49,40 @@ const FeatureIcon = ({ name }) => {
 
 const features = [
   {
-    id: 'experts',
-    icon: 'shield-check',
-    title: 'Certified Nutrition Experts',
-    description: 'Our team holds advanced degrees and certifications in sports nutrition.',
+    id: 'root-cause',
+    icon: 'flask',
+    title: 'Root-Cause, Not Quick-Fix',
+    description: 'We address the underlying issue — hormones, metabolism, lifestyle — not just the symptom.',
   },
   {
-    id: 'authentic',
-    icon: 'flask',
-    title: '100% Authentic Supplements',
-    description: 'Every product is tested for purity, potency, and safety in third‑party labs.',
+    id: 'clinical-practical',
+    icon: 'clipboard',
+    title: 'Clinical Nutrition + Practical Fitness',
+    description: 'A qualified dietitian and certified trainers working from the same plan, not separate services.',
   },
   {
     id: 'personalized',
-    icon: 'clipboard',
-    title: 'Personalized Diet Plans',
-    description: 'Custom meal and supplement plans designed for your unique goals and body.',
+    icon: 'shield-check',
+    title: 'Personalized Programs',
+    description: 'No generic templates — every plan is built around your body and goals.',
   },
   {
-    id: 'delivery',
-    icon: 'truck',
-    title: 'Fast Delivery',
-    description: 'Express shipping with real‑time tracking so you never wait too long.',
+    id: 'flexibility',
+    icon: 'home',
+    title: 'Home & Gym Flexibility',
+    description: 'Train and eat well wherever you are.',
   },
   {
-    id: 'payments',
-    icon: 'credit-card',
-    title: 'Secure Payments',
-    description: 'All transactions are encrypted and processed through trusted gateways.',
+    id: 'ethical',
+    icon: 'leaf',
+    title: 'Ethical, Sustainable Methods',
+    description: 'Science-backed change, never restrictive shortcuts or fad promises.',
   },
   {
     id: 'support',
     icon: 'headset',
-    title: 'Customer Support',
-    description: 'Dedicated support team ready to assist you 7 days a week.',
+    title: 'Ongoing Support',
+    description: 'Real check-ins and plan adjustments as your results come in.',
   },
 ];
 
@@ -87,7 +93,8 @@ export default function WhyChooseFitoo() {
         <div className="text-center mb-12 reveal">
           <H2>Why Choose Fitoo</H2>
           <Text muted className="mt-3 max-w-xl mx-auto">
-            We combine science, quality, and care to deliver the best nutrition experience.
+            We combine clinical science, real coaching experience, and personal care to deliver
+            results that last.
           </Text>
         </div>
 

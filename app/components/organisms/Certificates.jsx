@@ -28,10 +28,10 @@ export default function Certificates() {
   return (
     <section className="relative py-20 section-defer">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center mb-12">
-        <H2>Trusted &amp; Certified</H2>
+        <H2>Expert-Led, Not Guesswork</H2>
         <Text muted className="mt-3 max-w-xl mx-auto">
-          Every product is third-party tested and certified to the highest industry standards, so
-          you know exactly what you&apos;re putting in your body.
+          Every program at Fitoo is built by qualified practitioners — not influencers repeating
+          trends.
         </Text>
       </div>
 

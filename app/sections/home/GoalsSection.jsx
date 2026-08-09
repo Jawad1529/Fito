@@ -11,42 +11,44 @@ import diabeticPatientsIcon from '../../assets/icons/diabetic-Patients.svg';
 
 // Kept in sync with CONSULTATION_GOALS ids in utils/consultationConfig.js —
 // clicking a card jumps straight into that goal's step in /consultation.
+// Aesthetic Goals and Competition Prep have no matching consultation flow
+// step yet, so those two link to the general /consultation entry point.
 const goals = [
   {
     id: 'fat-loss',
     image: fatLossIcon,
     title: 'Fat Loss',
-    description: 'Lose body fat with a personalized nutrition plan.',
+    description: 'Lose body fat with a personalized nutrition and training plan.',
   },
   {
     id: 'muscle-gain',
     image: muscleGainIcon,
     title: 'Muscle Gain',
-    description: 'Build lean muscle and increase strength.',
+    description: 'Build lean muscle and strength with structured, goal-oriented coaching.',
   },
   {
     id: 'body-recomposition',
     image: bodyRecompositionIcon,
     title: 'Body Recomposition',
-    description: 'Build muscle while reducing body fat.',
+    description: 'Build muscle while reducing fat, guided by clinical nutrition.',
   },
   {
     id: 'pcos',
     image: pcosIcon,
     title: 'PCOS',
-    description: 'Nutrition guidance for managing PCOS symptoms.',
-  },
-  {
-    id: 'mother-wellness',
-    image: motherWellnessIcon,
-    title: 'Mother Wellness',
-    description: 'Nutrition support for pregnancy, postpartum & breastfeeding.',
+    description: 'Hormonal health support and nutrition guidance for managing PCOS symptoms.',
   },
   {
     id: 'diabetes',
     image: diabeticPatientsIcon,
-    title: 'Diabetic Patients',
-    description: 'Nutrition guidance for managing blood sugar and diabetes.',
+    title: 'Diabetes Reversal',
+    description: 'Reverse insulin resistance and improve metabolic markers with a clinical program.',
+  },
+  {
+    id: 'mother-wellness',
+    image: motherWellnessIcon,
+    title: 'Mother & Child Wellness',
+    description: 'Nutrition and fitness support through pregnancy, postpartum, and beyond.',
   },
 ];
 
@@ -60,7 +62,7 @@ export default function GoalsSection() {
         <div className="text-center mb-12 reveal">
           <H2>What&apos;s Your Goal?</H2>
           <Text muted className="mt-3 max-w-xl mx-auto">
-            Pick your goal and we&apos;ll drop you straight into the matching consultation flow.
+            Pick your goal and we&apos;ll match you with the right program and practitioner.
           </Text>
         </div>
 
@@ -71,7 +73,7 @@ export default function GoalsSection() {
           {goals.map((goal) => (
             <Link
               key={goal.id}
-              href={`/consultation?goal=${goal.id}`}
+              href={goal.noFlow ? '/consultation' : `/consultation?goal=${goal.id}`}
               className="relative block group glass border border-border-light rounded-2xl p-6 text-center hover-lift hover-lift-sm hover:border-primary/30"
             >
               <div className="flex justify-center mb-4">

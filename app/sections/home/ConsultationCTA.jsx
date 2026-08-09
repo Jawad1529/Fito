@@ -66,11 +66,11 @@ export default function ConsultationCTA() {
 
             <div className="mt-8 text-center lg:text-left">
               <H2 className="text-3xl sm:text-4xl lg:text-5xl">
-                Not sure what supplements are right for you?
+                Not Sure Where to Start?
               </H2>
               <Text size="lg" className="mt-4 max-w-lg">
-                Let our nutrition experts build a personalized diet plan based
-                on your body goals.
+                Talk to our coaching and clinical team — we&apos;ll build a plan
+                based on your goals, your body, and your lifestyle.
               </Text>
             </div>
           </div>
