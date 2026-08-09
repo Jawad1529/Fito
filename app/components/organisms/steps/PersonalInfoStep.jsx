@@ -31,6 +31,23 @@ const BMI_CATEGORIES = [
   { max: Infinity, label: 'Obese', color: '#EF4444' },
 ];
 
+const cmToFeetInches = (cm) => {
+  if (!cm) return { feet: '', inches: '' };
+  const totalInches = cm / 2.54;
+  let feet = Math.floor(totalInches / 12);
+  let inches = Math.round(totalInches % 12);
+  if (inches === 12) {
+    feet += 1;
+    inches = 0;
+  }
+  return { feet, inches };
+};
+
+const feetInchesToCm = (feet, inches) => {
+  const totalInches = (Number(feet) || 0) * 12 + (Number(inches) || 0);
+  return totalInches > 0 ? Math.round(totalInches * 2.54) : null;
+};
+
 export default function PersonalInfoStep({
   formData,
   updateField,
@@ -42,6 +59,16 @@ export default function PersonalInfoStep({
   }, [formData.height, formData.weight]);
 
   const bmiCategory = bmi ? BMI_CATEGORIES.find((c) => bmi < c.max) : null;
+
+  const { feet: heightFeet, inches: heightInches } = cmToFeetInches(formData.height);
+
+  const updateHeightFeet = (feet) => {
+    updateField('height', feetInchesToCm(feet, heightInches));
+  };
+
+  const updateHeightInches = (inches) => {
+    updateField('height', feetInchesToCm(heightFeet, inches));
+  };
 
   return (
     <div className="space-y-6!">
@@ -154,24 +181,19 @@ export default function PersonalInfoStep({
           <div>
             <H5 className="mb-4">Height</H5>
 
-            <div className="flex flex-col gap-3">
-              <Slider
-                min={120}
-                max={220}
-                value={formData.height}
-                onChange={(value)=>updateField("height",value)}
+            <div className="grid grid-cols-2 gap-3">
+              <Input
+                type="number"
+                suffix="ft"
+                value={heightFeet}
+                onChange={(e)=>updateHeightFeet(e.target.value)}
               />
 
               <Input
                 type="number"
-                suffix="cm"
-                value={formData.height}
-                onChange={(e)=>
-                  updateField(
-                    "height",
-                    Number(e.target.value)
-                  )
-                }
+                suffix="in"
+                value={heightInches}
+                onChange={(e)=>updateHeightInches(e.target.value)}
               />
             </div>
           </div>
