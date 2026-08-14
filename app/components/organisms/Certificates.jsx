@@ -21,7 +21,7 @@ const certificates = [
   { name: 'ISO 9001:2015', img: isoIcon },
   { name: 'Halal Certified', img: halalIcon },
   { name: 'Quality Assured', img: qualityIcon },
-  { name: 'Time-Tested Formulas', img: timeTestedIcon },
+  { name: 'Lab-Tested Formulas', img: timeTestedIcon },
 ];
 
 // Duplicate the list once so the marquee can loop seamlessly at -50%.
