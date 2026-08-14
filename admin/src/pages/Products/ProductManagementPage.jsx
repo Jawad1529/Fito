@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Modal, Descriptions, Image, Button, message } from 'antd';
+import { Modal, Descriptions, Image, Button, Tag, message } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import PageHeading from '../../components/atoms/PageHeading';
 import SearchBar from '../../components/molecules/SearchBar';
@@ -22,6 +22,14 @@ import {
 } from '../../api/adminProducts.api';
 
 const apiError = (err, fallback) => err?.response?.data?.message || fallback;
+
+// The real API already includes `discountedPrice`; mock/testing-mode products
+// don't, so it's derived here from price + discountPercent when missing.
+const finalPrice = (product) =>
+    product.discountedPrice ??
+    (product.discountPercent > 0
+        ? Math.round(product.price * (1 - product.discountPercent / 100) * 100) / 100
+        : product.price);
 
 export default function ProductManagementPage() {
     const { testingMode } = useTestingMode();
@@ -125,7 +133,23 @@ function ProductManagementPageInner({ testingMode }) {
             title: 'Price',
             dataIndex: 'price',
             sorter: testingMode ? (a, b) => a.price - b.price : undefined,
-            render: (p) => `Rs. ${p.toFixed(2)}`,
+            render: (p, record) =>
+                record.discountPercent > 0 ? (
+                    <span className="text-gray-400 line-through">{`Rs. ${p.toFixed(2)}`}</span>
+                ) : (
+                    `Rs. ${p.toFixed(2)}`
+                ),
+        },
+        {
+            title: 'Discount',
+            dataIndex: 'discountPercent',
+            render: (discountPercent) =>
+                discountPercent > 0 ? <Tag color="green">{discountPercent}% off</Tag> : <Tag>None</Tag>,
+        },
+        {
+            title: 'Final Price',
+            key: 'finalPrice',
+            render: (_, record) => <span className="font-semibold">{`Rs. ${finalPrice(record).toFixed(2)}`}</span>,
         },
         { title: 'Stock', dataIndex: 'stock', sorter: testingMode ? (a, b) => a.stock - b.stock : undefined },
         { title: 'Rating', dataIndex: 'rating', render: (r) => <RatingStars rating={r ?? 0} /> },
@@ -197,7 +221,17 @@ function ProductManagementPageInner({ testingMode }) {
                         <Descriptions column={1} bordered size="small">
                             <Descriptions.Item label="Name">{viewing.name}</Descriptions.Item>
                             <Descriptions.Item label="Category">{viewing.category}</Descriptions.Item>
-                            <Descriptions.Item label="Price">{`Rs. ${viewing.price.toFixed(2)}`}</Descriptions.Item>
+                            <Descriptions.Item label="Price">
+                                {viewing.discountPercent > 0 ? (
+                                    <>
+                                        <span className="text-gray-400 line-through mr-2">{`Rs. ${viewing.price.toFixed(2)}`}</span>
+                                        <span className="font-semibold">{`Rs. ${finalPrice(viewing).toFixed(2)}`}</span>
+                                        <Tag color="green" className="ml-2">{viewing.discountPercent}% off</Tag>
+                                    </>
+                                ) : (
+                                    `Rs. ${viewing.price.toFixed(2)}`
+                                )}
+                            </Descriptions.Item>
                             <Descriptions.Item label="Stock">{viewing.stock}</Descriptions.Item>
                             <Descriptions.Item label="Rating">
                                 <RatingStars rating={viewing.rating ?? 0} /> ({viewing.reviews ?? 0} reviews)

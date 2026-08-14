@@ -1,8 +1,9 @@
 import asyncHandler from '../utils/asyncHandler.js';
 import Consultation from '../models/Consultation.model.js';
+import ConsultationPlan from '../models/ConsultationPlan.model.js';
 import { CONSULTATION_GOALS } from '../constants/consultationGoals.js';
 import { REPLY_AUTHOR } from '../constants/contentStatus.js';
-import { toPublicConsultation } from '../utils/serializers.js';
+import { toPublicConsultation, computeDiscountedPrice } from '../utils/serializers.js';
 import { toImageUrl } from '../middleware/upload.middleware.js';
 
 // Multipart bodies arrive as strings, so JSON fields need parsing. Returns
@@ -33,7 +34,7 @@ const findMyConsultationOr404 = async (id, userId) => {
 // goalData (JSON), transactionId, plus file fields bodyPhotos/reports/paymentScreenshot.
 export const createConsultation = asyncHandler(async (req, res) => {
     const { goal, transactionId } = req.body;
-    const plan = parseJson(req.body.plan, null);
+    const submittedPlan = parseJson(req.body.plan, null);
     const personalInfo = parseJson(req.body.personalInfo, null);
     const goalData = parseJson(req.body.goalData, {});
 
@@ -44,6 +45,26 @@ export const createConsultation = asyncHandler(async (req, res) => {
     if (!personalInfo?.fullName || !personalInfo?.email || !personalInfo?.phone) {
         res.status(400);
         throw new Error('Personal info must include fullName, email and phone');
+    }
+
+    // The price actually charged is looked up from the admin-managed
+    // ConsultationPlan collection rather than trusted from the client, so a
+    // tampered `plan.price` in the request can't change what gets billed.
+    let plan = null;
+    if (submittedPlan?.id) {
+        const planDoc = await ConsultationPlan.findOne({ goal, planId: submittedPlan.id });
+        if (!planDoc) {
+            res.status(400);
+            throw new Error('Invalid plan selected');
+        }
+        const discountedPrice = computeDiscountedPrice(planDoc.price, planDoc.discountPercent);
+        plan = {
+            id: planDoc.planId,
+            label: planDoc.label,
+            durationMonths: planDoc.durationMonths,
+            price: discountedPrice,
+            originalPrice: planDoc.discountPercent > 0 ? planDoc.price : undefined,
+        };
     }
 
     const files = req.files ?? {};

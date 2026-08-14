@@ -4,6 +4,7 @@ export const products = [
         name: 'Whey Protein Isolate',
         category: 'Protein Powders',
         price: 49.99,
+        discountPercent: 20,
         stock: 120,
         rating: 4.8,
         reviews: 342,

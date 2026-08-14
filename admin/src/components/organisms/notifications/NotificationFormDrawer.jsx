@@ -25,6 +25,7 @@ export default function NotificationFormDrawer({ open, onClose, onSubmit, initia
             onClose={onClose}
             title={initialValues ? 'Edit Notification' : 'New Notification'}
             width={460}
+            rootClassName="mobile-full-drawer"
             destroyOnHidden
             extra={
                 <Button type="primary" loading={saving} onClick={() => form.submit()}>

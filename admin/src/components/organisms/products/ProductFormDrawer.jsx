@@ -48,6 +48,7 @@ export default function ProductFormDrawer({
             onClose={onClose}
             title={initialValues ? 'Edit Product' : 'Create Product'}
             width={420}
+            rootClassName="mobile-full-drawer"
             destroyOnHidden
             extra={
                 <Button type="primary" loading={saving} onClick={() => form.submit()}>
@@ -66,6 +67,15 @@ export default function ProductFormDrawer({
 
                 <Form.Item name="price" label="Price (Rs.)" rules={[{ required: true }]}>
                     <InputNumber min={0} step={0.01} className="w-full" />
+                </Form.Item>
+
+                <Form.Item
+                    name="discountPercent"
+                    label="Discount (%)"
+                    initialValue={0}
+                    tooltip="Shown as a struck-through original price on the storefront."
+                >
+                    <InputNumber min={0} max={100} step={1} className="w-full" />
                 </Form.Item>
 
                 <Form.Item name="stock" label="Stock" rules={[{ required: true }]}>

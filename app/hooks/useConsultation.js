@@ -87,7 +87,11 @@ export default function useConsultation(initialGoal = null) {
             id: selectedPlan.id,
             label: selectedPlan.label,
             durationMonths: selectedPlan.durationMonths,
-            price: selectedPlan.price,
+            // The real API re-derives this from the admin-managed plan price
+            // and ignores what's sent here; testing mode (no backend) has
+            // nothing else to fall back on, so send the actual charged amount.
+            price: selectedPlan.discountedPrice ?? selectedPlan.price,
+            originalPrice: selectedPlan.discountPercent > 0 ? selectedPlan.price : undefined,
           }
         : null;
       const personalInfo = {

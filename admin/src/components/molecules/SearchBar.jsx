@@ -9,7 +9,7 @@ export default function SearchBar({ value, onChange, placeholder = 'Search...' }
             placeholder={placeholder}
             value={value}
             onChange={(e) => onChange(e.target.value)}
-            className="max-w-xs"
+            className="w-full sm:max-w-xs"
         />
     );
 }

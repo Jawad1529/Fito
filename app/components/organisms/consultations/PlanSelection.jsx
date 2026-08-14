@@ -41,6 +41,8 @@ export default function PlanSelection({
         {plans.map((plan) => {
 
           const isSelected = selectedPlan?.id === plan.id;
+          const hasDiscount = plan.discountPercent > 0;
+          const chargedPrice = plan.discountedPrice ?? plan.price;
 
           return (
             <Card
@@ -94,12 +96,24 @@ export default function PlanSelection({
 
                 <Caption>{plan.label} Plan</Caption>
 
-                <H3 className="mt-1 mb-1">
-                  {formatPrice(plan.price)}
-                </H3>
+                <div className="flex items-center gap-2 mt-1 mb-1">
+                  <H3 className="m-0">
+                    {formatPrice(chargedPrice)}
+                  </H3>
+                  {hasDiscount && (
+                    <>
+                      <Text muted className="line-through">
+                        {formatPrice(plan.price)}
+                      </Text>
+                      <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-success/10 text-success">
+                        {plan.discountPercent}% off
+                      </span>
+                    </>
+                  )}
+                </div>
 
                 <Text muted className="mb-4">
-                  {formatPrice(Math.round(plan.price / plan.durationMonths))} / month
+                  {formatPrice(Math.round(chargedPrice / plan.durationMonths))} / month
                 </Text>
 
                 {plan.bestFor && (

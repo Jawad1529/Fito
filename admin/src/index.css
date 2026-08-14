@@ -50,3 +50,24 @@ body {
 .row-highlight > td {
   animation: row-highlight-fade 2.5s ease-out forwards;
 }
+
+/* Mobile: modals shrink to fit the viewport instead of overflowing it. */
+@media (max-width: 640px) {
+  .ant-modal {
+    max-width: calc(100vw - 24px);
+    top: 16px;
+    padding-bottom: 16px;
+  }
+
+  .ant-modal-content {
+    width: 100%;
+  }
+
+  /* Form drawers (create/edit panels) go full-width on mobile instead of
+     rendering at their fixed desktop px width, which would otherwise leave
+     the form too narrow to use. The nav drawer keeps its own narrower width
+     since it's a menu, not a form. */
+  .mobile-full-drawer .ant-drawer-content-wrapper {
+    width: 100vw !important;
+  }
+}

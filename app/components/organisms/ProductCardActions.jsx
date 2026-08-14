@@ -14,6 +14,8 @@ import useCart from '../../hooks/useCart';
 function ProductCardActions({ product, isWishlisted = false, onToggleWishlist }) {
     const { addToCart, isInCart } = useCart();
     const inCart = isInCart(product.id);
+    const hasDiscount = product.discountPercent > 0;
+    const chargedPrice = product.discountedPrice ?? product.price;
 
     return (
         <>
@@ -30,8 +32,15 @@ function ProductCardActions({ product, isWishlisted = false, onToggleWishlist })
                 />
             </button>
 
-            <div className="relative z-10 mt-4 flex items-center justify-between">
-                <span className="text-xl font-bold text-text">PKR {product.price.toFixed(2)}</span>
+            <div className="relative z-10 mt-4 flex items-center justify-between gap-2">
+                <div className="flex items-center gap-1.5 flex-wrap min-w-0">
+                    <span className="text-xl font-bold text-text">PKR {chargedPrice.toFixed(2)}</span>
+                    {hasDiscount && (
+                        <span className="text-xs text-text-muted line-through">
+                            PKR {product.price.toFixed(2)}
+                        </span>
+                    )}
+                </div>
                 <Button
                     variant={inCart ? 'outline' : 'primary'}
                     size="sm"

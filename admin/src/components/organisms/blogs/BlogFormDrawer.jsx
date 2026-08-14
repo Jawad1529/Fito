@@ -49,6 +49,7 @@ export default function BlogFormDrawer({
             onClose={onClose}
             title={initialValues ? 'Edit Blog' : 'Create Blog'}
             width={460}
+            rootClassName="mobile-full-drawer"
             destroyOnHidden
             extra={
                 <Button type="primary" loading={saving} onClick={() => form.submit()}>

@@ -1,3 +1,10 @@
+// Shared by Product and ConsultationPlan — `price` is always the raw,
+// admin-edited base price; this is the amount actually charged once a
+// discount is applied. Rounded to 2 decimals, matching the precision prices
+// are entered/displayed with elsewhere in this app.
+export const computeDiscountedPrice = (price, discountPercent) =>
+    discountPercent > 0 ? Math.round(price * (1 - discountPercent / 100) * 100) / 100 : price;
+
 // Shared response shapes so User/Admin documents are serialized the same
 // way everywhere they're returned (auth, admin user management, etc).
 export const toPublicUser = (user) => ({
@@ -42,6 +49,10 @@ export const toPublicProduct = (product) => ({
     name: product.name,
     category: product.category,
     price: product.price,
+    discountPercent: product.discountPercent ?? 0,
+    // Amount actually charged — the app shows `price` struck through beside
+    // this whenever discountPercent > 0.
+    discountedPrice: computeDiscountedPrice(product.price, product.discountPercent ?? 0),
     stock: product.stock,
     description: product.description,
     image: product.images?.[0],
@@ -130,6 +141,18 @@ export const toPublicConsultation = (consultation) => ({
     submittedAt: consultation.createdAt,
     createdAt: consultation.createdAt,
     updatedAt: consultation.updatedAt,
+});
+
+// Same discount shape as toPublicProduct: `price` is the admin-edited base
+// price, `discountedPrice` the amount actually charged.
+export const toPublicConsultationPlan = (plan) => ({
+    id: plan.planId,
+    goal: plan.goal,
+    label: plan.label,
+    durationMonths: plan.durationMonths,
+    price: plan.price,
+    discountPercent: plan.discountPercent ?? 0,
+    discountedPrice: computeDiscountedPrice(plan.price, plan.discountPercent ?? 0),
 });
 
 export const toPublicReview = (review) => ({

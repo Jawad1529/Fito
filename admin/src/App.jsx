@@ -12,6 +12,7 @@ import DashboardPage from './pages/Dashboard/DashboardPage';
 import UserManagementPage from './pages/Users/UserManagementPage';
 import ConsultationManagementPage from './pages/Consultations/ConsultationManagementPage';
 import ConsultationDetailPage from './pages/Consultations/ConsultationDetailPage';
+import ConsultationPlanManagementPage from './pages/ConsultationPlans/ConsultationPlanManagementPage';
 import ProductManagementPage from './pages/Products/ProductManagementPage';
 import BlogManagementPage from './pages/Blogs/BlogManagementPage';
 import NotificationManagementPage from './pages/Notifications/NotificationManagementPage';
@@ -69,6 +70,7 @@ export default function App() {
                   <Route path={ROUTES.DASHBOARD} element={<DashboardPage />} />
                   <Route path={ROUTES.CONSULTATIONS} element={<ConsultationManagementPage />} />
                   <Route path={ROUTES.CONSULTATION_DETAIL} element={<ConsultationDetailPage />} />
+                  <Route path={ROUTES.CONSULTATION_PLANS} element={<ConsultationPlanManagementPage />} />
                   <Route path={ROUTES.PRODUCTS} element={<ProductManagementPage />} />
                   <Route path={ROUTES.BLOGS} element={<BlogManagementPage />} />
                   <Route path={ROUTES.NOTIFICATIONS} element={<NotificationManagementPage />} />

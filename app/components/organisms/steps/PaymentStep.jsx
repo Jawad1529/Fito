@@ -71,6 +71,8 @@ export default function PaymentStep({
   selectedPlan,
 }) {
   const uploads = formData.uploads || {};
+  const hasDiscount = selectedPlan?.discountPercent > 0;
+  const chargedPrice = selectedPlan ? selectedPlan.discountedPrice ?? selectedPlan.price : null;
 
   const handlePaymentUpload = (files) => {
     updateField("uploads", {
@@ -106,15 +108,28 @@ export default function PaymentStep({
           {selectedPlan ? `${selectedPlan.label} Plan` : "Consultation Fee"}
         </Text>
 
-        <div className="text-4xl font-bold text-primary">
-          {selectedPlan
-            ? `Rs. ${selectedPlan.price.toLocaleString("en-US")}`
-            : "Rs. 2,500"}
+        <div className="flex items-center gap-2 flex-wrap">
+          <div className="text-4xl font-bold text-primary">
+            {selectedPlan
+              ? `Rs. ${chargedPrice.toLocaleString("en-US")}`
+              : "Rs. 2,500"}
+          </div>
+
+          {hasDiscount && (
+            <>
+              <Text muted className="line-through text-lg">
+                Rs. {selectedPlan.price.toLocaleString("en-US")}
+              </Text>
+              <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-success/10 text-success">
+                {selectedPlan.discountPercent}% off
+              </span>
+            </>
+          )}
         </div>
 
         {selectedPlan?.durationMonths && (
           <Text muted className="text-sm mt-1">
-            Rs. {Math.round(selectedPlan.price / selectedPlan.durationMonths).toLocaleString("en-US")} / month
+            Rs. {Math.round(chargedPrice / selectedPlan.durationMonths).toLocaleString("en-US")} / month
             {' · '}{selectedPlan.durationMonths} month{selectedPlan.durationMonths > 1 ? 's' : ''}
           </Text>
         )}

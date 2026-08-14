@@ -8,7 +8,7 @@ import { message } from 'antd';
 import useConsultation from '../../../hooks/useConsultation';
 import useAuth from '../../../hooks/useAuth';
 import useTestingMode from '../../../hooks/useTestingMode';
-import { CONSULTATION_GOALS } from '../../../utils/consultationConfig';
+import useConsultationPlans from '../../../hooks/useConsultationPlans';
 
 import GoalSelection from './GoalSelection';
 import PlanSelection from './PlanSelection';
@@ -27,10 +27,11 @@ import { H3, Text } from '../../atoms/Typography';
 export default function ConsultationFlow() {
   const { isAuthenticated } = useAuth();
   const { testingMode } = useTestingMode();
+  const consultationGoals = useConsultationPlans();
 
   const searchParams = useSearchParams();
   const goalParam = searchParams.get('goal');
-  const initialGoal = CONSULTATION_GOALS.some((goal) => goal.id === goalParam)
+  const initialGoal = consultationGoals.some((goal) => goal.id === goalParam)
     ? goalParam
     : null;
 
@@ -54,7 +55,7 @@ export default function ConsultationFlow() {
     isSubmitting,
   } = consultation;
 
-  const selectedGoalConfig = CONSULTATION_GOALS.find(
+  const selectedGoalConfig = consultationGoals.find(
     (goal) => goal.id === selectedGoal
   );
 
@@ -68,7 +69,7 @@ export default function ConsultationFlow() {
   const steps = [
     <GoalSelection
       key="goal"
-      goals={CONSULTATION_GOALS}
+      goals={consultationGoals}
       selectedGoal={selectedGoal}
       onSelect={handleSelectGoal}
     />,

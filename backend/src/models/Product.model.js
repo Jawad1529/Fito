@@ -10,6 +10,9 @@ const productSchema = new mongoose.Schema(
         name: { type: String, required: true, trim: true },
         category: { type: String, required: true, trim: true },
         price: { type: Number, required: true, min: 0 },
+        // Percentage off `price`, shown as a struck-through original price on
+        // the storefront. 0 means no discount.
+        discountPercent: { type: Number, default: 0, min: 0, max: 100 },
         stock: { type: Number, default: 0, min: 0 },
         description: { type: String, required: true, trim: true },
         // First entry of `images` is the primary/thumbnail image. Stored as

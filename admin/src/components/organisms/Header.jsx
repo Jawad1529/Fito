@@ -1,5 +1,5 @@
 import { Avatar, Dropdown } from 'antd';
-import { MenuFoldOutlined, MenuUnfoldOutlined, UserOutlined, LogoutOutlined, SettingOutlined } from '@ant-design/icons';
+import { MenuFoldOutlined, MenuUnfoldOutlined, MenuOutlined, UserOutlined, LogoutOutlined, SettingOutlined } from '@ant-design/icons';
 import { useLocation, useNavigate, matchPath } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { ROLE_LABELS } from '../../constants/roles';
@@ -12,7 +12,7 @@ const getPageTitle = (pathname) => {
     return match?.title ?? '';
 };
 
-export default function Header({ collapsed, onToggle }) {
+export default function Header({ collapsed, isMobile, onToggle }) {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
@@ -34,20 +34,20 @@ export default function Header({ collapsed, onToggle }) {
     ];
 
     return (
-        <header className="h-16 bg-white border-b border-gray-100 flex items-center justify-between px-4 sm:px-6">
-            <div className="flex items-center gap-4 min-w-0">
+        <header className="h-16 bg-white border-b border-gray-100 flex items-center justify-between px-3 sm:px-6 gap-2">
+            <div className="flex items-center gap-2 sm:gap-4 min-w-0">
                 <button
                     type="button"
                     onClick={onToggle}
-                    aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+                    aria-label={isMobile ? 'Open menu' : collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
                     className="text-lg text-gray-600 hover:text-primary hover:bg-gray-50 transition-colors shrink-0 w-9 h-9 rounded-lg flex items-center justify-center -ml-1"
                 >
-                    {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+                    {isMobile ? <MenuOutlined /> : collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
                 </button>
                 <h2 className="text-base sm:text-lg font-semibold text-gray-900 truncate">{pageTitle}</h2>
             </div>
 
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 sm:gap-4 shrink-0">
                 <TestingModeToggle />
                 <Dropdown menu={{ items: menuItems }} trigger={['click']}>
                     <button type="button" className="flex items-center gap-3 cursor-pointer rounded-lg px-2 py-1.5 -mr-2 hover:bg-gray-50 transition-colors">

@@ -32,7 +32,7 @@ export const listProducts = asyncHandler(async (req, res) => {
 
 // POST /api/admin/products (multipart/form-data, field name: images)
 export const createProduct = asyncHandler(async (req, res) => {
-    const { name, category, price, stock, description, status } = req.body;
+    const { name, category, price, discountPercent, stock, description, status } = req.body;
 
     if (!name || !category || !description) {
         res.status(400);
@@ -43,6 +43,11 @@ export const createProduct = asyncHandler(async (req, res) => {
         res.status(400);
         throw new Error('Price must be a non-negative number');
     }
+    const parsedDiscount = parseNumber(discountPercent, 0);
+    if (parsedDiscount < 0 || parsedDiscount > 100) {
+        res.status(400);
+        throw new Error('Discount percent must be between 0 and 100');
+    }
     if (status && !Object.values(PRODUCT_STATUS).includes(status)) {
         res.status(400);
         throw new Error(`Status must be one of: ${Object.values(PRODUCT_STATUS).join(', ')}`);
@@ -52,6 +57,7 @@ export const createProduct = asyncHandler(async (req, res) => {
         name,
         category,
         price: parsedPrice,
+        discountPercent: parsedDiscount,
         stock: parseNumber(stock, 0),
         description,
         status,
@@ -65,7 +71,7 @@ export const createProduct = asyncHandler(async (req, res) => {
 // Newly uploaded files are appended to the gallery; `existingImages` lets the
 // panel drop previously uploaded ones without re-uploading the rest.
 export const updateProduct = asyncHandler(async (req, res) => {
-    const { name, category, price, stock, description, status, existingImages } = req.body;
+    const { name, category, price, discountPercent, stock, description, status, existingImages } = req.body;
 
     const product = await Product.findById(req.params.id);
     if (!product) {
@@ -77,12 +83,20 @@ export const updateProduct = asyncHandler(async (req, res) => {
         res.status(400);
         throw new Error(`Status must be one of: ${Object.values(PRODUCT_STATUS).join(', ')}`);
     }
+    if (discountPercent !== undefined) {
+        const parsedDiscount = parseNumber(discountPercent, product.discountPercent);
+        if (parsedDiscount < 0 || parsedDiscount > 100) {
+            res.status(400);
+            throw new Error('Discount percent must be between 0 and 100');
+        }
+    }
 
     if (name !== undefined) product.name = name;
     if (category !== undefined) product.category = category;
     if (description !== undefined) product.description = description;
     if (status !== undefined) product.status = status;
     if (price !== undefined) product.price = parseNumber(price, product.price);
+    if (discountPercent !== undefined) product.discountPercent = parseNumber(discountPercent, product.discountPercent);
     if (stock !== undefined) product.stock = parseNumber(stock, product.stock);
 
     if (existingImages !== undefined) {

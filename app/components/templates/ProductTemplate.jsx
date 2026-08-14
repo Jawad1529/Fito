@@ -123,7 +123,21 @@ export default function ProductTemplate({ id, initialProduct = null }) {
                             </div>
                         </div>
 
-                        <div className="text-3xl font-bold text-white">PKR {product.price.toFixed(2)}</div>
+                        <div className="flex items-center gap-3 flex-wrap">
+                            <div className="text-3xl font-bold text-white">
+                                PKR {(product.discountedPrice ?? product.price).toFixed(2)}
+                            </div>
+                            {product.discountPercent > 0 && (
+                                <>
+                                    <span className="text-lg text-gray-400 line-through">
+                                        PKR {product.price.toFixed(2)}
+                                    </span>
+                                    <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-green-500/15 text-green-400">
+                                        {product.discountPercent}% off
+                                    </span>
+                                </>
+                            )}
+                        </div>
 
                         <div className="border-t border-white/10 pt-6">
                             <Text className="text-gray-300 leading-relaxed">{product.description}</Text>

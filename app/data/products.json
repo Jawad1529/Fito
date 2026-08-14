@@ -4,6 +4,8 @@
     "name": "Whey Protein Isolate",
     "category": "Protein Powders",
     "price": 49.99,
+    "discountPercent": 20,
+    "discountedPrice": 39.99,
     "rating": 4.8,
     "reviews": 342,
     "image": "https://img.magnific.com/free-photo/protein-gym_23-2151980040.jpg?semt=ais_hybrid&w=740&q=80",

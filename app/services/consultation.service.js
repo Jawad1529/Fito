@@ -41,3 +41,10 @@ export const sendConsultationMessage = async (id, message) => {
   const { data } = await apiClient.post(`/consultations/${id}/messages`, { message });
   return data.consultation;
 };
+
+// Admin-managed prices/discounts for the 18 (goal, duration) plans — no auth
+// required, unlike the rest of this file.
+export const getConsultationPlans = async () => {
+  const { data } = await apiClient.get('/consultation-plans');
+  return data.plans;
+};

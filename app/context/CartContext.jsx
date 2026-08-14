@@ -20,7 +20,9 @@ export function CartProvider({ children }) {
           {
             id: product.id,
             name: product.name,
-            price: product.price,
+            // Charges the discounted amount automatically wherever a product
+            // has an active discount — see Product.model.js/toPublicProduct.
+            price: product.discountedPrice ?? product.price,
             image: product.image,
             quantity,
           },
