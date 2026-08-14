@@ -57,6 +57,12 @@ function ProductFormPageInner({ id, testingMode }) {
     // filled once the fetch below resolves.
     const [keptImages, setKeptImages] = useState(testingMode ? (mockProduct?.images ?? []) : []);
     const urlValue = Form.useWatch('image', form);
+    const priceValue = Form.useWatch('price', form);
+    const discountValue = Form.useWatch('discountPercent', form);
+    const finalPriceValue =
+        typeof priceValue === 'number' && discountValue > 0
+            ? Math.round(priceValue * (1 - discountValue / 100) * 100) / 100
+            : priceValue;
 
     useEffect(() => {
         if (!isEdit || testingMode) return;
@@ -184,6 +190,24 @@ function ProductFormPageInner({ id, testingMode }) {
                                     </Form.Item>
                                 </Col>
                             </Row>
+
+                            {typeof priceValue === 'number' && (
+                                <div className="-mt-2 mb-4 text-sm">
+                                    {discountValue > 0 ? (
+                                        <>
+                                            <span className="text-gray-400 line-through mr-2">
+                                                {`Rs. ${priceValue.toFixed(2)}`}
+                                            </span>
+                                            <span className="font-semibold text-green-600">
+                                                {`Rs. ${finalPriceValue.toFixed(2)}`}
+                                            </span>
+                                            <span className="ml-2 text-gray-500">{`(${discountValue}% off)`}</span>
+                                        </>
+                                    ) : (
+                                        <span className="text-gray-500">{`Final Price: Rs. ${priceValue.toFixed(2)}`}</span>
+                                    )}
+                                </div>
+                            )}
 
                             <Row gutter={16}>
                                 <Col span={12}>

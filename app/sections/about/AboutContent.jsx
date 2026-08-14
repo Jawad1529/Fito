@@ -6,6 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import Icon from '@/components/atoms/Icon';
 import Tag from '@/components/atoms/Tag';
+import SocialLinks from '@/components/atoms/SocialLinks';
 import { TEAM_MEMBERS as teamMembers, ABOUT_STATS as stats } from '@/constants/aboutContent';
 import coachingImage from '@/assets/images/About 1.webp';
 import labImage from '@/assets/images/About 2.webp';
@@ -255,6 +256,7 @@ export default function AboutContent() {
                   className="relative aspect-[4/5] rounded-3xl overflow-hidden ring-1 ring-border-light"
                 >
                   <Image src={member.image} alt={`${member.name} portrait`} fill unoptimized className="object-cover" />
+                  <SocialLinks links={member.social} name={member.name} />
                 </div>
 
                 <div className="mt-4 text-center sm:text-left">

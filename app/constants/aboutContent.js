@@ -9,12 +9,22 @@ export const TEAM_MEMBERS = [
         title: 'Co-Founder & Head Coach & Lead Nutritionist',
         image: owner1,
         credentials: ['CISSN Certified', '10+ Yrs Coaching'],
+        social: {
+            linkedin: 'https://www.linkedin.com/in/umer-shabbir-66804521b?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app',
+            instagram: 'https://www.instagram.com/umers1017?igsh=MmpqZ2tycjVtZzl0',
+            facebook: 'https://www.facebook.com/share/1H76fXNLjV/',
+        },
     },
     {
         name: 'Abdul Basit',
         title: 'Co-Founder & Operations',
         image: owner2,
         credentials: ['MBA', 'Supply Chain'],
+        social: {
+            instagram: 'https://www.instagram.com/fitoofitness?igsh=MTVzOXltczE4dnZxMQ==',
+            facebook: 'https://www.facebook.com/khanbasit012',
+            linkedin: 'https://linkedin.com/comm/mynetwork/discovery-see-all?usecase=PEOPLE_FOLLOWS&followMember=m-basit-khan-a6b971321',
+        },
     },
 ];
 

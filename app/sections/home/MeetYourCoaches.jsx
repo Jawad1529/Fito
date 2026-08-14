@@ -1,6 +1,7 @@
 // Static team section — no state, no client JS.
 import Image from 'next/image';
 import { H2, Text } from '../../components/atoms/Typography';
+import SocialLinks from '../../components/atoms/SocialLinks';
 
 import umerImage from '@assets/images/owner1.webp';
 import basitImage from '@assets/images/owner2.webp';
@@ -12,6 +13,11 @@ const coaches = [
     name: 'Umer Shabbir',
     role: 'Founder | Clinical Dietitian & UK-Certified Fitness Trainer',
     bio: 'Specialist in Diabetes Management, PCOS, and body recomposition. 1,000+ clients transformed over 8 years.',
+    social: {
+      linkedin: 'https://www.linkedin.com/in/umer-shabbir-66804521b?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app',
+      instagram: 'https://www.instagram.com/umers1017?igsh=MmpqZ2tycjVtZzl0',
+      facebook: 'https://www.facebook.com/share/1H76fXNLjV/',
+    },
   },
   {
     id: 'abdul-basit-khan',
@@ -19,6 +25,11 @@ const coaches = [
     name: 'Abdul Basit Khan',
     role: 'Certified Fitness Trainer | Former Mr. Lahore, Mr. Punjab & Mr. Pakistan',
     bio: 'Specialist in competition prep and physique conditioning.',
+    social: {
+      instagram: 'https://www.instagram.com/fitoofitness?igsh=MTVzOXltczE4dnZxMQ==',
+      facebook: 'https://www.facebook.com/khanbasit012',
+      linkedin: 'https://linkedin.com/comm/mynetwork/discovery-see-all?usecase=PEOPLE_FOLLOWS&followMember=m-basit-khan-a6b971321',
+    },
   },
 ];
 
@@ -49,6 +60,7 @@ export default function MeetYourCoaches() {
                   placeholder="blur"
                   className="object-cover"
                 />
+                <SocialLinks links={coach.social} name={coach.name} />
               </div>
               <div className="p-6">
                 <h3 className="text-lg font-semibold text-text">{coach.name}</h3>
