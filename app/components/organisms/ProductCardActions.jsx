@@ -21,7 +21,7 @@ function ProductCardActions({ product, isWishlisted = false, onToggleWishlist })
         <>
             <button
                 type="button"
-                onClick={() => onToggleWishlist?.(product.id)}
+                onClick={() => onToggleWishlist?.(product)}
                 className="absolute top-4 right-4 z-10 w-9 h-9 rounded-full glass-strong flex items-center justify-center transition-colors hover:bg-primary/20 border border-border-light"
                 aria-label={isWishlisted ? `Remove ${product.name} from wishlist` : `Add ${product.name} to wishlist`}
                 aria-pressed={isWishlisted}

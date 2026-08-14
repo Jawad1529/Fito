@@ -12,6 +12,7 @@ import FeaturedProducts from '../organisms/FeaturedProducts';
 import ReviewSection from '../organisms/ReviewSection';
 import QuantitySelector from '../molecules/QuantitySelector';
 import useCart from '../../hooks/useCart';
+import useWishlist from '../../hooks/useWishlist';
 import useTestingMode from '../../hooks/useTestingMode';
 import useApiResource from '../../hooks/useApiResource';
 import { getProduct } from '../../services/product.service';
@@ -39,9 +40,9 @@ export default function ProductTemplate({ id, initialProduct = null }) {
         return productsData.find((p) => String(p.id) === String(id)) || null;
     }, [testingMode, apiProduct, initialProduct, id]);
 
-    const [isWishlisted, setIsWishlisted] = useState(false);
     const [quantity, setQuantity] = useState(1);
     const { addToCart, isInCart } = useCart();
+    const { isWishlisted, toggleWishlist } = useWishlist();
 
     if (loading && !product) {
         return (
@@ -167,14 +168,14 @@ export default function ProductTemplate({ id, initialProduct = null }) {
                             <Button
                                 variant="outline"
                                 size="lg"
-                                onClick={() => setIsWishlisted((prev) => !prev)}
-                                aria-label={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
-                                aria-pressed={isWishlisted}
+                                onClick={() => toggleWishlist(product)}
+                                aria-label={isWishlisted(product.id) ? 'Remove from wishlist' : 'Add to wishlist'}
+                                aria-pressed={isWishlisted(product.id)}
                                 className="px-4"
                             >
                                 <Icon
                                     name="heart"
-                                    className={`w-5 h-5 ${isWishlisted ? 'fill-red-500 text-red-500' : ''}`}
+                                    className={`w-5 h-5 ${isWishlisted(product.id) ? 'fill-red-500 text-red-500' : ''}`}
                                 />
                             </Button>
                         </div>

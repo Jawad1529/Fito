@@ -52,8 +52,8 @@ export const notifications = [
     },
     {
         id: 5,
-        title: 'Mother Wellness Referral Bonus',
-        message: 'Refer a friend to the Mother Wellness Program and both get Rs. 1,000 off.',
+        title: 'Busy Moms Referral Bonus',
+        message: 'Refer a friend to the Busy Moms program and both get Rs. 1,000 off.',
         type: 'promo',
         audience: 'mother-wellness',
         status: 'draft',

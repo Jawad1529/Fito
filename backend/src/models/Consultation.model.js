@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import { REPLY_AUTHOR } from '../constants/contentStatus.js';
 import { CONSULTATION_STATUS } from '../constants/consultationStatus.js';
 import { CONSULTATION_GOALS } from '../constants/consultationGoals.js';
+import { GENDERS, ACTIVITY_LEVELS } from '../constants/personalInfo.js';
 
 // Same shape as Review.model.js's replySchema — a message thread between the
 // customer and whichever admin is handling the consultation.
@@ -35,11 +36,11 @@ const consultationSchema = new mongoose.Schema(
             fullName: { type: String, required: true, trim: true },
             email: { type: String, required: true, trim: true, lowercase: true },
             phone: { type: String, required: true, trim: true },
-            dob: Date,
-            gender: String,
-            activityLevel: String,
-            height: Number,
-            weight: Number,
+            dob: { type: Date, required: true },
+            gender: { type: String, enum: GENDERS, required: true },
+            activityLevel: { type: String, enum: ACTIVITY_LEVELS, required: true },
+            height: { type: Number, required: true },
+            weight: { type: Number, required: true },
         },
         // Fields vary per goal (see admin/src/data/consultations.js and
         // app/components/organisms/forms/*Form.jsx), so this is stored as-is

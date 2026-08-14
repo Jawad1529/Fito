@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, useCallback, useMemo } from 'react';
+import { useMemo } from 'react';
 import { H2, Text } from '../../components/atoms/Typography';
 import Spinner from '../atoms/Spinner';
 import ProductCard from './ProductCard';
 import useTestingMode from '../../hooks/useTestingMode';
 import useApiResource from '../../hooks/useApiResource';
+import useWishlist from '../../hooks/useWishlist';
 import { getProducts } from '../../services/product.service';
 import productsData from '../../data/products.json';
 
@@ -16,7 +17,7 @@ export default function FeaturedProducts({
   excludeId,
 }) {
   const { testingMode } = useTestingMode();
-  const [wishlist, setWishlist] = useState([]);
+  const { isWishlisted, toggleWishlist } = useWishlist();
 
   const { data: apiProducts, loading } = useApiResource(() => getProducts({ sort: 'rating' }), [], {
     skip: testingMode,
@@ -27,14 +28,6 @@ export default function FeaturedProducts({
     const source = testingMode ? productsData : apiProducts ?? [];
     return source.filter((p) => p.id !== excludeId).slice(0, limit);
   }, [testingMode, apiProducts, excludeId, limit]);
-
-  // Stable identity so the memo on ProductCard actually holds — an inline
-  // arrow would be a new prop every render and defeat it.
-  const toggleWishlist = useCallback((productId) => {
-    setWishlist((prev) =>
-      prev.includes(productId) ? prev.filter((id) => id !== productId) : [...prev, productId]
-    );
-  }, []);
 
   return (
     <section className="relative py-20 section-defer">
@@ -64,7 +57,7 @@ export default function FeaturedProducts({
               <ProductCard
                 key={product.id}
                 product={product}
-                isWishlisted={wishlist.includes(product.id)}
+                isWishlisted={isWishlisted(product.id)}
                 onToggleWishlist={toggleWishlist}
               />
             ))}

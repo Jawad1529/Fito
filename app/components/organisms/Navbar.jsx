@@ -12,6 +12,7 @@ import { Text } from '../atoms/Typography';
 import NotificationItem from '../molecules/NotificationItem';
 import SearchBar from '../molecules/SearchBar';
 import useCart from '../../hooks/useCart';
+import useWishlist from '../../hooks/useWishlist';
 import useAuth from '../../hooks/useAuth';
 import useTestingMode from '../../hooks/useTestingMode';
 import useNotifications from '../../hooks/useNotifications';
@@ -32,6 +33,7 @@ export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const { totalItems } = useCart();
+  const { totalItems: totalWishlistItems } = useWishlist();
   const { user, isAuthenticated, logout } = useAuth();
   const { testingMode, setTestingMode } = useTestingMode();
   const {
@@ -199,6 +201,11 @@ export default function Navbar() {
                   </Popover>
                 </Badge>
               )}
+              <Badge count={totalWishlistItems}>
+                <Link href="/wishlist" aria-label="Wishlist" className="text-text-secondary hover:text-text transition-colors">
+                  <Icon name="heart" className="w-5 h-5" />
+                </Link>
+              </Badge>
               <Badge count={totalItems}>
                 <Link href="/cart" aria-label="Cart" className="text-text-secondary hover:text-text transition-colors">
                   <Icon name="cart" className="w-5 h-5" />
@@ -288,6 +295,16 @@ export default function Navbar() {
                       </Link>
                     </Badge>
                   )}
+                  <Badge count={totalWishlistItems}>
+                    <Link
+                      href="/wishlist"
+                      aria-label="Wishlist"
+                      onClick={() => setMobileOpen(false)}
+                      className="text-text-secondary hover:text-text"
+                    >
+                      <Icon name="heart" className="w-5 h-5" />
+                    </Link>
+                  </Badge>
                   <Badge count={totalItems}>
                     <Link
                       href="/cart"

@@ -9,6 +9,7 @@ import Spinner from '../../../components/atoms/Spinner';
 import useTestingMode from '../../../hooks/useTestingMode';
 import useDebounce from '../../../hooks/useDebounce';
 import useApiResource from '../../../hooks/useApiResource';
+import useWishlist from '../../../hooks/useWishlist';
 import { getProducts, getProductCategories } from '../../../services/product.service';
 import productsData from '../../../data/products.json';
 
@@ -41,7 +42,7 @@ export default function ShopPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [sortBy, setSortBy] = useState('default');
-  const [wishlist, setWishlist] = useState([]);
+  const { isWishlisted, toggleWishlist } = useWishlist();
 
   // Avoids firing a request on every keystroke.
   const debouncedSearch = useDebounce(searchQuery, 350);
@@ -77,13 +78,6 @@ export default function ShopPage() {
     }
     return apiProducts ?? [];
   }, [testingMode, apiProducts, searchQuery, selectedCategory, sortBy]);
-
-  // Memoized so the memo on ProductCard holds across filter/wishlist changes.
-  const toggleWishlist = useCallback((productId) => {
-    setWishlist((prev) =>
-      prev.includes(productId) ? prev.filter((id) => id !== productId) : [...prev, productId]
-    );
-  }, []);
 
   const clearFilters = useCallback(() => {
     setSearchQuery('');
@@ -195,7 +189,7 @@ export default function ShopPage() {
               <ProductCard
                 key={product.id}
                 product={product}
-                isWishlisted={wishlist.includes(product.id)}
+                isWishlisted={isWishlisted(product.id)}
                 onToggleWishlist={toggleWishlist}
               />
             ))}

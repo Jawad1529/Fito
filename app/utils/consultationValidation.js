@@ -74,7 +74,7 @@ export const GOAL_DATA_SCHEMAS = {
     cycle: Yup.string().required("Please select your cycle regularity"),
   }),
   "mother-wellness": Yup.object({
-    stage: Yup.string().required("Please select the stage that describes you"),
+    postpartumStage: Yup.string().required("Please let us know how long since you had your baby"),
     breastfeeding: Yup.string().required("Please select your breastfeeding status"),
   }),
   diabetes: Yup.object({

@@ -240,7 +240,7 @@ export const CONSULTATION_GOALS = [
   {
     id: "mother-wellness",
     title: "Busy Moms",
-    shortDescription: "Nutrition support for pregnancy, postpartum & breastfeeding.",
+    shortDescription: "Nutrition & fitness support for moms working on their postpartum goals.",
     icon: "🤱",
     image: motherWellnessImage,
     color: "#8B5CF6",
@@ -252,7 +252,7 @@ export const CONSULTATION_GOALS = [
         label: "Basic",
         price: 6000,
         image: motherWellnessImage,
-        bestFor: "Best for a specific stage (e.g. a trimester or early postpartum) that needs short-term support.",
+        bestFor: "Best for a specific stage of postpartum recovery that needs short-term support.",
         features: [
           "Personalized maternal nutrition plan",
           "2 follow-up check-ins",
@@ -267,7 +267,7 @@ export const CONSULTATION_GOALS = [
         price: 16500,
         image: motherWellnessImage,
         badge: "Most Popular",
-        bestFor: "Best for ongoing support across pregnancy or postpartum recovery.",
+        bestFor: "Best for ongoing support across postpartum recovery and fitness goals.",
         features: [
           "Everything in the 1 Month plan",
           "Monthly plan revisions (3 total)",
@@ -282,7 +282,7 @@ export const CONSULTATION_GOALS = [
         price: 30000,
         image: motherWellnessImage,
         badge: "Best Value",
-        bestFor: "Best for continuous support from pregnancy through breastfeeding.",
+        bestFor: "Best for continuous support through breastfeeding and long-term fitness goals.",
         features: [
           "Everything in the 3 Month plan",
           "Bi-weekly check-ins (12 total)",

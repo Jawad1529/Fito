@@ -55,7 +55,7 @@ const programs = [
     title: 'Busy Moms',
     image: motherWellnessImage,
     description:
-      'Nutrition and fitness support through pregnancy, postpartum recovery, and breastfeeding — paced to what your body needs at each stage. Plans are trimester- and stage-aware, covering energy needs, nutrient gaps, and safe movement, with a coach who adjusts as you move from pregnancy into recovery.',
+      'Nutrition and fitness support for moms who\'ve already had a baby — paced to where you are in postpartum recovery and breastfeeding. Plans are stage-aware, covering energy needs, nutrient gaps, and safe, progressive movement, with a coach who adjusts as your body and goals change.',
   },
 ];
 
@@ -65,7 +65,7 @@ const programs = [
 export default function ProgramsContent() {
   return (
     <section aria-label="Our programs" className="relative pt-28 pb-20 sm:pt-32 sm:pb-24 lg:pb-28">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-6">
         <div className="text-center max-w-2xl mx-auto reveal">
           <Tag variant="outline" className="mb-5">
             <Icon name="bolt" className="w-3.5 h-3.5" />

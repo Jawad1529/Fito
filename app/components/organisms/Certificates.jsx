@@ -10,15 +10,18 @@
 import Image from 'next/image';
 import { H2, Text } from '../../components/atoms/Typography';
 
+import gmpIcon from '../../assets/icons/Gmp-certified-01.svg';
+import halalIcon from '../../assets/icons/Halal-01.svg';
+import isoIcon from '../../assets/icons/ISO-01.svg';
+import qualityIcon from '../../assets/icons/Quantity-01.svg';
+import timeTestedIcon from '../../assets/icons/Time-tested.svg';
+
 const certificates = [
-  { name: 'GMP Certified', img: 'https://placehold.co/160x160/111111/facc15?text=GMP' },
-  { name: 'Informed-Sport Certified', img: 'https://placehold.co/160x160/111111/facc15?text=IS' },
-  { name: 'NSF Certified for Sport', img: 'https://placehold.co/160x160/111111/facc15?text=NSF' },
-  { name: 'ISO 9001:2015', img: 'https://placehold.co/160x160/111111/facc15?text=ISO' },
-  { name: 'Non-GMO Project Verified', img: 'https://placehold.co/160x160/111111/facc15?text=NON-GMO' },
-  { name: 'Halal Certified', img: 'https://placehold.co/160x160/111111/facc15?text=HALAL' },
-  { name: 'Vegan Society Approved', img: 'https://placehold.co/160x160/111111/facc15?text=VEGAN' },
-  { name: 'Gluten-Free Certified', img: 'https://placehold.co/160x160/111111/facc15?text=GF' },
+  { name: 'GMP Certified', img: gmpIcon },
+  { name: 'ISO 9001:2015', img: isoIcon },
+  { name: 'Halal Certified', img: halalIcon },
+  { name: 'Quality Assured', img: qualityIcon },
+  { name: 'Time-Tested Formulas', img: timeTestedIcon },
 ];
 
 // Duplicate the list once so the marquee can loop seamlessly at -50%.

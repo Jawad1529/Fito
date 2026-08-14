@@ -4,7 +4,7 @@ export const CONSULTATION_GOALS = [
     { id: 'muscle-gain', title: 'Muscle Gain', icon: '💪' },
     { id: 'body-recomposition', title: 'Body Recomposition', icon: '⚖️' },
     { id: 'pcos', title: 'PCOS', icon: '🌸' },
-    { id: 'mother-wellness', title: 'Mother Wellness Program', icon: '🤱' },
+    { id: 'mother-wellness', title: 'Busy Moms', icon: '🤱' },
     { id: 'diabetes', title: 'Diabetic Patients', icon: '🩸' },
 ];
 

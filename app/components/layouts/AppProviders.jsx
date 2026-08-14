@@ -5,6 +5,7 @@ import { GoogleOAuthProvider } from '@react-oauth/google';
 import { TestingModeProvider } from '@/context/TestingModeContext';
 import { AuthProvider } from '@/context/AuthContext';
 import { CartProvider } from '@/context/CartContext';
+import { WishlistProvider } from '@/context/WishlistContext';
 import { antTheme } from '@/lib/antTheme';
 
 // All global providers in one place.
@@ -23,7 +24,9 @@ export default function AppProviders({ children }) {
             <ConfigProvider theme={antTheme}>
                 <TestingModeProvider>
                     <AuthProvider>
-                        <CartProvider>{children}</CartProvider>
+                        <CartProvider>
+                            <WishlistProvider>{children}</WishlistProvider>
+                        </CartProvider>
                     </AuthProvider>
                 </TestingModeProvider>
             </ConfigProvider>

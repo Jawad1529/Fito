@@ -1,6 +1,7 @@
 import Hero from '@/sections/home/Hero';
 import Certificates from '@/components/organisms/Certificates';
 import GoalsSection from '@/sections/home/GoalsSection';
+import FeaturedProducts from '@/components/organisms/FeaturedProducts';
 import WhyChooseFitoo from '@/sections/home/WhyChooseFitoo';
 import ConsultationCTA from '@/sections/home/ConsultationCTA';
 import MeetYourCoaches from '@/sections/home/MeetYourCoaches';
@@ -31,6 +32,7 @@ export default function HomePage() {
       <Hero />
       <Certificates />
       <GoalsSection />
+      <FeaturedProducts />
       <WhyChooseFitoo />
       <ConsultationCTA />
       <MeetYourCoaches />

@@ -7,7 +7,6 @@ import Slider from '../../atoms/Slider';
 import Input from '../../atoms/Input';
 import Checkbox from '../../atoms/Checkbox';
 import Radio from '../../atoms/Radio';
-import DatePicker from '../../atoms/DatePicker';
 import TextArea from '../../atoms/TextArea';
 
 const Field = ({ label, error, children }) => (
@@ -33,37 +32,26 @@ export default function MotherWellnessForm({
       <Card className="glass border border-border-light">
 
         <H4 className="mb-5">
-          Motherhood Stage (ماں بننے کا مرحلہ)
+          Motherhood Profile (زچگی کی تفصیلات)
         </H4>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 
           <div className="md:col-span-2">
-            <Field label="Which stage best describes you? (کون سا مرحلہ آپ سے مطابقت رکھتا ہے؟)" error={touched.stage && errors.stage}>
+            <Field label="How long since you had your baby? (بچے کی پیدائش کو کتنا عرصہ ہوا ہے؟)" error={touched.postpartumStage && errors.postpartumStage}>
               <Radio.Group
-                value={goalData.stage}
+                value={goalData.postpartumStage}
                 onChange={(e) =>
-                  setFieldValue("stage", e.target.value)
+                  setFieldValue("postpartumStage", e.target.value)
                 }
               >
-                <Radio value="pregnant">Pregnant</Radio>
-                <Radio value="postpartum">Postpartum</Radio>
-                <Radio value="trying-to-conceive">Trying to Conceive</Radio>
+                <Radio value="0-6-months">0–6 Months</Radio>
+                <Radio value="6-12-months">6–12 Months</Radio>
+                <Radio value="1-2-years">1–2 Years</Radio>
+                <Radio value="2-plus-years">2+ Years</Radio>
               </Radio.Group>
             </Field>
           </div>
-
-          <Field label="Due Date / Delivery Date (متوقع تاریخ / پیدائش کی تاریخ)">
-            <DatePicker
-              value={goalData.stageDate}
-              onChange={(date) =>
-                setFieldValue(
-                  "stageDate",
-                  date?.toISOString()
-                )
-              }
-            />
-          </Field>
 
           <Field label="Number of Children (بچوں کی تعداد)">
             <Select
@@ -72,7 +60,6 @@ export default function MotherWellnessForm({
                 setFieldValue("numChildren", value)
               }
               options={[
-                { label: "This is my first", value: 0 },
                 { label: "1", value: 1 },
                 { label: "2", value: 2 },
                 { label: "3+", value: 3 },
@@ -80,21 +67,18 @@ export default function MotherWellnessForm({
             />
           </Field>
 
-          <div className="md:col-span-2">
-            <Field label="Delivery Type (if applicable) (پیدائش کی قسم)">
-              <Select
-                value={goalData.deliveryType}
-                onChange={(value) =>
-                  setFieldValue("deliveryType", value)
-                }
-                options={[
-                  { label: "Vaginal Delivery", value: "vaginal" },
-                  { label: "C-Section", value: "c-section" },
-                  { label: "Not Applicable Yet", value: "na" },
-                ]}
-              />
-            </Field>
-          </div>
+          <Field label="Delivery Type (پیدائش کی قسم)">
+            <Select
+              value={goalData.deliveryType}
+              onChange={(value) =>
+                setFieldValue("deliveryType", value)
+              }
+              options={[
+                { label: "Vaginal Delivery", value: "vaginal" },
+                { label: "C-Section", value: "c-section" },
+              ]}
+            />
+          </Field>
 
         </div>
 
@@ -131,10 +115,11 @@ export default function MotherWellnessForm({
                 setFieldValue("conditions", value)
               }
               options={[
-                "Gestational Diabetes",
+                "Diastasis Recti",
                 "Anemia",
                 "Thyroid Issues",
                 "High Blood Pressure",
+                "PCOS",
                 "None",
               ]}
             />
@@ -149,7 +134,7 @@ export default function MotherWellnessForm({
                   e.target.value
                 )
               }
-              placeholder="Prenatal vitamins, iron, folic acid, etc."
+              placeholder="Multivitamins, iron, thyroid medication, etc."
             />
           </Field>
 
@@ -233,11 +218,11 @@ export default function MotherWellnessForm({
             setFieldValue("goals", value)
           }
           options={[
-            "Post-Pregnancy Weight Loss",
+            "Postpartum Weight Loss",
+            "Tone & Strengthen Core",
+            "Build Overall Strength",
             "Regain Energy",
-            "Improve Milk Supply",
             "Balanced Nutrition",
-            "Manage Cravings",
             "Emotional Wellbeing",
           ]}
         />
@@ -260,7 +245,7 @@ export default function MotherWellnessForm({
               e.target.value
             )
           }
-          placeholder="Tell us anything else that will help us support you and your baby..."
+          placeholder="Tell us anything else that will help us support your fitness journey..."
         />
 
       </Card>

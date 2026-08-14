@@ -48,7 +48,7 @@ const goals = [
     id: 'mother-wellness',
     image: motherWellnessIcon,
     title: 'Busy Moms',
-    description: 'Nutrition and fitness support through pregnancy, postpartum, and beyond.',
+    description: 'Nutrition and fitness support for moms working on postpartum recovery and beyond.',
   },
 ];
 

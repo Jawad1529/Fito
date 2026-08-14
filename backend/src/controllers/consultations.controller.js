@@ -3,6 +3,7 @@ import asyncHandler from '../utils/asyncHandler.js';
 import Consultation from '../models/Consultation.model.js';
 import ConsultationPlan from '../models/ConsultationPlan.model.js';
 import { CONSULTATION_GOALS } from '../constants/consultationGoals.js';
+import { GENDERS, ACTIVITY_LEVELS, PHONE_REGEX, EMAIL_REGEX } from '../constants/personalInfo.js';
 import { REPLY_AUTHOR } from '../constants/contentStatus.js';
 import { toPublicConsultation, computeDiscountedPrice } from '../utils/serializers.js';
 import { toImageUrl } from '../middleware/upload.middleware.js';
@@ -31,8 +32,11 @@ const findMyConsultationOr404 = async (id, userId) => {
 };
 
 // POST /api/consultations (multipart/form-data) — login required (see
-// `protect` on the route). Fields: goal, plan (JSON), personalInfo (JSON),
-// goalData (JSON), transactionId, plus file fields bodyPhotos/reports/paymentScreenshot.
+// `protect` on the route). Fields: goal, plan (JSON), personalInfo (JSON —
+// fullName/email/phone/dob/gender/activityLevel/height/weight all required,
+// mirroring app/utils/consultationValidation.js's Yup schema), goalData
+// (JSON), transactionId, plus file fields bodyPhotos (required, at least
+// one)/reports/paymentScreenshot.
 export const createConsultation = asyncHandler(async (req, res) => {
     const { goal, transactionId } = req.body;
     const submittedPlan = parseJson(req.body.plan, null);
@@ -46,6 +50,34 @@ export const createConsultation = asyncHandler(async (req, res) => {
     if (!personalInfo?.fullName || !personalInfo?.email || !personalInfo?.phone) {
         res.status(400);
         throw new Error('Personal info must include fullName, email and phone');
+    }
+    if (!EMAIL_REGEX.test(personalInfo.email)) {
+        res.status(400);
+        throw new Error('Enter a valid email address');
+    }
+    if (!PHONE_REGEX.test(personalInfo.phone)) {
+        res.status(400);
+        throw new Error('Enter a valid phone number');
+    }
+    if (!personalInfo.dob || Number.isNaN(new Date(personalInfo.dob).getTime()) || new Date(personalInfo.dob) > new Date()) {
+        res.status(400);
+        throw new Error('A valid date of birth is required');
+    }
+    if (!GENDERS.includes(personalInfo.gender)) {
+        res.status(400);
+        throw new Error(`Gender must be one of: ${GENDERS.join(', ')}`);
+    }
+    if (!ACTIVITY_LEVELS.includes(personalInfo.activityLevel)) {
+        res.status(400);
+        throw new Error(`Activity level must be one of: ${ACTIVITY_LEVELS.join(', ')}`);
+    }
+    if (typeof personalInfo.height !== 'number' || personalInfo.height <= 0) {
+        res.status(400);
+        throw new Error('Height must be a positive number');
+    }
+    if (typeof personalInfo.weight !== 'number' || personalInfo.weight <= 0) {
+        res.status(400);
+        throw new Error('Weight must be a positive number');
     }
 
     // The price actually charged is looked up from the admin-managed
@@ -73,6 +105,11 @@ export const createConsultation = asyncHandler(async (req, res) => {
     }
 
     const files = req.files ?? {};
+
+    if (!(files.bodyPhotos ?? []).length) {
+        res.status(400);
+        throw new Error('Please upload at least one body photo');
+    }
 
     const consultation = await Consultation.create({
         user: req.user._id,
