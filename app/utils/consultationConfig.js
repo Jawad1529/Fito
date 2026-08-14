@@ -29,7 +29,7 @@ export const CONSULTATION_GOALS = [
       {
         id: "1-month",
         durationMonths: 1,
-        label: "1 Month",
+        label: "Basic",
         price: 4500,
         image: fatLossImage,
         bestFor: "Best for those who want a quick reset or trying it out before committing longer.",
@@ -43,7 +43,7 @@ export const CONSULTATION_GOALS = [
       {
         id: "3-month",
         durationMonths: 3,
-        label: "3 Months",
+        label: "Pro",
         price: 12000,
         image: fatLossImage,
         badge: "Most Popular",
@@ -58,7 +58,7 @@ export const CONSULTATION_GOALS = [
       {
         id: "6-month",
         durationMonths: 6,
-        label: "6 Months",
+        label: "Premium",
         price: 21000,
         image: fatLossImage,
         badge: "Best Value",
@@ -84,7 +84,7 @@ export const CONSULTATION_GOALS = [
       {
         id: "1-month",
         durationMonths: 1,
-        label: "1 Month",
+        label: "Basic",
         price: 5000,
         image: muscleGainImage,
         bestFor: "Best for those who want a quick reset or trying it out before committing longer.",
@@ -98,7 +98,7 @@ export const CONSULTATION_GOALS = [
       {
         id: "3-month",
         durationMonths: 3,
-        label: "3 Months",
+        label: "Pro",
         price: 13500,
         image: muscleGainImage,
         badge: "Most Popular",
@@ -113,7 +113,7 @@ export const CONSULTATION_GOALS = [
       {
         id: "6-month",
         durationMonths: 6,
-        label: "6 Months",
+        label: "Premium",
         price: 24000,
         image: muscleGainImage,
         badge: "Best Value",
@@ -139,7 +139,7 @@ export const CONSULTATION_GOALS = [
       {
         id: "1-month",
         durationMonths: 1,
-        label: "1 Month",
+        label: "Basic",
         price: 5000,
         image: bodyRecompositionImage,
         bestFor: "Best for those who want a quick reset or trying it out before committing longer.",
@@ -153,7 +153,7 @@ export const CONSULTATION_GOALS = [
       {
         id: "3-month",
         durationMonths: 3,
-        label: "3 Months",
+        label: "Pro",
         price: 13500,
         image: bodyRecompositionImage,
         badge: "Most Popular",
@@ -168,7 +168,7 @@ export const CONSULTATION_GOALS = [
       {
         id: "6-month",
         durationMonths: 6,
-        label: "6 Months",
+        label: "Premium",
         price: 24000,
         image: bodyRecompositionImage,
         badge: "Best Value",
@@ -194,7 +194,7 @@ export const CONSULTATION_GOALS = [
       {
         id: "1-month",
         durationMonths: 1,
-        label: "1 Month",
+        label: "Basic",
         price: 5500,
         image: pcosImage,
         bestFor: "Best for those newly diagnosed and wanting to understand what changes help first.",
@@ -208,7 +208,7 @@ export const CONSULTATION_GOALS = [
       {
         id: "3-month",
         durationMonths: 3,
-        label: "3 Months",
+        label: "Pro",
         price: 15000,
         image: pcosImage,
         badge: "Most Popular",
@@ -223,7 +223,7 @@ export const CONSULTATION_GOALS = [
       {
         id: "6-month",
         durationMonths: 6,
-        label: "6 Months",
+        label: "Premium",
         price: 27000,
         image: pcosImage,
         badge: "Best Value",
@@ -249,7 +249,7 @@ export const CONSULTATION_GOALS = [
       {
         id: "1-month",
         durationMonths: 1,
-        label: "1 Month",
+        label: "Basic",
         price: 6000,
         image: motherWellnessImage,
         bestFor: "Best for a specific stage (e.g. a trimester or early postpartum) that needs short-term support.",
@@ -263,7 +263,7 @@ export const CONSULTATION_GOALS = [
       {
         id: "3-month",
         durationMonths: 3,
-        label: "3 Months",
+        label: "Pro",
         price: 16500,
         image: motherWellnessImage,
         badge: "Most Popular",
@@ -278,7 +278,7 @@ export const CONSULTATION_GOALS = [
       {
         id: "6-month",
         durationMonths: 6,
-        label: "6 Months",
+        label: "Premium",
         price: 30000,
         image: motherWellnessImage,
         badge: "Best Value",
@@ -304,7 +304,7 @@ export const CONSULTATION_GOALS = [
       {
         id: "1-month",
         durationMonths: 1,
-        label: "1 Month",
+        label: "Basic",
         price: 5500,
         image: diabeticPatientsImage,
         bestFor: "Best for those newly diagnosed and wanting a plan to start stabilizing blood sugar.",
@@ -318,7 +318,7 @@ export const CONSULTATION_GOALS = [
       {
         id: "3-month",
         durationMonths: 3,
-        label: "3 Months",
+        label: "Pro",
         price: 15000,
         image: diabeticPatientsImage,
         badge: "Most Popular",
@@ -333,7 +333,7 @@ export const CONSULTATION_GOALS = [
       {
         id: "6-month",
         durationMonths: 6,
-        label: "6 Months",
+        label: "Premium",
         price: 27000,
         image: diabeticPatientsImage,
         badge: "Best Value",

@@ -1,24 +1,27 @@
 import mongoose from 'mongoose';
 import { CONSULTATION_GOALS } from '../constants/consultationGoals.js';
 
-// Admin-managed price for one (goal, duration) combination — e.g. fat-loss's
-// 3-month plan. There are 18 of these (6 goals x 3 durations); missing ones
-// are lazily created from consultationPlanDefaults.js the first time they're
-// read (see consultationPlans.controller.js), so no manual seeding is required.
+// A single admin-managed "program" offered under one goal — e.g. fat-loss's
+// "Basic" plan. Admins can freely create/edit/delete any number of these per
+// goal (see consultationPlans.controller.js); each goal starts out with the
+// 3 defaults from consultationPlanDefaults.js, lazily created the first time
+// that goal is read with zero plans, so no manual seeding is required.
 const consultationPlanSchema = new mongoose.Schema(
     {
-        goal: { type: String, enum: CONSULTATION_GOALS, required: true },
-        planId: { type: String, required: true, trim: true },
+        goal: { type: String, enum: CONSULTATION_GOALS, required: true, index: true },
+        // Admin-entered display name (e.g. "Basic", "Pro", "6-Week Reset") —
+        // shown as-is on the app's plan selection screen.
         label: { type: String, required: true, trim: true },
         durationMonths: { type: Number, required: true, min: 1 },
         price: { type: Number, required: true, min: 0 },
         // Percentage off `price`, shown as a struck-through original price on
         // the app. 0 means no discount.
         discountPercent: { type: Number, default: 0, min: 0, max: 100 },
+        // Short bullet points describing what's included — no images, per
+        // product decision; the app already owns imagery at the goal level.
+        features: [{ type: String, trim: true }],
     },
     { timestamps: true }
 );
-
-consultationPlanSchema.index({ goal: 1, planId: 1 }, { unique: true });
 
 export default mongoose.model('ConsultationPlan', consultationPlanSchema);

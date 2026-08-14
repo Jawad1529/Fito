@@ -7,11 +7,15 @@ import { getConsultationPlans } from '../services/consultation.service';
 import { CONSULTATION_GOALS as STATIC_GOALS } from '../utils/consultationConfig';
 
 /**
- * Merges admin-managed pricing (price/discountPercent/discountedPrice) from
- * the backend into the static goal config (labels, images, features stay
- * owned by consultationConfig.js — only pricing is overridden). Falls back to
- * the static defaults in testing mode, before the fetch resolves, or if it
- * fails, so the flow is never blocked on the network.
+ * Admins fully own the list of programs offered per goal (label, duration,
+ * price, discount, feature bullets — see the admin panel's "Manage Pricing"
+ * page), so the real plan list for a goal can be any length, not just the
+ * static 3 tiers this file's fallback ships with. Images stay owned by the
+ * static goal config (see PlanSelection.jsx), since admins don't manage those.
+ *
+ * Falls back to the static plans in testing mode, before the fetch resolves,
+ * or if a goal has no admin-managed plans yet, so the flow is never blocked
+ * on the network or left with an empty plan list.
  */
 export default function useConsultationPlans() {
   const { testingMode } = useTestingMode();
@@ -24,20 +28,20 @@ export default function useConsultationPlans() {
   return useMemo(() => {
     if (!remotePlans) return STATIC_GOALS;
 
-    const byKey = new Map(remotePlans.map((plan) => [`${plan.goal}:${plan.id}`, plan]));
+    return STATIC_GOALS.map((goal) => {
+      const goalPlans = remotePlans
+        .filter((plan) => plan.goal === goal.id)
+        .map((plan) => ({
+          id: plan.id,
+          label: plan.label,
+          durationMonths: plan.durationMonths,
+          price: plan.price,
+          discountPercent: plan.discountPercent,
+          discountedPrice: plan.discountedPrice,
+          features: plan.features,
+        }));
 
-    return STATIC_GOALS.map((goal) => ({
-      ...goal,
-      plans: goal.plans.map((plan) => {
-        const remote = byKey.get(`${goal.id}:${plan.id}`);
-        if (!remote) return plan;
-        return {
-          ...plan,
-          price: remote.price,
-          discountPercent: remote.discountPercent,
-          discountedPrice: remote.discountedPrice,
-        };
-      }),
-    }));
+      return goalPlans.length ? { ...goal, plans: goalPlans } : goal;
+    });
   }, [remotePlans]);
 }

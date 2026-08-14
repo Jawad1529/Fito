@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import asyncHandler from '../utils/asyncHandler.js';
 import Consultation from '../models/Consultation.model.js';
 import ConsultationPlan from '../models/ConsultationPlan.model.js';
@@ -52,14 +53,18 @@ export const createConsultation = asyncHandler(async (req, res) => {
     // tampered `plan.price` in the request can't change what gets billed.
     let plan = null;
     if (submittedPlan?.id) {
-        const planDoc = await ConsultationPlan.findOne({ goal, planId: submittedPlan.id });
+        if (!mongoose.isValidObjectId(submittedPlan.id)) {
+            res.status(400);
+            throw new Error('Invalid plan selected');
+        }
+        const planDoc = await ConsultationPlan.findOne({ _id: submittedPlan.id, goal });
         if (!planDoc) {
             res.status(400);
             throw new Error('Invalid plan selected');
         }
         const discountedPrice = computeDiscountedPrice(planDoc.price, planDoc.discountPercent);
         plan = {
-            id: planDoc.planId,
+            id: planDoc._id,
             label: planDoc.label,
             durationMonths: planDoc.durationMonths,
             price: discountedPrice,

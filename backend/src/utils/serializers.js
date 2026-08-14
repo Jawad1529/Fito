@@ -146,13 +146,14 @@ export const toPublicConsultation = (consultation) => ({
 // Same discount shape as toPublicProduct: `price` is the admin-edited base
 // price, `discountedPrice` the amount actually charged.
 export const toPublicConsultationPlan = (plan) => ({
-    id: plan.planId,
+    id: plan._id,
     goal: plan.goal,
     label: plan.label,
     durationMonths: plan.durationMonths,
     price: plan.price,
     discountPercent: plan.discountPercent ?? 0,
     discountedPrice: computeDiscountedPrice(plan.price, plan.discountPercent ?? 0),
+    features: plan.features ?? [],
 });
 
 export const toPublicReview = (review) => ({

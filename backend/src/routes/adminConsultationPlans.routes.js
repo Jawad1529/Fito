@@ -1,5 +1,10 @@
 import express from 'express';
-import { listConsultationPlans, updateConsultationPlan } from '../controllers/consultationPlans.controller.js';
+import {
+    listConsultationPlans,
+    createConsultationPlan,
+    updateConsultationPlan,
+    deleteConsultationPlan,
+} from '../controllers/consultationPlans.controller.js';
 import { protectAdmin } from '../middleware/adminAuth.middleware.js';
 
 const router = express.Router();
@@ -9,6 +14,8 @@ const router = express.Router();
 router.use(protectAdmin);
 
 router.get('/', listConsultationPlans);
-router.patch('/:goal/:planId', updateConsultationPlan);
+router.post('/', createConsultationPlan);
+router.patch('/:id', updateConsultationPlan);
+router.delete('/:id', deleteConsultationPlan);
 
 export default router;

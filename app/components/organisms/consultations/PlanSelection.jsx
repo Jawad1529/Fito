@@ -10,12 +10,9 @@ function formatPrice(price) {
   return `Rs. ${price.toLocaleString('en-US')}`;
 }
 
-// Duration-based plan ids map to a tier name shown over the plan image.
-const PLAN_TIER_LABELS = {
-  '1-month': 'Basic',
-  '3-month': 'Pro',
-  '6-month': 'Premium',
-};
+function formatDuration(months) {
+  return `${months} Month${months > 1 ? 's' : ''}`;
+}
 
 export default function PlanSelection({
   goal,
@@ -77,7 +74,7 @@ export default function PlanSelection({
 
               <div className="relative w-full aspect-square">
                 <Image
-                  src={plan.image}
+                  src={plan.image || goal?.image}
                   alt={`${plan.label} plan reference`}
                   fill
                   objectFit="contain"
@@ -85,16 +82,18 @@ export default function PlanSelection({
 
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/5 to-transparent" />
 
-                {PLAN_TIER_LABELS[plan.id] && (
+                {/* Tier name is fully admin-controlled (see the admin panel's
+                    "Manage Pricing" page) — shown exactly as entered. */}
+                {plan.label && (
                   <span className="absolute bottom-3 left-4 z-10 text-white text-2xl font-bold tracking-wide drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
-                    {PLAN_TIER_LABELS[plan.id]}
+                    {plan.label}
                   </span>
                 )}
               </div>
 
               <div className="p-6 flex flex-col grow">
 
-                <Caption>{plan.label} Plan</Caption>
+                <Caption>{formatDuration(plan.durationMonths)}</Caption>
 
                 <div className="flex items-center gap-2 mt-1 mb-1">
                   <H3 className="m-0">

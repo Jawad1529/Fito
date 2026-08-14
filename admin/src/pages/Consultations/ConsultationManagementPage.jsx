@@ -1,8 +1,11 @@
-import { Tabs } from 'antd';
+import { Tabs, Button } from 'antd';
+import { useNavigate } from 'react-router-dom';
+import { DollarOutlined } from '@ant-design/icons';
 import PageHeading from '../../components/atoms/PageHeading';
 import ConsultationTable from '../../components/organisms/consultations/ConsultationTable';
 import { CONSULTATION_GOALS } from '../../constants/consultationGoals';
 import { consultationsByGoal } from '../../data/consultations';
+import { consultationPricingPath } from '../../constants/routes';
 import { useTestingMode } from '../../context/TestingModeContext';
 
 export default function ConsultationManagementPage() {
@@ -13,6 +16,7 @@ export default function ConsultationManagementPage() {
 }
 
 function ConsultationManagementPageInner({ testingMode }) {
+    const navigate = useNavigate();
     const byGoal = (goalId) => (testingMode ? consultationsByGoal[goalId] ?? [] : []);
     const allConsultations = testingMode ? Object.values(consultationsByGoal).flat() : [];
 
@@ -40,11 +44,18 @@ function ConsultationManagementPageInner({ testingMode }) {
                             </span>
                         ),
                         children: (
-                            <ConsultationTable
-                                initialData={byGoal(goal.id)}
-                                testingMode={testingMode}
-                                goal={goal.id}
-                            />
+                            <div>
+                                <div className="flex justify-end mb-4">
+                                    <Button icon={<DollarOutlined />} onClick={() => navigate(consultationPricingPath(goal.id))}>
+                                        Manage Pricing
+                                    </Button>
+                                </div>
+                                <ConsultationTable
+                                    initialData={byGoal(goal.id)}
+                                    testingMode={testingMode}
+                                    goal={goal.id}
+                                />
+                            </div>
                         ),
                     })),
                 ]}
