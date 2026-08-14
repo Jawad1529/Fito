@@ -95,19 +95,21 @@ export default function PlanSelection({
 
                 <Caption>{formatDuration(plan.durationMonths)}</Caption>
 
-                <div className="flex items-center gap-2 mt-1 mb-1">
-                  <H3 className="m-0">
-                    {formatPrice(chargedPrice)}
-                  </H3>
-                  {hasDiscount && (
-                    <>
-                      <Text muted className="line-through">
+                <div className="mt-1 mb-1">
+                  <div className="flex items-baseline gap-2 flex-wrap">
+                    <H3 className="m-0 whitespace-nowrap">
+                      {formatPrice(chargedPrice)}
+                    </H3>
+                    {hasDiscount && (
+                      <Text muted className="line-through whitespace-nowrap">
                         {formatPrice(plan.price)}
                       </Text>
-                      <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-success/10 text-success">
-                        {plan.discountPercent}% off
-                      </span>
-                    </>
+                    )}
+                  </div>
+                  {hasDiscount && (
+                    <span className="inline-block mt-1 text-xs font-semibold px-2 py-0.5 rounded-full bg-success/10 text-success whitespace-nowrap">
+                      {plan.discountPercent}% off
+                    </span>
                   )}
                 </div>
 

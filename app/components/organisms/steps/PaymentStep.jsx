@@ -108,22 +108,25 @@ export default function PaymentStep({
           {selectedPlan ? `${selectedPlan.label} Plan` : "Consultation Fee"}
         </Text>
 
-        <div className="flex items-center gap-2 flex-wrap">
-          <div className="text-4xl font-bold text-primary">
-            {selectedPlan
-              ? `Rs. ${chargedPrice.toLocaleString("en-US")}`
-              : "Rs. 2,500"}
+        <div>
+          <div className="flex items-baseline gap-2 flex-wrap">
+            <div className="text-4xl font-bold text-primary whitespace-nowrap">
+              {selectedPlan
+                ? `Rs. ${chargedPrice.toLocaleString("en-US")}`
+                : "Rs. 2,500"}
+            </div>
+
+            {hasDiscount && (
+              <Text muted className="line-through text-lg whitespace-nowrap">
+                Rs. {selectedPlan.price.toLocaleString("en-US")}
+              </Text>
+            )}
           </div>
 
           {hasDiscount && (
-            <>
-              <Text muted className="line-through text-lg">
-                Rs. {selectedPlan.price.toLocaleString("en-US")}
-              </Text>
-              <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-success/10 text-success">
-                {selectedPlan.discountPercent}% off
-              </span>
-            </>
+            <span className="inline-block mt-1 text-xs font-semibold px-2 py-0.5 rounded-full bg-success/10 text-success whitespace-nowrap">
+              {selectedPlan.discountPercent}% off
+            </span>
           )}
         </div>
 
