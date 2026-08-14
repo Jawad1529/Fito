@@ -64,7 +64,7 @@ const trustSignals = [
   { Icon: StarIcon, label: 'Titles Won by Our Coaching Team', stat: 'Multiple' },
 ];
 
-const goals = ['Fat Loss', 'Muscle Gain', 'Diabetes Reversal', 'PCOS & More'];
+const goals = ['Fat Loss', 'Muscle Gain', 'Diabetes Management', 'PCOS & More'];
 
 const processSteps = [
   { n: '01', label: 'Consult', desc: 'Talk to a certified coach or clinical dietitian' },
@@ -212,7 +212,7 @@ export default function Hero() {
                   Book a Consultation
                 </Button>
               </Link>
-              <Link href="#programs" className="sm:flex-1">
+              <Link href="/programs" className="sm:flex-1">
                 <Button
                   variant="primary"
                   size="lg"

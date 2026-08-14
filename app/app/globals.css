@@ -392,25 +392,31 @@ html {
   }
 }
 
-/* ── 
+/* ──
 Transformation story before/after wipe ──
    Pure CSS replacement for what used to be a framer-motion clipPath animation
-   driven by React state. Gated on a fine pointer: touch devices can't hover,
-   so they just see the "before" image with its label. */
+   driven by React state. Desktop reveals on hover; touch devices can't
+   hover, so a hidden checkbox (.story-toggle) + a <label> wrapping the image
+   drive the same reveal off a tap instead. */
 .story-after {
   clip-path: inset(0 100% 0 0);
+  transition: clip-path 0.6s ease-in-out;
 }
 
 .story-handle {
   left: 100%;
+  transition: left 0.6s ease-in-out;
+}
+
+.story-toggle:checked ~ .story-media .story-after {
+  clip-path: inset(0 0 0 0);
+}
+
+.story-toggle:checked ~ .story-media .story-handle {
+  left: 0%;
 }
 
 @media (hover: hover) and (pointer: fine) {
-
-  .story-after,
-  .story-handle {
-    transition: clip-path 0.6s ease-in-out, left 0.6s ease-in-out;
-  }
 
   .story:hover .story-after {
     clip-path: inset(0 0 0 0);
@@ -427,6 +433,29 @@ Transformation story before/after wipe ──
 
   .story:hover .story-hint {
     opacity: 0;
+  }
+}
+
+/* Glowing "tap to see results" pill, mobile-only fallback for devices
+   without hover. Fades out once the toggle is checked. */
+.story-tap-hint {
+  animation: story-tap-glow 1.8s ease-in-out infinite;
+  transition: opacity 0.3s ease;
+}
+
+.story-toggle:checked ~ .story-media .story-tap-hint {
+  opacity: 0;
+  pointer-events: none;
+}
+
+@keyframes story-tap-glow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--primary) 60%, transparent);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 16px 4px color-mix(in srgb, var(--primary) 60%, transparent);
+    transform: scale(1.06);
   }
 }
 

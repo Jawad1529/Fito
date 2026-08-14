@@ -40,6 +40,12 @@ export default function ConsultationFlow() {
   const flowRef = useRef(null);
   const isFirstRender = useRef(true);
 
+  // Formik-validated steps expose { submit } via ref — handleNext triggers
+  // validation through these instead of advancing directly (see below).
+  const personalInfoStepRef = useRef(null);
+  const goalFormStepRef = useRef(null);
+  const photoStepRef = useRef(null);
+
   const {
     currentStep,
     selectedGoal,
@@ -60,6 +66,18 @@ export default function ConsultationFlow() {
   );
 
   const planStepIndex = 1;
+  const personalInfoStepIndex = 2;
+  const goalFormStepIndex = 3;
+  const photoStepIndex = 4;
+
+  // Steps that own a Formik instance advance themselves (via onValid, called
+  // from inside their onSubmit) only once validation passes — handleNext
+  // just triggers their submit and returns.
+  const stepRefsByIndex = {
+    [personalInfoStepIndex]: personalInfoStepRef,
+    [goalFormStepIndex]: goalFormStepRef,
+    [photoStepIndex]: photoStepRef,
+  };
 
   const handleSelectGoal = (goalId) => {
     setSelectedGoal(goalId);
@@ -84,21 +102,27 @@ export default function ConsultationFlow() {
 
     <PersonalInfoStep
       key="personal"
+      ref={personalInfoStepRef}
       formData={formData}
       updateField={updateField}
+      onValid={next}
     />,
 
     <GoalSpecificStep
       key="goal-form"
+      ref={goalFormStepRef}
       goal={selectedGoalConfig}
       formData={formData}
       updateGoalData={updateGoalData}
+      onValid={next}
     />,
 
     <PhotoUploadStep
       key="photos"
+      ref={photoStepRef}
       formData={formData}
       updateField={updateField}
+      onValid={next}
     />,
 
     <PaymentStep
@@ -141,6 +165,14 @@ export default function ConsultationFlow() {
       } else {
         message.error('Something went wrong submitting your consultation. Please try again.');
       }
+      return;
+    }
+
+    const stepRef = stepRefsByIndex[currentStep];
+    if (stepRef?.current) {
+      // Triggers Formik's validation; onValid (= next) only fires from
+      // inside that step's onSubmit once it passes.
+      stepRef.current.submit();
       return;
     }
 

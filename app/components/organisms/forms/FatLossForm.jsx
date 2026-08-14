@@ -8,19 +8,22 @@ import Slider from '../../atoms/Slider';
 import Checkbox from '../../atoms/Checkbox';
 import TextArea from '../../atoms/TextArea';
 
-const Field = ({ label, children }) => (
+const Field = ({ label, error, children }) => (
   <div className="flex flex-col gap-2">
     <label className="text-sm text-text-secondary font-medium">{label}</label>
     {children}
+    {error && <p className="text-xs text-danger">{error}</p>}
   </div>
 );
 
 export default function FatLossForm({
-  formData,
-  updateGoalData,
+  values,
+  errors,
+  touched,
+  setFieldValue,
 }) {
 
-  const goalData = formData.goalData || {};
+  const goalData = values || {};
 
   return (
     <div className="space-y-6!">
@@ -32,20 +35,20 @@ export default function FatLossForm({
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 
-          <Field label="Current Weight (kg) (موجودہ وزن)">
+          <Field label="Current Weight (kg) (موجودہ وزن)" error={touched.currentWeight && errors.currentWeight}>
             <InputNumber
               value={goalData.currentWeight}
               onChange={(value)=>
-                updateGoalData("currentWeight", value)
+                setFieldValue("currentWeight", value)
               }
             />
           </Field>
 
-          <Field label="Target Weight (kg) (ہدف وزن)">
+          <Field label="Target Weight (kg) (ہدف وزن)" error={touched.targetWeight && errors.targetWeight}>
             <InputNumber
               value={goalData.targetWeight}
               onChange={(value)=>
-                updateGoalData("targetWeight", value)
+                setFieldValue("targetWeight", value)
               }
             />
           </Field>
@@ -55,7 +58,7 @@ export default function FatLossForm({
               <InputNumber
                 value={goalData.waist}
                 onChange={(value)=>
-                  updateGoalData("waist", value)
+                  setFieldValue("waist", value)
                 }
               />
             </Field>
@@ -73,11 +76,11 @@ export default function FatLossForm({
 
         <div className="grid grid-cols-1 gap-5">
 
-          <Field label="Daily Activity Level (روزانہ سرگرمی کی سطح)">
+          <Field label="Daily Activity Level (روزانہ سرگرمی کی سطح)" error={touched.activity && errors.activity}>
             <Select
               value={goalData.activity}
               onChange={(value)=>
-                updateGoalData("activity", value)
+                setFieldValue("activity", value)
               }
               options={[
                 {
@@ -106,7 +109,7 @@ export default function FatLossForm({
               max={12}
               value={goalData.sleep}
               onChange={(value)=>
-                updateGoalData("sleep", value)
+                setFieldValue("sleep", value)
               }
             />
           </Field>
@@ -118,7 +121,7 @@ export default function FatLossForm({
               step={0.5}
               value={goalData.water}
               onChange={(value)=>
-                updateGoalData("water", value)
+                setFieldValue("water", value)
               }
             />
           </Field>
@@ -141,7 +144,7 @@ export default function FatLossForm({
             <Select
               value={goalData.meals}
               onChange={(value)=>
-                updateGoalData("meals", value)
+                setFieldValue("meals", value)
               }
               options={[
                 {label:"2",value:2},
@@ -157,7 +160,7 @@ export default function FatLossForm({
               className="flex flex-col gap-3"
               value={goalData.challenges}
               onChange={(value)=>
-                updateGoalData("challenges", value)
+                setFieldValue("challenges", value)
               }
               options={[
                 "Sugar cravings",
@@ -174,7 +177,7 @@ export default function FatLossForm({
               rows={4}
               value={goalData.previousDiets || ''}
               onChange={(e)=>
-                updateGoalData(
+                setFieldValue(
                   "previousDiets",
                   e.target.value
                 )

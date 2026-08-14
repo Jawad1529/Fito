@@ -10,18 +10,21 @@ import Radio from '../../atoms/Radio';
 import DatePicker from '../../atoms/DatePicker';
 import TextArea from '../../atoms/TextArea';
 
-const Field = ({ label, children }) => (
+const Field = ({ label, error, children }) => (
   <div className="flex flex-col gap-2">
     <label className="text-sm text-text-secondary font-medium">{label}</label>
     {children}
+    {error && <p className="text-xs text-danger">{error}</p>}
   </div>
 );
 
 export default function MotherWellnessForm({
-  formData,
-  updateGoalData,
+  values,
+  errors,
+  touched,
+  setFieldValue,
 }) {
-  const goalData = formData.goalData || {};
+  const goalData = values || {};
 
   return (
     <div className="space-y-6!">
@@ -36,11 +39,11 @@ export default function MotherWellnessForm({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 
           <div className="md:col-span-2">
-            <Field label="Which stage best describes you? (کون سا مرحلہ آپ سے مطابقت رکھتا ہے؟)">
+            <Field label="Which stage best describes you? (کون سا مرحلہ آپ سے مطابقت رکھتا ہے؟)" error={touched.stage && errors.stage}>
               <Radio.Group
                 value={goalData.stage}
                 onChange={(e) =>
-                  updateGoalData("stage", e.target.value)
+                  setFieldValue("stage", e.target.value)
                 }
               >
                 <Radio value="pregnant">Pregnant</Radio>
@@ -54,7 +57,7 @@ export default function MotherWellnessForm({
             <DatePicker
               value={goalData.stageDate}
               onChange={(date) =>
-                updateGoalData(
+                setFieldValue(
                   "stageDate",
                   date?.toISOString()
                 )
@@ -66,7 +69,7 @@ export default function MotherWellnessForm({
             <Select
               value={goalData.numChildren}
               onChange={(value) =>
-                updateGoalData("numChildren", value)
+                setFieldValue("numChildren", value)
               }
               options={[
                 { label: "This is my first", value: 0 },
@@ -82,7 +85,7 @@ export default function MotherWellnessForm({
               <Select
                 value={goalData.deliveryType}
                 onChange={(value) =>
-                  updateGoalData("deliveryType", value)
+                  setFieldValue("deliveryType", value)
                 }
                 options={[
                   { label: "Vaginal Delivery", value: "vaginal" },
@@ -106,11 +109,11 @@ export default function MotherWellnessForm({
 
         <div className="grid grid-cols-1 gap-5">
 
-          <Field label="Breastfeeding Status (دودھ پلانے کی صورتحال)">
+          <Field label="Breastfeeding Status (دودھ پلانے کی صورتحال)" error={touched.breastfeeding && errors.breastfeeding}>
             <Radio.Group
               value={goalData.breastfeeding}
               onChange={(e) =>
-                updateGoalData("breastfeeding", e.target.value)
+                setFieldValue("breastfeeding", e.target.value)
               }
             >
               <Radio value="exclusively">Exclusively Breastfeeding</Radio>
@@ -125,7 +128,7 @@ export default function MotherWellnessForm({
               className="flex flex-col gap-3"
               value={goalData.conditions}
               onChange={(value) =>
-                updateGoalData("conditions", value)
+                setFieldValue("conditions", value)
               }
               options={[
                 "Gestational Diabetes",
@@ -141,7 +144,7 @@ export default function MotherWellnessForm({
             <Input
               value={goalData.medications}
               onChange={(e) =>
-                updateGoalData(
+                setFieldValue(
                   "medications",
                   e.target.value
                 )
@@ -167,7 +170,7 @@ export default function MotherWellnessForm({
             <Select
               value={goalData.meals}
               onChange={(value) =>
-                updateGoalData("meals", value)
+                setFieldValue("meals", value)
               }
               options={[
                 { label: "2", value: 2 },
@@ -185,7 +188,7 @@ export default function MotherWellnessForm({
               step={0.5}
               value={goalData.water}
               onChange={(value) =>
-                updateGoalData("water", value)
+                setFieldValue("water", value)
               }
             />
           </Field>
@@ -196,7 +199,7 @@ export default function MotherWellnessForm({
               max={12}
               value={goalData.sleep}
               onChange={(value) =>
-                updateGoalData("sleep", value)
+                setFieldValue("sleep", value)
               }
             />
           </Field>
@@ -207,7 +210,7 @@ export default function MotherWellnessForm({
               max={10}
               value={goalData.energy}
               onChange={(value) =>
-                updateGoalData("energy", value)
+                setFieldValue("energy", value)
               }
             />
           </Field>
@@ -227,7 +230,7 @@ export default function MotherWellnessForm({
           className="flex flex-col gap-3"
           value={goalData.goals}
           onChange={(value) =>
-            updateGoalData("goals", value)
+            setFieldValue("goals", value)
           }
           options={[
             "Post-Pregnancy Weight Loss",
@@ -252,7 +255,7 @@ export default function MotherWellnessForm({
           rows={5}
           value={goalData.notes || ''}
           onChange={(e) =>
-            updateGoalData(
+            setFieldValue(
               "notes",
               e.target.value
             )

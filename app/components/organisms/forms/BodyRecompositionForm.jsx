@@ -8,18 +8,21 @@ import Slider from '../../atoms/Slider';
 import Checkbox from '../../atoms/Checkbox';
 import TextArea from '../../atoms/TextArea';
 
-const Field = ({ label, children }) => (
+const Field = ({ label, error, children }) => (
   <div className="flex flex-col gap-2">
     <label className="text-sm text-text-secondary font-medium">{label}</label>
     {children}
+    {error && <p className="text-xs text-danger">{error}</p>}
   </div>
 );
 
 export default function BodyRecompositionForm({
-  formData,
-  updateGoalData,
+  values,
+  errors,
+  touched,
+  setFieldValue,
 }) {
-  const goalData = formData.goalData || {};
+  const goalData = values || {};
 
   return (
     <div className="space-y-6!">
@@ -29,11 +32,11 @@ export default function BodyRecompositionForm({
         <H4 className="mb-5">Body Goals (جسمانی اہداف)</H4>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <Field label="Target Weight (kg) (ہدف وزن)">
+          <Field label="Target Weight (kg) (ہدف وزن)" error={touched.targetWeight && errors.targetWeight}>
             <InputNumber
               value={goalData.targetWeight}
               onChange={(value) =>
-                updateGoalData("targetWeight", value)
+                setFieldValue("targetWeight", value)
               }
             />
           </Field>
@@ -44,7 +47,7 @@ export default function BodyRecompositionForm({
               max={60}
               value={goalData.bodyFat}
               onChange={(value) =>
-                updateGoalData("bodyFat", value)
+                setFieldValue("bodyFat", value)
               }
             />
           </Field>
@@ -54,7 +57,7 @@ export default function BodyRecompositionForm({
               <InputNumber
                 value={goalData.waist}
                 onChange={(value) =>
-                  updateGoalData("waist", value)
+                  setFieldValue("waist", value)
                 }
               />
             </Field>
@@ -74,7 +77,7 @@ export default function BodyRecompositionForm({
               max={7}
               value={goalData.workoutDays}
               onChange={(value) =>
-                updateGoalData("workoutDays", value)
+                setFieldValue("workoutDays", value)
               }
             />
           </Field>
@@ -85,17 +88,17 @@ export default function BodyRecompositionForm({
               max={7}
               value={goalData.cardioDays}
               onChange={(value) =>
-                updateGoalData("cardioDays", value)
+                setFieldValue("cardioDays", value)
               }
             />
           </Field>
 
           <div className="md:col-span-2">
-            <Field label="Training Experience (تربیتی تجربہ)">
+            <Field label="Training Experience (تربیتی تجربہ)" error={touched.experience && errors.experience}>
               <Select
                 value={goalData.experience}
                 onChange={(value) =>
-                  updateGoalData("experience", value)
+                  setFieldValue("experience", value)
                 }
                 options={[
                   { label: "Beginner", value: "beginner" },
@@ -119,7 +122,7 @@ export default function BodyRecompositionForm({
             <Select
               value={goalData.meals}
               onChange={(value) =>
-                updateGoalData("meals", value)
+                setFieldValue("meals", value)
               }
               options={[
                 { label: "2", value: 2 },
@@ -134,7 +137,7 @@ export default function BodyRecompositionForm({
             <InputNumber
               value={goalData.protein}
               onChange={(value) =>
-                updateGoalData("protein", value)
+                setFieldValue("protein", value)
               }
             />
           </Field>
@@ -145,7 +148,7 @@ export default function BodyRecompositionForm({
                 className="flex flex-col gap-3"
                 value={goalData.challenges}
                 onChange={(value) =>
-                  updateGoalData("challenges", value)
+                  setFieldValue("challenges", value)
                 }
                 options={[
                   "Hard to lose fat",
@@ -173,7 +176,7 @@ export default function BodyRecompositionForm({
               max={12}
               value={goalData.sleep}
               onChange={(value) =>
-                updateGoalData("sleep", value)
+                setFieldValue("sleep", value)
               }
             />
           </Field>
@@ -183,7 +186,7 @@ export default function BodyRecompositionForm({
               rows={4}
               value={goalData.notes || ''}
               onChange={(e) =>
-                updateGoalData("notes", e.target.value)
+                setFieldValue("notes", e.target.value)
               }
               placeholder="Anything you'd like us to know?"
             />

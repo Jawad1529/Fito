@@ -1,12 +1,21 @@
 'use client';
 
-import Alert from '../../atoms/Alert';
+import { forwardRef, useImperativeHandle, useRef } from 'react';
+import { Formik, Form } from 'formik';
 
-export default function GoalSpecificStep({
-  goal,
-  formData,
-  updateGoalData,
-}) {
+import Alert from '../../atoms/Alert';
+import { GOAL_DATA_SCHEMAS } from '../../../utils/consultationValidation';
+
+const GoalSpecificStep = forwardRef(function GoalSpecificStep(
+  { goal, formData, updateGoalData, onValid },
+  ref
+) {
+  const formikRef = useRef(null);
+
+  useImperativeHandle(ref, () => ({
+    submit: () => formikRef.current?.submitForm(),
+  }));
+
   if (!goal) {
     return (
       <Alert
@@ -19,9 +28,28 @@ export default function GoalSpecificStep({
   const GoalForm = goal.component;
 
   return (
-    <GoalForm
-      formData={formData}
-      updateGoalData={updateGoalData}
-    />
+    <Formik
+      innerRef={formikRef}
+      initialValues={formData.goalData || {}}
+      enableReinitialize
+      validationSchema={GOAL_DATA_SCHEMAS[goal.id]}
+      onSubmit={(values) => {
+        Object.entries(values).forEach(([key, value]) => updateGoalData(key, value));
+        onValid();
+      }}
+    >
+      {({ values, errors, touched, setFieldValue }) => (
+        <Form>
+          <GoalForm
+            values={values}
+            errors={errors}
+            touched={touched}
+            setFieldValue={setFieldValue}
+          />
+        </Form>
+      )}
+    </Formik>
   );
-}
+});
+
+export default GoalSpecificStep;

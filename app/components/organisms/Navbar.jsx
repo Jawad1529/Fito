@@ -19,6 +19,7 @@ import useNotifications from '../../hooks/useNotifications';
 const navLinks = [
   { label: 'Home', href: '/' },
   { label: 'Shop', href: '/shop' },
+  { label: 'Programs', href: '/programs' },
   { label: 'Consultation', href: '/consultation' },
   { label: 'Blog', href: '/blog' },
   { label: 'About', href: '/about' },

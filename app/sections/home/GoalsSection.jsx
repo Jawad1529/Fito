@@ -41,13 +41,13 @@ const goals = [
   {
     id: 'diabetes',
     image: diabeticPatientsIcon,
-    title: 'Diabetes Reversal',
+    title: 'Diabetes Management',
     description: 'Reverse insulin resistance and improve metabolic markers with a clinical program.',
   },
   {
     id: 'mother-wellness',
     image: motherWellnessIcon,
-    title: 'Mother & Child Wellness',
+    title: 'Busy Moms',
     description: 'Nutrition and fitness support through pregnancy, postpartum, and beyond.',
   },
 ];

@@ -35,6 +35,22 @@ export const ABOUT_SEO = {
     ],
 };
 
+export const PROGRAMS_SEO = {
+    title: 'Our Programs — Fat Loss, Muscle Gain, PCOS & More | Fitoo',
+    description:
+        'Explore Fitoo\'s coaching programs — fat loss, muscle gain, body recomposition, PCOS, Diabetes Management and Busy Moms — and book your plan.',
+    keywords: [
+        'fitoo programs',
+        'fat loss program',
+        'muscle gain program',
+        'body recomposition',
+        'pcos program',
+        'Diabetes Management program',
+        'busy moms program',
+        'nutrition coaching programs',
+    ],
+};
+
 export const FAQ_SEO = {
     title: 'FAQs — Orders, Shipping, Products & Consultations | Fitoo',
     description:

@@ -10,18 +10,21 @@ import Checkbox from '../../atoms/Checkbox';
 import Radio from '../../atoms/Radio';
 import TextArea from '../../atoms/TextArea';
 
-const Field = ({ label, children }) => (
+const Field = ({ label, error, children }) => (
   <div className="flex flex-col gap-2">
     <label className="text-sm text-text-secondary font-medium">{label}</label>
     {children}
+    {error && <p className="text-xs text-danger">{error}</p>}
   </div>
 );
 
 export default function PCOSForm({
-  formData,
-  updateGoalData,
+  values,
+  errors,
+  touched,
+  setFieldValue,
 }) {
-  const goalData = formData.goalData || {};
+  const goalData = values || {};
 
   return (
     <div className="space-y-6!">
@@ -36,11 +39,11 @@ export default function PCOSForm({
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 
-          <Field label="Have you been diagnosed with PCOS? (کیا آپ کو پی سی او ایس کی تشخیص ہوئی ہے؟)">
+          <Field label="Have you been diagnosed with PCOS? (کیا آپ کو پی سی او ایس کی تشخیص ہوئی ہے؟)" error={touched.diagnosed && errors.diagnosed}>
             <Radio.Group
               value={goalData.diagnosed}
               onChange={(e)=>
-                updateGoalData("diagnosed", e.target.value)
+                setFieldValue("diagnosed", e.target.value)
               }
             >
               <Radio value="yes">Yes</Radio>
@@ -53,7 +56,7 @@ export default function PCOSForm({
             <DatePicker
               value={goalData.diagnosisDate}
               onChange={(date)=>
-                updateGoalData(
+                setFieldValue(
                   "diagnosisDate",
                   date?.toISOString()
                 )
@@ -66,7 +69,7 @@ export default function PCOSForm({
               <Input
                 value={goalData.medication}
                 onChange={(e)=>
-                  updateGoalData(
+                  setFieldValue(
                     "medication",
                     e.target.value
                   )
@@ -92,7 +95,7 @@ export default function PCOSForm({
           className="flex flex-col gap-3"
           value={goalData.symptoms}
           onChange={(value)=>
-            updateGoalData("symptoms", value)
+            setFieldValue("symptoms", value)
           }
           options={[
             "Weight Gain",
@@ -118,11 +121,11 @@ export default function PCOSForm({
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 
-          <Field label="Cycle Regularity (سائیکل کی باقاعدگی)">
+          <Field label="Cycle Regularity (سائیکل کی باقاعدگی)" error={touched.cycle && errors.cycle}>
             <Select
               value={goalData.cycle}
               onChange={(value)=>
-                updateGoalData("cycle", value)
+                setFieldValue("cycle", value)
               }
               options={[
                 {
@@ -145,7 +148,7 @@ export default function PCOSForm({
             <DatePicker
               value={goalData.lastPeriod}
               onChange={(date)=>
-                updateGoalData(
+                setFieldValue(
                   "lastPeriod",
                   date?.toISOString()
                 )
@@ -173,7 +176,7 @@ export default function PCOSForm({
               max={7}
               value={goalData.exercise}
               onChange={(value)=>
-                updateGoalData("exercise", value)
+                setFieldValue("exercise", value)
               }
             />
           </Field>
@@ -184,7 +187,7 @@ export default function PCOSForm({
               max={12}
               value={goalData.sleep}
               onChange={(value)=>
-                updateGoalData("sleep", value)
+                setFieldValue("sleep", value)
               }
             />
           </Field>
@@ -195,7 +198,7 @@ export default function PCOSForm({
               max={10}
               value={goalData.stress}
               onChange={(value)=>
-                updateGoalData("stress", value)
+                setFieldValue("stress", value)
               }
             />
           </Field>
@@ -216,7 +219,7 @@ export default function PCOSForm({
           className="flex flex-col gap-3"
           value={goalData.goals}
           onChange={(value)=>
-            updateGoalData("goals", value)
+            setFieldValue("goals", value)
           }
           options={[
             "Weight Loss",
@@ -241,7 +244,7 @@ export default function PCOSForm({
           rows={5}
           value={goalData.notes || ''}
           onChange={(e)=>
-            updateGoalData(
+            setFieldValue(
               "notes",
               e.target.value
             )

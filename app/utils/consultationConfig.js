@@ -239,7 +239,7 @@ export const CONSULTATION_GOALS = [
   },
   {
     id: "mother-wellness",
-    title: "Mother Wellness Program",
+    title: "Busy Moms",
     shortDescription: "Nutrition support for pregnancy, postpartum & breastfeeding.",
     icon: "🤱",
     image: motherWellnessImage,

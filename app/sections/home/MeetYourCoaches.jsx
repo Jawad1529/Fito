@@ -11,7 +11,7 @@ const coaches = [
     image: umerImage,
     name: 'Umer Shabbir',
     role: 'Founder | Clinical Dietitian & UK-Certified Fitness Trainer',
-    bio: 'Specialist in diabetes reversal, PCOS, and body recomposition. 1,000+ clients transformed over 8 years.',
+    bio: 'Specialist in Diabetes Management, PCOS, and body recomposition. 1,000+ clients transformed over 8 years.',
   },
   {
     id: 'abdul-basit-khan',

@@ -1,6 +1,7 @@
 'use client';
 
-import { useMemo } from 'react';
+import { forwardRef, useImperativeHandle, useRef } from 'react';
+import { Formik, Form } from 'formik';
 import {
   UserOutlined,
   MailOutlined,
@@ -16,11 +17,13 @@ import Select from '../../atoms/Select';
 import DatePicker from '../../atoms/DatePicker';
 import Slider from '../../atoms/Slider';
 import { H3, H4, H5, Text } from '../../atoms/Typography';
+import { personalInfoValidationSchema } from '../../../utils/consultationValidation';
 
-const Field = ({ label, children }) => (
+const Field = ({ label, error, children }) => (
   <div className="flex flex-col gap-2">
     <label className="text-sm text-text-secondary font-medium">{label}</label>
     {children}
+    {error && <p className="text-xs text-danger">{error}</p>}
   </div>
 );
 
@@ -48,206 +51,244 @@ const feetInchesToCm = (feet, inches) => {
   return totalInches > 0 ? Math.round(totalInches * 2.54) : null;
 };
 
-export default function PersonalInfoStep({
-  formData,
-  updateField,
-}) {
-  const bmi = useMemo(() => {
-    const heightM = (formData.height || 0) / 100;
-    if (!heightM || !formData.weight) return null;
-    return formData.weight / (heightM * heightM);
-  }, [formData.height, formData.weight]);
+const PersonalInfoStep = forwardRef(function PersonalInfoStep(
+  { formData, updateField, onValid },
+  ref
+) {
+  const formikRef = useRef(null);
 
-  const bmiCategory = bmi ? BMI_CATEGORIES.find((c) => bmi < c.max) : null;
+  useImperativeHandle(ref, () => ({
+    submit: () => formikRef.current?.submitForm(),
+  }));
 
-  const { feet: heightFeet, inches: heightInches } = cmToFeetInches(formData.height);
-
-  const updateHeightFeet = (feet) => {
-    updateField('height', feetInchesToCm(feet, heightInches));
-  };
-
-  const updateHeightInches = (inches) => {
-    updateField('height', feetInchesToCm(heightFeet, inches));
+  const initialValues = {
+    fullName: formData.fullName || '',
+    email: formData.email || '',
+    phone: formData.phone || '',
+    dob: formData.dob || null,
+    gender: formData.gender || '',
+    activityLevel: formData.activityLevel || '',
+    height: formData.height ?? null,
+    weight: formData.weight ?? null,
   };
 
   return (
-    <div className="space-y-6!">
+    <Formik
+      innerRef={formikRef}
+      initialValues={initialValues}
+      enableReinitialize
+      validationSchema={personalInfoValidationSchema}
+      onSubmit={(values) => {
+        Object.entries(values).forEach(([key, value]) => updateField(key, value));
+        onValid();
+      }}
+    >
+      {({ values, errors, touched, setFieldValue }) => {
+        const bmiHeightM = (values.height || 0) / 100;
+        const bmi = bmiHeightM && values.weight ? values.weight / (bmiHeightM * bmiHeightM) : null;
+        const bmiCategory = bmi ? BMI_CATEGORIES.find((c) => bmi < c.max) : null;
+        const { feet: heightFeet, inches: heightInches } = cmToFeetInches(values.height);
 
-      <div>
-        <H3 className="mb-2">
-          Personal Information
-        </H3>
+        const updateHeightFeet = (feet) => {
+          setFieldValue('height', feetInchesToCm(feet, heightInches));
+        };
 
-        <Text muted>
-          Tell us a little about yourself.
-        </Text>
-      </div>
+        const updateHeightInches = (inches) => {
+          setFieldValue('height', feetInchesToCm(heightFeet, inches));
+        };
 
-      <Card className="glass border border-border-light">
+        return (
+          <Form className="space-y-6!">
 
-        <H4 className="mb-5">Basic Information</H4>
+            <div>
+              <H3 className="mb-2">
+                Personal Information
+              </H3>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-
-          <Field label="Full Name">
-            <Input
-              icon={<UserOutlined />}
-              placeholder="John Doe"
-              value={formData.fullName}
-              onChange={(e)=>updateField("fullName",e.target.value)}
-            />
-          </Field>
-
-          <Field label="Email">
-            <Input
-              icon={<MailOutlined />}
-              placeholder="john@email.com"
-              value={formData.email}
-              onChange={(e)=>updateField("email",e.target.value)}
-            />
-          </Field>
-
-          <Field label="Phone Number">
-            <Input
-              icon={<PhoneOutlined />}
-              placeholder="+92..."
-              value={formData.phone}
-              onChange={(e)=>updateField("phone",e.target.value)}
-            />
-          </Field>
-
-          <Field label="Date of Birth">
-            <DatePicker
-              value={formData.dob}
-              onChange={(date)=>
-                updateField(
-                  "dob",
-                  date?.toISOString()
-                )
-              }
-            />
-          </Field>
-
-          <Field label="Gender">
-            <Select
-              value={formData.gender}
-              onChange={(value)=>updateField("gender",value)}
-              options={[
-                {label:"Male",value:"male"},
-                {label:"Female",value:"female"},
-                {label:"Other",value:"other"},
-              ]}
-            />
-          </Field>
-
-          <Field label="Activity Level">
-            <Select
-              value={formData.activityLevel}
-              onChange={(value)=>updateField("activityLevel",value)}
-              options={[
-                {
-                  label:"Sedentary",
-                  value:"sedentary",
-                },
-                {
-                  label:"Lightly Active",
-                  value:"light",
-                },
-                {
-                  label:"Moderately Active",
-                  value:"moderate",
-                },
-                {
-                  label:"Very Active",
-                  value:"active",
-                },
-              ]}
-            />
-          </Field>
-
-        </div>
-
-      </Card>
-
-      <Card className="glass border border-border-light">
-
-        <div className="flex items-center gap-2 mb-5">
-          <TeamOutlined className="text-primary" />
-          <H4>Body Metrics</H4>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-
-          <div>
-            <H5 className="mb-4">Height</H5>
-
-            <div className="grid grid-cols-2 gap-3">
-              <Input
-                type="number"
-                suffix="ft"
-                value={heightFeet}
-                onChange={(e)=>updateHeightFeet(e.target.value)}
-              />
-
-              <Input
-                type="number"
-                suffix="in"
-                value={heightInches}
-                onChange={(e)=>updateHeightInches(e.target.value)}
-              />
+              <Text muted>
+                Tell us a little about yourself.
+              </Text>
             </div>
-          </div>
 
-          <div>
-            <H5 className="mb-4">Weight</H5>
+            <Card className="glass border border-border-light">
 
-            <div className="flex flex-col gap-3">
-              <Slider
-                min={30}
-                max={200}
-                value={formData.weight}
-                onChange={(value)=>updateField("weight",value)}
-              />
+              <H4 className="mb-5">Basic Information</H4>
 
-              <Input
-                type="number"
-                suffix="kg"
-                value={formData.weight}
-                onChange={(e)=>
-                  updateField(
-                    "weight",
-                    Number(e.target.value)
-                  )
-                }
-              />
-            </div>
-          </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 
-        </div>
+                <Field label="Full Name" error={touched.fullName && errors.fullName}>
+                  <Input
+                    icon={<UserOutlined />}
+                    placeholder="John Doe"
+                    value={values.fullName}
+                    error={touched.fullName && errors.fullName}
+                    onChange={(e) => setFieldValue('fullName', e.target.value)}
+                  />
+                </Field>
 
-        {bmi && (
-          <div className="flex items-center gap-3 mt-6 bg-overlay rounded-xl p-4">
-            <ThunderboltOutlined className="text-primary text-lg shrink-0" />
-            <Text className="text-sm">
-              <span className="text-text font-semibold">Your BMI: {bmi.toFixed(1)}</span>
-              {' — '}
-              <span style={{ color: bmiCategory?.color }} className="font-medium">
-                {bmiCategory?.label}
+                <Field label="Email" error={touched.email && errors.email}>
+                  <Input
+                    icon={<MailOutlined />}
+                    placeholder="john@email.com"
+                    value={values.email}
+                    error={touched.email && errors.email}
+                    onChange={(e) => setFieldValue('email', e.target.value)}
+                  />
+                </Field>
+
+                <Field label="Phone Number" error={touched.phone && errors.phone}>
+                  <Input
+                    icon={<PhoneOutlined />}
+                    placeholder="+92..."
+                    value={values.phone}
+                    error={touched.phone && errors.phone}
+                    onChange={(e) => setFieldValue('phone', e.target.value)}
+                  />
+                </Field>
+
+                <Field label="Date of Birth" error={touched.dob && errors.dob}>
+                  <DatePicker
+                    value={values.dob}
+                    onChange={(date) =>
+                      setFieldValue(
+                        "dob",
+                        date?.toISOString()
+                      )
+                    }
+                  />
+                </Field>
+
+                <Field label="Gender" error={touched.gender && errors.gender}>
+                  <Select
+                    value={values.gender}
+                    onChange={(value) => setFieldValue('gender', value)}
+                    options={[
+                      {label:"Male",value:"male"},
+                      {label:"Female",value:"female"},
+                      {label:"Other",value:"other"},
+                    ]}
+                  />
+                </Field>
+
+                <Field label="Activity Level" error={touched.activityLevel && errors.activityLevel}>
+                  <Select
+                    value={values.activityLevel}
+                    onChange={(value) => setFieldValue('activityLevel', value)}
+                    options={[
+                      {
+                        label:"Sedentary",
+                        value:"sedentary",
+                      },
+                      {
+                        label:"Lightly Active",
+                        value:"light",
+                      },
+                      {
+                        label:"Moderately Active",
+                        value:"moderate",
+                      },
+                      {
+                        label:"Very Active",
+                        value:"active",
+                      },
+                    ]}
+                  />
+                </Field>
+
+              </div>
+
+            </Card>
+
+            <Card className="glass border border-border-light">
+
+              <div className="flex items-center gap-2 mb-5">
+                <TeamOutlined className="text-primary" />
+                <H4>Body Metrics</H4>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+
+                <div>
+                  <H5 className="mb-4">Height</H5>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <Input
+                      type="number"
+                      suffix="ft"
+                      value={heightFeet}
+                      onChange={(e) => updateHeightFeet(e.target.value)}
+                    />
+
+                    <Input
+                      type="number"
+                      suffix="in"
+                      value={heightInches}
+                      onChange={(e) => updateHeightInches(e.target.value)}
+                    />
+                  </div>
+                  {touched.height && errors.height && (
+                    <p className="mt-1 text-xs text-danger">{errors.height}</p>
+                  )}
+                </div>
+
+                <div>
+                  <H5 className="mb-4">Weight</H5>
+
+                  <div className="flex flex-col gap-3">
+                    <Slider
+                      min={30}
+                      max={200}
+                      value={values.weight}
+                      onChange={(value) => setFieldValue('weight', value)}
+                    />
+
+                    <Input
+                      type="number"
+                      suffix="kg"
+                      value={values.weight}
+                      onChange={(e) =>
+                        setFieldValue(
+                          "weight",
+                          Number(e.target.value)
+                        )
+                      }
+                    />
+                  </div>
+                  {touched.weight && errors.weight && (
+                    <p className="mt-1 text-xs text-danger">{errors.weight}</p>
+                  )}
+                </div>
+
+              </div>
+
+              {bmi && (
+                <div className="flex items-center gap-3 mt-6 bg-overlay rounded-xl p-4">
+                  <ThunderboltOutlined className="text-primary text-lg shrink-0" />
+                  <Text className="text-sm">
+                    <span className="text-text font-semibold">Your BMI: {bmi.toFixed(1)}</span>
+                    {' — '}
+                    <span style={{ color: bmiCategory?.color }} className="font-medium">
+                      {bmiCategory?.label}
+                    </span>
+                    <span className="text-text-muted"> (calculated from height and weight)</span>
+                  </Text>
+                </div>
+              )}
+
+            </Card>
+
+            <div className="flex items-start gap-2 text-text-muted text-xs">
+              <CalendarOutlined className="mt-0.5 shrink-0" />
+              <span>
+                This information helps your dietitian tailor a plan specifically to you — it&apos;s never shared outside your consultation.
               </span>
-              <span className="text-text-muted"> (calculated from height and weight)</span>
-            </Text>
-          </div>
-        )}
+            </div>
 
-      </Card>
-
-      <div className="flex items-start gap-2 text-text-muted text-xs">
-        <CalendarOutlined className="mt-0.5 shrink-0" />
-        <span>
-          This information helps your dietitian tailor a plan specifically to you — it&apos;s never shared outside your consultation.
-        </span>
-      </div>
-
-    </div>
+          </Form>
+        );
+      }}
+    </Formik>
   );
-}
+});
+
+export default PersonalInfoStep;

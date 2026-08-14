@@ -1,9 +1,17 @@
-// Static section. The before/after reveal is CSS-only now, so this needs no
-// state, no framer-motion, and no client bundle.
+// Static section. The before/after reveal is CSS-only — a hidden checkbox
+// drives both the hover wipe (desktop) and the tap-to-reveal (mobile, via a
+// <label> wrapping the image) — so this needs no state, no framer-motion,
+// and no client bundle.
 import Image from 'next/image';
 import Link from 'next/link';
 import { H2, Text } from '../../components/atoms/Typography';
 import Icon from '../../components/atoms/Icon';
+import ba101 from '@/assets/images/ba101.jpeg';
+import ba102 from '@/assets/images/ba102.jpeg';
+import ba201 from '@/assets/images/ba201.jpeg';
+import ba202 from '@/assets/images/ba202.jpeg';
+import ba301 from '@/assets/images/ba301.jpeg';
+import ba302 from '@/assets/images/ba302.jpeg';
 
 const transformations = [
   {
@@ -15,8 +23,8 @@ const transformations = [
     afterWeight: 62,
     duration: '4 months',
     story: 'Sarah lost 16 kg with a personalized diet plan and regular check-ins.',
-    beforeImage: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSbANoKO2axa0Y-52fSiYNJZmVp86Kgn3rxr0iT8zwtVQ&s=10',
-    afterImage: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRNpLdU91t50-j7Mt3Y-lqPk26LaJ9sCIqTCv3lsCtSdtLq_usXwQutBlWD&s=10',
+    beforeImage: ba101,
+    afterImage: ba102,
   },
   {
     id: 't2',
@@ -27,8 +35,8 @@ const transformations = [
     afterWeight: 82,
     duration: '6 months',
     story: 'James gained 14 kg of lean muscle with targeted nutrition and training.',
-    beforeImage: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSbANoKO2axa0Y-52fSiYNJZmVp86Kgn3rxr0iT8zwtVQ&s=10',
-    afterImage: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRNpLdU91t50-j7Mt3Y-lqPk26LaJ9sCIqTCv3lsCtSdtLq_usXwQutBlWD&s=10',
+    beforeImage: ba201,
+    afterImage: ba202,
   },
   {
     id: 't3',
@@ -39,8 +47,8 @@ const transformations = [
     afterWeight: 68,
     duration: '3 months',
     story: 'Emily transformed her habits with sustainable nutrition and daily wellness.',
-    beforeImage: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSbANoKO2axa0Y-52fSiYNJZmVp86Kgn3rxr0iT8zwtVQ&s=10',
-    afterImage: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRNpLdU91t50-j7Mt3Y-lqPk26LaJ9sCIqTCv3lsCtSdtLq_usXwQutBlWD&s=10',
+    beforeImage: ba301,
+    afterImage: ba302,
   },
 ];
 
@@ -64,15 +72,25 @@ export default function TransformationStories() {
                 key={story.id}
                 className="story group relative glass border border-border-light rounded-2xl overflow-hidden hover-lift hover-lift-sm hover:border-primary/30"
               >
-                {/* Before/After Image Container */}
-                <div className="relative w-full aspect-[4/5] overflow-hidden">
+                {/* Drives the reveal on devices without hover. Sits outside
+                    the label so `~` sibling selectors in CSS can target the
+                    image layers below from a single checked state. */}
+                <input
+                  type="checkbox"
+                  id={`reveal-${story.id}`}
+                  className="story-toggle sr-only"
+                  aria-label={`Toggle before and after photo for ${story.name}`}
+                />
+
+                {/* Before/After Image Container — also a label, so tapping
+                    it on touch devices toggles the checkbox above. */}
+                <label htmlFor={`reveal-${story.id}`} className="story-media relative block w-full aspect-[4/5] overflow-hidden cursor-pointer md:cursor-default">
                   {/* Before — always visible underneath */}
                   <div className="absolute inset-0">
                     <Image
                       src={story.beforeImage}
                       alt={`${story.name} before transformation`}
                       fill
-                      unoptimized
                       sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                       className="object-cover"
                     />
@@ -82,18 +100,16 @@ export default function TransformationStories() {
                     </span>
                   </div>
 
-                  {/* After — wiped in on hover.
+                  {/* After — wiped in on hover (desktop) or tap (mobile).
                       clip-path via a CSS transition instead of framer-motion:
                       the old version drove clipPath off React state, so every
                       frame of the 600ms wipe was a React render plus a full
-                      image repaint. Also gated behind a hover-capable pointer,
-                      since on touch it just flashed. */}
+                      image repaint. */}
                   <div className="story-after absolute inset-0">
                     <Image
                       src={story.afterImage}
                       alt={`${story.name} after transformation`}
                       fill
-                      unoptimized
                       sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                       className="object-cover"
                     />
@@ -105,7 +121,13 @@ export default function TransformationStories() {
 
                   {/* Wipe edge */}
                   <div className="story-handle absolute top-0 bottom-0 w-0.5 bg-primary shadow-lg shadow-primary/50" />
-                </div>
+
+                  {/* Glowing tap hint — mobile only (no hover there), fades
+                      out once the checkbox is checked. */}
+                  <span className="story-tap-hint md:hidden absolute bottom-3 inset-x-0 mx-auto w-fit bg-primary text-text-inverse text-xs font-semibold px-4 py-2 rounded-full">
+                    Tap to see results
+                  </span>
+                </label>
 
                 {/* Content */}
                 <div className="p-5 space-y-3">

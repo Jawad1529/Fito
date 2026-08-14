@@ -7,21 +7,23 @@ import Slider from '../../atoms/Slider';
 import Input from '../../atoms/Input';
 import DatePicker from '../../atoms/DatePicker';
 import Checkbox from '../../atoms/Checkbox';
-import Radio from '../../atoms/Radio';
 import TextArea from '../../atoms/TextArea';
 
-const Field = ({ label, children }) => (
+const Field = ({ label, error, children }) => (
   <div className="flex flex-col gap-2">
     <label className="text-sm text-text-secondary font-medium">{label}</label>
     {children}
+    {error && <p className="text-xs text-danger">{error}</p>}
   </div>
 );
 
 export default function DiabetesForm({
-  formData,
-  updateGoalData,
+  values,
+  errors,
+  touched,
+  setFieldValue,
 }) {
-  const goalData = formData.goalData || {};
+  const goalData = values || {};
 
   return (
     <div className="space-y-6!">
@@ -36,11 +38,11 @@ export default function DiabetesForm({
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 
-          <Field label="Diabetes Type (ذیابیطس کی قسم)">
+          <Field label="Diabetes Type (ذیابیطس کی قسم)" error={touched.diabetesType && errors.diabetesType}>
             <Select
               value={goalData.diabetesType}
               onChange={(value)=>
-                updateGoalData("diabetesType", value)
+                setFieldValue("diabetesType", value)
               }
               options={[
                 {
@@ -67,7 +69,7 @@ export default function DiabetesForm({
             <DatePicker
               value={goalData.diagnosisDate}
               onChange={(date)=>
-                updateGoalData(
+                setFieldValue(
                   "diagnosisDate",
                   date?.toISOString()
                 )
@@ -80,7 +82,7 @@ export default function DiabetesForm({
               <Input
                 value={goalData.medication}
                 onChange={(e)=>
-                  updateGoalData(
+                  setFieldValue(
                     "medication",
                     e.target.value
                   )
@@ -104,12 +106,12 @@ export default function DiabetesForm({
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 
-          <Field label="Fasting Blood Sugar (mg/dL) (فاسٹنگ بلڈ شوگر)">
+          <Field label="Fasting Blood Sugar (mg/dL) (فاسٹنگ بلڈ شوگر)" error={touched.fastingSugar && errors.fastingSugar}>
             <Input
               type="number"
               value={goalData.fastingSugar}
               onChange={(e)=>
-                updateGoalData(
+                setFieldValue(
                   "fastingSugar",
                   e.target.value
                 )
@@ -123,7 +125,7 @@ export default function DiabetesForm({
               type="number"
               value={goalData.postMealSugar}
               onChange={(e)=>
-                updateGoalData(
+                setFieldValue(
                   "postMealSugar",
                   e.target.value
                 )
@@ -137,7 +139,7 @@ export default function DiabetesForm({
               type="number"
               value={goalData.hba1c}
               onChange={(e)=>
-                updateGoalData(
+                setFieldValue(
                   "hba1c",
                   e.target.value
                 )
@@ -162,7 +164,7 @@ export default function DiabetesForm({
           className="flex flex-col gap-3"
           value={goalData.symptoms}
           onChange={(value)=>
-            updateGoalData("symptoms", value)
+            setFieldValue("symptoms", value)
           }
           options={[
             "Frequent Urination",
@@ -193,7 +195,7 @@ export default function DiabetesForm({
               max={7}
               value={goalData.exercise}
               onChange={(value)=>
-                updateGoalData("exercise", value)
+                setFieldValue("exercise", value)
               }
             />
           </Field>
@@ -204,7 +206,7 @@ export default function DiabetesForm({
               max={12}
               value={goalData.sleep}
               onChange={(value)=>
-                updateGoalData("sleep", value)
+                setFieldValue("sleep", value)
               }
             />
           </Field>
@@ -215,7 +217,7 @@ export default function DiabetesForm({
               max={10}
               value={goalData.stress}
               onChange={(value)=>
-                updateGoalData("stress", value)
+                setFieldValue("stress", value)
               }
             />
           </Field>
@@ -236,7 +238,7 @@ export default function DiabetesForm({
           className="flex flex-col gap-3"
           value={goalData.goals}
           onChange={(value)=>
-            updateGoalData("goals", value)
+            setFieldValue("goals", value)
           }
           options={[
             "Better Blood Sugar Control",
@@ -261,7 +263,7 @@ export default function DiabetesForm({
           rows={5}
           value={goalData.notes || ''}
           onChange={(e)=>
-            updateGoalData(
+            setFieldValue(
               "notes",
               e.target.value
             )

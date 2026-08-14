@@ -8,18 +8,21 @@ import Slider from '../../atoms/Slider';
 import Radio from '../../atoms/Radio';
 import TextArea from '../../atoms/TextArea';
 
-const Field = ({ label, children }) => (
+const Field = ({ label, error, children }) => (
   <div className="flex flex-col gap-2">
     <label className="text-sm text-text-secondary font-medium">{label}</label>
     {children}
+    {error && <p className="text-xs text-danger">{error}</p>}
   </div>
 );
 
 export default function MuscleGainForm({
-  formData,
-  updateGoalData,
+  values,
+  errors,
+  touched,
+  setFieldValue,
 }) {
-  const goalData = formData.goalData || {};
+  const goalData = values || {};
 
   return (
     <div className="space-y-6!">
@@ -29,11 +32,11 @@ export default function MuscleGainForm({
         <H4 className="mb-5">Muscle Building Goal (پٹھے بنانے کا ہدف)</H4>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <Field label="Target Weight (kg) (ہدف وزن)">
+          <Field label="Target Weight (kg) (ہدف وزن)" error={touched.targetWeight && errors.targetWeight}>
             <InputNumber
               value={goalData.targetWeight}
               onChange={(value) =>
-                updateGoalData("targetWeight", value)
+                setFieldValue("targetWeight", value)
               }
             />
           </Field>
@@ -42,7 +45,7 @@ export default function MuscleGainForm({
             <Radio.Group
               value={goalData.primaryGoal}
               onChange={(e) =>
-                updateGoalData("primaryGoal", e.target.value)
+                setFieldValue("primaryGoal", e.target.value)
               }
             >
               <Radio value="lean-muscle">Lean Muscle</Radio>
@@ -59,11 +62,11 @@ export default function MuscleGainForm({
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 
-          <Field label="Training Experience (تربیتی تجربہ)">
+          <Field label="Training Experience (تربیتی تجربہ)" error={touched.trainingExperience && errors.trainingExperience}>
             <Select
               value={goalData.trainingExperience}
               onChange={(value)=>
-                updateGoalData("trainingExperience", value)
+                setFieldValue("trainingExperience", value)
               }
               options={[
                 { label: "Beginner", value: "beginner" },
@@ -79,17 +82,17 @@ export default function MuscleGainForm({
               max={7}
               value={goalData.workoutDays}
               onChange={(value)=>
-                updateGoalData("workoutDays", value)
+                setFieldValue("workoutDays", value)
               }
             />
           </Field>
 
           <div className="md:col-span-2">
-            <Field label="Do you have gym access? (کیا آپ کو جم تک رسائی ہے؟)">
+            <Field label="Do you have gym access? (کیا آپ کو جم تک رسائی ہے؟)" error={touched.gymAccess && errors.gymAccess}>
               <Select
                 value={goalData.gymAccess}
                 onChange={(value)=>
-                  updateGoalData("gymAccess", value)
+                  setFieldValue("gymAccess", value)
                 }
                 options={[
                   { label: "Yes", value: "yes" },
@@ -114,7 +117,7 @@ export default function MuscleGainForm({
             <Select
               value={goalData.mealsPerDay}
               onChange={(value)=>
-                updateGoalData("mealsPerDay", value)
+                setFieldValue("mealsPerDay", value)
               }
               options={[
                 { label: "2", value: 2 },
@@ -129,7 +132,7 @@ export default function MuscleGainForm({
             <InputNumber
               value={goalData.protein}
               onChange={(value)=>
-                updateGoalData("protein", value)
+                setFieldValue("protein", value)
               }
             />
           </Field>
@@ -142,7 +145,7 @@ export default function MuscleGainForm({
                 step={0.5}
                 value={goalData.water}
                 onChange={(value)=>
-                  updateGoalData("water", value)
+                  setFieldValue("water", value)
                 }
               />
             </Field>
@@ -165,7 +168,7 @@ export default function MuscleGainForm({
               max={12}
               value={goalData.sleep}
               onChange={(value)=>
-                updateGoalData("sleep", value)
+                setFieldValue("sleep", value)
               }
             />
           </Field>
@@ -175,7 +178,7 @@ export default function MuscleGainForm({
               rows={4}
               value={goalData.injuries || ''}
               onChange={(e)=>
-                updateGoalData(
+                setFieldValue(
                   "injuries",
                   e.target.value
                 )
