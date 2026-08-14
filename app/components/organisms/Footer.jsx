@@ -5,6 +5,7 @@ import Icon from '../atoms/Icon';
 import Input from '../atoms/Input';
 import Button from '../atoms/Button';
 import Divider from '../atoms/Divider';
+import Logo from '../shared/Logo';
 import { Caption, Text } from '../atoms/Typography';
 
 const shopLinks = [
@@ -34,10 +35,8 @@ const legalLinks = [
 ];
 
 const socialLinks = [
-  { name: 'facebook', href: 'https://facebook.com' },
-  { name: 'instagram', href: 'https://instagram.com' },
-  { name: 'twitter', href: 'https://twitter.com' },
-  { name: 'youtube', href: 'https://youtube.com' },
+  { name: 'facebook', href: 'https://www.facebook.com/share/1B2UCHJ3cB/' },
+  { name: 'instagram', href: 'https://www.instagram.com/fitoo.pro?igsh=MW56dTF0Ym1taHo2eA==&igsi=MW56dTF0Ym1taHo2eA==' },
 ];
 
 function FooterColumn({ title, links }) {
@@ -72,12 +71,7 @@ export default function Footer() {
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-10">
           {/* Brand */}
           <div className="col-span-2">
-            <Link
-              href="/"
-              className="text-2xl font-bold text-text tracking-tight"
-            >
-              Fitoo
-            </Link>
+            <Logo className="h-10 w-auto" />
 
             <Text muted className="mt-3 max-w-xs text-sm">
               Premium supplements and personalized diet consultation to help

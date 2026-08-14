@@ -7,6 +7,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useTestingMode } from '../../context/TestingModeContext';
 import TestingModeToggle from '../../components/atoms/TestingModeToggle';
 import { ROUTES } from '../../constants/routes';
+import logo from '../../assets/logo/fitoo-logo.svg';
 
 export default function LoginPage() {
     const { login } = useAuth();
@@ -51,9 +52,7 @@ export default function LoginPage() {
                     styles={{ body: { padding: 32 } }}
                 >
                     <div className="text-center mb-7">
-                        <div className="w-11 h-11 rounded-xl bg-primary text-white flex items-center justify-center text-lg font-bold mx-auto mb-4">
-                            F
-                        </div>
+                        <img src={logo} alt="Fitoo" className="h-12 w-auto mx-auto mb-4" />
                         <h1 className="text-xl font-semibold text-gray-900">Fito Admin</h1>
                         <p className="text-sm text-gray-500 mt-1">Sign in to manage your store</p>
                     </div>

@@ -1,0 +1,337 @@
+import { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import {
+    Form,
+    Input,
+    InputNumber,
+    Select,
+    Button,
+    Image,
+    Upload,
+    Card,
+    Row,
+    Col,
+    Spin,
+    Result,
+    message,
+} from 'antd';
+import { PlusOutlined, DeleteOutlined, ArrowLeftOutlined } from '@ant-design/icons';
+import PageHeading from '../../components/atoms/PageHeading';
+import { PRODUCT_CATEGORIES } from '../../constants/productCategories';
+import { ROUTES } from '../../constants/routes';
+import { useTestingMode } from '../../context/TestingModeContext';
+import useMockProducts from '../../hooks/useMockProducts';
+import imageUrl from '../../utils/imageUrl';
+import {
+    fetchProduct,
+    createProduct as createProductApi,
+    updateProduct as updateProductApi,
+} from '../../api/adminProducts.api';
+
+const apiError = (err, fallback) => err?.response?.data?.message || fallback;
+
+export default function ProductFormPage() {
+    const { id } = useParams();
+    const { testingMode } = useTestingMode();
+    // Remounts (resetting all local state) whenever the id or testing mode
+    // changes, instead of syncing that reset through an effect.
+    return <ProductFormPageInner key={`${id}-${testingMode}`} id={id} testingMode={testingMode} />;
+}
+
+function ProductFormPageInner({ id, testingMode }) {
+    const navigate = useNavigate();
+    const [form] = Form.useForm();
+    const [mockProducts, setMockProducts] = useMockProducts();
+
+    const isEdit = Boolean(id);
+    const mockProduct = isEdit ? mockProducts.find((p) => String(p.id) === String(id)) : null;
+
+    const [product, setProduct] = useState(testingMode ? mockProduct : null);
+    const [loading, setLoading] = useState(isEdit && !testingMode);
+    const [saving, setSaving] = useState(false);
+    const [notFound, setNotFound] = useState(isEdit && testingMode && !mockProduct);
+
+    const [files, setFiles] = useState([]);
+    // In testing mode the product is already known synchronously, so this
+    // seeds correctly on first render; in real mode it starts empty and gets
+    // filled once the fetch below resolves.
+    const [keptImages, setKeptImages] = useState(testingMode ? (mockProduct?.images ?? []) : []);
+    const urlValue = Form.useWatch('image', form);
+
+    useEffect(() => {
+        if (!isEdit || testingMode) return;
+        let cancelled = false;
+        fetchProduct(id)
+            .then((data) => {
+                if (cancelled) return;
+                setProduct(data);
+                setKeptImages(data.images ?? []);
+                form.setFieldsValue(data);
+            })
+            .catch(() => {
+                if (!cancelled) setNotFound(true);
+            })
+            .finally(() => {
+                if (!cancelled) setLoading(false);
+            });
+        return () => {
+            cancelled = true;
+        };
+    }, [id, isEdit, testingMode, form]);
+
+    if (loading) {
+        return (
+            <div className="flex justify-center py-16">
+                <Spin />
+            </div>
+        );
+    }
+
+    if (notFound) {
+        return (
+            <Result
+                status="404"
+                title="Product not found"
+                extra={
+                    <Button type="primary" onClick={() => navigate(ROUTES.PRODUCTS)}>
+                        Back to Products
+                    </Button>
+                }
+            />
+        );
+    }
+
+    const handleFinish = async (values) => {
+        if (testingMode) {
+            if (isEdit) {
+                setMockProducts((prev) => prev.map((p) => (p.id === product.id ? { ...p, ...values } : p)));
+                message.success('Product updated');
+            } else {
+                setMockProducts((prev) => [
+                    { ...values, id: Math.max(...prev.map((p) => p.id), 0) + 1, rating: 0, reviews: 0 },
+                    ...prev,
+                ]);
+                message.success('Product created');
+            }
+            navigate(ROUTES.PRODUCTS);
+            return;
+        }
+
+        setSaving(true);
+        try {
+            const payload = {
+                ...values,
+                images: files.map((f) => f.originFileObj).filter(Boolean),
+                existingImages: isEdit ? keptImages : undefined,
+            };
+            if (isEdit) {
+                await updateProductApi(product.id, payload);
+                message.success('Product updated');
+            } else {
+                await createProductApi(payload);
+                message.success('Product created');
+            }
+            navigate(ROUTES.PRODUCTS);
+        } catch (err) {
+            message.error(apiError(err, 'Failed to save product'));
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    return (
+        <div>
+            <PageHeading
+                title={isEdit ? 'Edit Product' : 'Add Product'}
+                subtitle={isEdit ? 'Update product details' : "Add a new product to your store"}
+                actions={
+                    <Button icon={<ArrowLeftOutlined />} onClick={() => navigate(ROUTES.PRODUCTS)}>
+                        Back to Products
+                    </Button>
+                }
+            />
+
+            <Form
+                form={form}
+                layout="vertical"
+                onFinish={handleFinish}
+                initialValues={{ discountPercent: 0, nutritionFacts: [], ...(testingMode && product ? product : {}) }}
+            >
+                <Row gutter={24}>
+                    <Col xs={24} lg={14}>
+                        <Card title="Product Details" className="mb-6">
+                            <Form.Item name="name" label="Product Name" rules={[{ required: true }]}>
+                                <Input placeholder="Whey Protein Isolate" />
+                            </Form.Item>
+
+                            <Form.Item name="category" label="Category" rules={[{ required: true }]}>
+                                <Select options={PRODUCT_CATEGORIES.map((c) => ({ label: c, value: c }))} />
+                            </Form.Item>
+
+                            <Row gutter={16}>
+                                <Col span={12}>
+                                    <Form.Item name="price" label="Price (Rs.)" rules={[{ required: true }]}>
+                                        <InputNumber min={0} step={0.01} className="w-full" />
+                                    </Form.Item>
+                                </Col>
+                                <Col span={12}>
+                                    <Form.Item
+                                        name="discountPercent"
+                                        label="Discount (%)"
+                                        tooltip="Shown as a struck-through original price on the storefront."
+                                    >
+                                        <InputNumber min={0} max={100} step={1} className="w-full" />
+                                    </Form.Item>
+                                </Col>
+                            </Row>
+
+                            <Row gutter={16}>
+                                <Col span={12}>
+                                    <Form.Item name="stock" label="Stock" rules={[{ required: true }]}>
+                                        <InputNumber min={0} className="w-full" />
+                                    </Form.Item>
+                                </Col>
+                                <Col span={12}>
+                                    <Form.Item name="status" label="Status" rules={[{ required: true }]}>
+                                        <Select
+                                            options={[
+                                                { label: 'Published', value: 'published' },
+                                                { label: 'Draft', value: 'draft' },
+                                                { label: 'Out of Stock', value: 'out_of_stock' },
+                                            ]}
+                                        />
+                                    </Form.Item>
+                                </Col>
+                            </Row>
+
+                            <Form.Item name="description" label="Description" rules={[{ required: true }]}>
+                                <Input.TextArea rows={4} />
+                            </Form.Item>
+                        </Card>
+                    </Col>
+
+                    <Col xs={24} lg={10}>
+                        <Card title="Images" className="mb-6">
+                            {!testingMode ? (
+                                <>
+                                    {keptImages.length > 0 && (
+                                        <div className="mb-4">
+                                            <div className="text-sm text-gray-500 mb-2">Current Images</div>
+                                            <div className="flex flex-wrap gap-2">
+                                                {keptImages.map((src) => (
+                                                    <div key={src} className="relative">
+                                                        <Image
+                                                            src={imageUrl(src)}
+                                                            width={72}
+                                                            height={72}
+                                                            className="rounded-lg object-cover"
+                                                        />
+                                                        <Button
+                                                            size="small"
+                                                            danger
+                                                            type="text"
+                                                            className="absolute -top-2 -right-2 bg-white shadow"
+                                                            onClick={() =>
+                                                                setKeptImages((prev) => prev.filter((s) => s !== src))
+                                                            }
+                                                        >
+                                                            ✕
+                                                        </Button>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    <Form.Item label="Add Images (max 6)">
+                                        <Upload
+                                            listType="picture-card"
+                                            fileList={files}
+                                            beforeUpload={() => false}
+                                            onChange={({ fileList }) => setFiles(fileList.slice(0, 6))}
+                                            accept="image/*"
+                                            multiple
+                                        >
+                                            {files.length >= 6 ? null : (
+                                                <div>
+                                                    <PlusOutlined />
+                                                    <div className="mt-1 text-xs">Upload</div>
+                                                </div>
+                                            )}
+                                        </Upload>
+                                    </Form.Item>
+                                </>
+                            ) : (
+                                <>
+                                    <Form.Item name="image" label="Image URL">
+                                        <Input placeholder="https://..." />
+                                    </Form.Item>
+                                    {urlValue && (
+                                        <Image
+                                            src={urlValue}
+                                            width={120}
+                                            height={120}
+                                            className="rounded-lg object-cover"
+                                            fallback=""
+                                        />
+                                    )}
+                                </>
+                            )}
+                        </Card>
+
+                        <Card
+                            title="Nutrition Facts"
+                            extra={
+                                <span className="text-xs text-gray-400">Shown as a table on the product page</span>
+                            }
+                            className="mt-6!"
+                        >
+                            <Form.List name="nutritionFacts">
+                                {(fields, { add, remove }) => (
+                                    <div className="flex flex-col gap-2">
+                                        {fields.map(({ key, name, ...restField }) => (
+                                            <div key={key} className="flex gap-2 items-start">
+                                                <Form.Item
+                                                    {...restField}
+                                                    name={[name, 'key']}
+                                                    rules={[{ required: true, message: 'Key required' }]}
+                                                    className="flex-1 mb-2"
+                                                >
+                                                    <Input placeholder="Calories" />
+                                                </Form.Item>
+                                                <Form.Item
+                                                    {...restField}
+                                                    name={[name, 'value']}
+                                                    rules={[{ required: true, message: 'Value required' }]}
+                                                    className="flex-1 mb-2"
+                                                >
+                                                    <Input placeholder="120 kcal" />
+                                                </Form.Item>
+                                                <Button
+                                                    type="text"
+                                                    danger
+                                                    icon={<DeleteOutlined />}
+                                                    onClick={() => remove(name)}
+                                                />
+                                            </div>
+                                        ))}
+                                        <Button type="dashed" onClick={() => add()} icon={<PlusOutlined />} block>
+                                            Add Row
+                                        </Button>
+                                    </div>
+                                )}
+                            </Form.List>
+                        </Card>
+                    </Col>
+                </Row>
+
+                <div className="flex justify-end gap-3">
+                    <Button onClick={() => navigate(ROUTES.PRODUCTS)}>Cancel</Button>
+                    <Button type="primary" htmlType="submit" loading={saving}>
+                        {isEdit ? 'Save Changes' : 'Create Product'}
+                    </Button>
+                </div>
+            </Form>
+        </div>
+    );
+}

@@ -7,6 +7,8 @@ export const ROUTES = {
     CONSULTATION_DETAIL: '/consultations/:id',
     CONSULTATION_PRICING: '/consultations/goal/:goalId/pricing',
     PRODUCTS: '/products',
+    PRODUCT_ADD: '/products/add',
+    PRODUCT_EDIT: '/products/:id/edit',
     REVIEWS: '/reviews',
     ORDERS: '/orders',
     BLOGS: '/blogs',
@@ -17,3 +19,4 @@ export const ROUTES = {
 
 export const consultationDetailPath = (id) => `/consultations/${id}`;
 export const consultationPricingPath = (goalId) => `/consultations/goal/${goalId}/pricing`;
+export const productEditPath = (id) => `/products/${id}/edit`;

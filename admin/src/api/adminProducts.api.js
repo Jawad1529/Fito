@@ -3,12 +3,14 @@ import apiClient from './client';
 // Products are sent as multipart/form-data because new gallery images are
 // uploaded alongside the fields. `images` holds newly picked File objects,
 // `existingImages` the URLs the admin chose to keep.
-const toFormData = ({ images = [], existingImages, ...fields }) => {
+const toFormData = ({ images = [], existingImages, nutritionFacts, ...fields }) => {
     const formData = new FormData();
 
     Object.entries(fields).forEach(([key, value]) => {
         if (value !== undefined && value !== null) formData.append(key, value);
     });
+
+    if (nutritionFacts !== undefined) formData.append('nutritionFacts', JSON.stringify(nutritionFacts));
 
     images.forEach((file) => formData.append('images', file));
 
@@ -25,6 +27,11 @@ const toFormData = ({ images = [], existingImages, ...fields }) => {
 export const fetchProducts = async (params = {}) => {
     const { data } = await apiClient.get('/admin/products', { params });
     return data;
+};
+
+export const fetchProduct = async (id) => {
+    const { data } = await apiClient.get(`/admin/products/${id}`);
+    return data.product;
 };
 
 export const createProduct = async (payload) => {

@@ -15,7 +15,15 @@
       "https://img.magnific.com/free-photo/protein-gym_23-2151980040.jpg?semt=ais_hybrid&w=740&q=80",
       "https://img.magnific.com/free-photo/protein-gym_23-2151980040.jpg?semt=ais_hybrid&w=740&q=80"
     ],
-    "description": "Pure whey isolate with 25g protein per serving, zero sugar."
+    "description": "Pure whey isolate with 25g protein per serving, zero sugar.",
+    "nutritionFacts": [
+      { "key": "Serving Size", "value": "30g (1 scoop)" },
+      { "key": "Calories", "value": "120 kcal" },
+      { "key": "Protein", "value": "25g" },
+      { "key": "Carbohydrates", "value": "2g" },
+      { "key": "Sugar", "value": "0g" },
+      { "key": "Fat", "value": "1g" }
+    ]
   },
   {
     "id": 2,

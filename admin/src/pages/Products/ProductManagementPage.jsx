@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Modal, Descriptions, Image, Button, Tag, message } from 'antd';
+import { useNavigate } from 'react-router-dom';
+import { Modal, Descriptions, Image, Button, Tag, Table, message } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import PageHeading from '../../components/atoms/PageHeading';
 import SearchBar from '../../components/molecules/SearchBar';
@@ -7,19 +8,14 @@ import RowActions from '../../components/molecules/RowActions';
 import StatusTag from '../../components/atoms/StatusTag';
 import RatingStars from '../../components/atoms/RatingStars';
 import DataTable from '../../components/organisms/DataTable';
-import ProductFormDrawer from '../../components/organisms/products/ProductFormDrawer';
 import useTableQuery from '../../hooks/useTableQuery';
 import useServerTableQuery from '../../hooks/useServerTableQuery';
-import { products as initialProducts } from '../../data/products';
+import useMockProducts from '../../hooks/useMockProducts';
 import { PRODUCT_CATEGORIES } from '../../constants/productCategories';
+import { ROUTES, productEditPath } from '../../constants/routes';
 import { useTestingMode } from '../../context/TestingModeContext';
 import imageUrl from '../../utils/imageUrl';
-import {
-    fetchProducts,
-    createProduct as createProductApi,
-    updateProduct as updateProductApi,
-    deleteProduct as deleteProductApi,
-} from '../../api/adminProducts.api';
+import { fetchProducts, deleteProduct as deleteProductApi } from '../../api/adminProducts.api';
 
 const apiError = (err, fallback) => err?.response?.data?.message || fallback;
 
@@ -38,7 +34,8 @@ export default function ProductManagementPage() {
 }
 
 function ProductManagementPageInner({ testingMode }) {
-    const [mockProducts, setMockProducts] = useState(initialProducts);
+    const navigate = useNavigate();
+    const [mockProducts, setMockProducts] = useMockProducts();
     const clientQuery = useTableQuery(mockProducts, { searchKeys: ['name', 'category'] });
     const serverQuery = useServerTableQuery(fetchProducts, { enabled: !testingMode });
 
@@ -46,57 +43,8 @@ function ProductManagementPageInner({ testingMode }) {
     const searchText = testingMode ? clientQuery.searchText : serverQuery.searchInput;
     const setSearchText = testingMode ? clientQuery.setSearchText : serverQuery.setSearchInput;
     const loading = !testingMode && serverQuery.loading;
-    const [saving, setSaving] = useState(false);
 
     const [viewing, setViewing] = useState(null);
-    const [drawerOpen, setDrawerOpen] = useState(false);
-    const [editingProduct, setEditingProduct] = useState(null);
-
-    const openCreate = () => {
-        setEditingProduct(null);
-        setDrawerOpen(true);
-    };
-
-    const openEdit = (product) => {
-        setEditingProduct(product);
-        setDrawerOpen(true);
-    };
-
-    const handleSubmit = async (values) => {
-        if (testingMode) {
-            if (editingProduct) {
-                setMockProducts((prev) =>
-                    prev.map((p) => (p.id === editingProduct.id ? { ...p, ...values } : p))
-                );
-                message.success('Product updated');
-            } else {
-                setMockProducts((prev) => [
-                    { ...values, id: Math.max(...prev.map((p) => p.id), 0) + 1, rating: 0, reviews: 0 },
-                    ...prev,
-                ]);
-                message.success('Product created');
-            }
-            setDrawerOpen(false);
-            return;
-        }
-
-        setSaving(true);
-        try {
-            if (editingProduct) {
-                await updateProductApi(editingProduct.id, values);
-                message.success('Product updated');
-            } else {
-                await createProductApi(values);
-                message.success('Product created');
-            }
-            serverQuery.refetch();
-            setDrawerOpen(false);
-        } catch (err) {
-            message.error(apiError(err, 'Failed to save product'));
-        } finally {
-            setSaving(false);
-        }
-    };
 
     const handleDelete = async (id) => {
         if (testingMode) {
@@ -171,7 +119,7 @@ function ProductManagementPageInner({ testingMode }) {
             render: (_, record) => (
                 <RowActions
                     onView={() => setViewing(record)}
-                    onEdit={() => openEdit(record)}
+                    onEdit={() => navigate(productEditPath(record.id))}
                     onDelete={() => handleDelete(record.id)}
                 />
             ),
@@ -186,7 +134,7 @@ function ProductManagementPageInner({ testingMode }) {
                 actions={
                     <>
                         <SearchBar value={searchText} onChange={setSearchText} placeholder="Search products..." />
-                        <Button type="primary" icon={<PlusOutlined />} onClick={openCreate}>
+                        <Button type="primary" icon={<PlusOutlined />} onClick={() => navigate(ROUTES.PRODUCT_ADD)}>
                             Add Product
                         </Button>
                     </>
@@ -239,18 +187,25 @@ function ProductManagementPageInner({ testingMode }) {
                             <Descriptions.Item label="Status"><StatusTag status={viewing.status} /></Descriptions.Item>
                             <Descriptions.Item label="Description">{viewing.description}</Descriptions.Item>
                         </Descriptions>
+                        {viewing.nutritionFacts?.length > 0 && (
+                            <div className="mt-4">
+                                <div className="text-sm text-gray-500 mb-2">Nutrition Facts</div>
+                                <Table
+                                    size="small"
+                                    pagination={false}
+                                    showHeader={false}
+                                    rowKey="key"
+                                    dataSource={viewing.nutritionFacts}
+                                    columns={[
+                                        { dataIndex: 'key', className: 'font-medium' },
+                                        { dataIndex: 'value' },
+                                    ]}
+                                />
+                            </div>
+                        )}
                     </div>
                 )}
             </Modal>
-
-            <ProductFormDrawer
-                open={drawerOpen}
-                onClose={() => setDrawerOpen(false)}
-                onSubmit={handleSubmit}
-                initialValues={editingProduct}
-                uploadMode={!testingMode}
-                saving={saving}
-            />
         </div>
     );
 }

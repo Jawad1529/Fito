@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 import { signupAdmin } from '../../api/adminAuth.api';
 import { ROUTES } from '../../constants/routes';
+import logo from '../../assets/logo/fitoo-logo.svg';
 
 export default function SignupPage() {
     const navigate = useNavigate();
@@ -46,9 +47,7 @@ export default function SignupPage() {
                     styles={{ body: { padding: 32 } }}
                 >
                     <div className="text-center mb-7">
-                        <div className="w-11 h-11 rounded-xl bg-primary text-white flex items-center justify-center text-lg font-bold mx-auto mb-4">
-                            F
-                        </div>
+                        <img src={logo} alt="Fitoo" className="h-12 w-auto mx-auto mb-4" />
                         <h1 className="text-xl font-semibold text-gray-900">Fito Admin</h1>
                         <p className="text-sm text-gray-500 mt-1">Request an admin account</p>
                     </div>

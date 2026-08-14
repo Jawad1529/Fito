@@ -55,6 +55,7 @@ export const toPublicProduct = (product) => ({
     discountedPrice: computeDiscountedPrice(product.price, product.discountPercent ?? 0),
     stock: product.stock,
     description: product.description,
+    nutritionFacts: product.nutritionFacts ?? [],
     image: product.images?.[0],
     images: product.images ?? [],
     rating: product.rating,

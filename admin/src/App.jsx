@@ -14,6 +14,7 @@ import ConsultationManagementPage from './pages/Consultations/ConsultationManage
 import ConsultationDetailPage from './pages/Consultations/ConsultationDetailPage';
 import ConsultationPlanPricingPage from './pages/Consultations/ConsultationPlanPricingPage';
 import ProductManagementPage from './pages/Products/ProductManagementPage';
+import ProductFormPage from './pages/Products/ProductFormPage';
 import BlogManagementPage from './pages/Blogs/BlogManagementPage';
 import NotificationManagementPage from './pages/Notifications/NotificationManagementPage';
 import ReviewManagementPage from './pages/Reviews/ReviewManagementPage';
@@ -72,6 +73,8 @@ export default function App() {
                   <Route path={ROUTES.CONSULTATION_DETAIL} element={<ConsultationDetailPage />} />
                   <Route path={ROUTES.CONSULTATION_PRICING} element={<ConsultationPlanPricingPage />} />
                   <Route path={ROUTES.PRODUCTS} element={<ProductManagementPage />} />
+                  <Route path={ROUTES.PRODUCT_ADD} element={<ProductFormPage />} />
+                  <Route path={ROUTES.PRODUCT_EDIT} element={<ProductFormPage />} />
                   <Route path={ROUTES.BLOGS} element={<BlogManagementPage />} />
                   <Route path={ROUTES.NOTIFICATIONS} element={<NotificationManagementPage />} />
                   <Route path={ROUTES.SETTINGS} element={<SettingsPage />} />

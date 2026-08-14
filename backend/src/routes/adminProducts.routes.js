@@ -1,6 +1,7 @@
 import express from 'express';
 import {
     listProducts,
+    getProduct,
     createProduct,
     updateProduct,
     deleteProduct,
@@ -15,6 +16,7 @@ const router = express.Router();
 router.use(protectAdmin);
 
 router.get('/', listProducts);
+router.get('/:id', getProduct);
 router.post('/', uploadProductImages, createProduct);
 router.patch('/:id', uploadProductImages, updateProduct);
 router.delete('/:id', deleteProduct);

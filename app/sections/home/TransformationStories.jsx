@@ -16,37 +16,37 @@ import ba302 from '@/assets/images/ba302.jpeg';
 const transformations = [
   {
     id: 't1',
-    name: 'Sarah Mitchell',
-    age: 28,
-    goal: 'Weight Loss',
-    beforeWeight: 78,
-    afterWeight: 62,
-    duration: '4 months',
-    story: 'Sarah lost 16 kg with a personalized diet plan and regular check-ins.',
+    name: 'M. Hassan',
+    program: 'Muscle Building Program',
+    goal: 'Muscle Gain',
+    beforeWeight: 37,
+    afterWeight: 65,
+    duration: '8 months',
+    story: 'Hassan went from a skinny 37 kg to a muscular 65 kg in 8 months.',
     beforeImage: ba101,
     afterImage: ba102,
   },
   {
     id: 't2',
-    name: 'James Rodriguez',
-    age: 34,
-    goal: 'Muscle Gain',
-    beforeWeight: 68,
-    afterWeight: 82,
+    name: 'Tahir Mehmood',
+    program: 'Body Recomposition Program',
+    goal: 'Body Recomposition',
+    beforeWeight: 85,
+    afterWeight: 72,
     duration: '6 months',
-    story: 'James gained 14 kg of lean muscle with targeted nutrition and training.',
+    story: 'Tahir went from 85 kg of fat to 72 kg of lean muscle through body recomposition.',
     beforeImage: ba201,
     afterImage: ba202,
   },
   {
     id: 't3',
-    name: 'Emily Chen',
-    age: 31,
-    goal: 'Healthy Lifestyle',
-    beforeWeight: 72,
-    afterWeight: 68,
-    duration: '3 months',
-    story: 'Emily transformed her habits with sustainable nutrition and daily wellness.',
+    name: 'Shair Muhammad',
+    program: 'Weight Loss Program',
+    goal: 'Weight Loss',
+    beforeWeight: 152,
+    afterWeight: 76,
+    duration: '6 months',
+    story: 'Shair transformed his life, going from 152 kg to 76 kg in just 6 months.',
     beforeImage: ba301,
     afterImage: ba302,
   },
@@ -135,7 +135,7 @@ export default function TransformationStories() {
                     <div>
                       <h3 className="text-lg font-semibold text-text">{story.name}</h3>
                       <p className="text-sm text-text-muted">
-                        {story.age} years • {story.goal}
+                        {story.program}
                       </p>
                     </div>
                     <div className="flex items-center gap-1 text-sm">

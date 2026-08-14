@@ -8,7 +8,7 @@ export default function AuthLayout({ children }) {
       <div className="min-h-screen bg-background flex items-center justify-center px-4 py-12 relative">
         <Background />
         <div className="relative z-10 w-full">
-          <div className="rounded-3xl p-8 sm:p-10 shadow-2xl">
+          <div className="rounded-3xl p-0 sm:p-6 shadow-2xl">
             {children}
           </div>
         </div>

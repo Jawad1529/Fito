@@ -20,6 +20,15 @@ const productSchema = new mongoose.Schema(
         images: [{ type: String }],
         rating: { type: Number, default: 0, min: 0, max: 5 },
         reviewCount: { type: Number, default: 0, min: 0 },
+        // Ordered key/value pairs (e.g. "Calories" -> "120 kcal"), rendered as a
+        // table on the app's product page. Order is preserved since it's an array.
+        nutritionFacts: [
+            {
+                _id: false,
+                key: { type: String, required: true, trim: true },
+                value: { type: String, required: true, trim: true },
+            },
+        ],
         status: {
             type: String,
             enum: Object.values(PRODUCT_STATUS),

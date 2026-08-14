@@ -14,6 +14,7 @@ import {
 } from '@ant-design/icons';
 import { useAuth } from '../../context/AuthContext';
 import { ROUTES } from '../../constants/routes';
+import logo from '../../assets/logo/fitoo-logo.svg';
 
 export default function Sidebar({ collapsed }) {
     const navigate = useNavigate();
@@ -56,11 +57,9 @@ export default function Sidebar({ collapsed }) {
     return (
         <div className="h-full flex flex-col bg-white border-r border-gray-100">
             <div className="h-16 flex items-center justify-center gap-2.5 border-b border-gray-100 px-4 shrink-0">
-                <div className="w-8 h-8 rounded-lg bg-primary text-white flex items-center justify-center text-sm font-bold shrink-0">
-                    F
-                </div>
+                <img src={logo} alt="Fitoo" className={collapsed ? 'h-8 w-auto' : 'h-9 w-auto'} />
                 {!collapsed && (
-                    <span className="text-base font-semibold text-gray-900 tracking-tight">Fito Admin</span>
+                    <span className="text-base font-semibold text-gray-900 tracking-tight">Admin</span>
                 )}
             </div>
 

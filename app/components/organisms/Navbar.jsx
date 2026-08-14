@@ -8,6 +8,7 @@ import { Switch, Tooltip, Popover, Empty, Spin } from 'antd';
 import Icon from '../atoms/Icon';
 import Button from '../atoms/Button';
 import Badge from '../atoms/Badge';
+import Logo from '../shared/Logo';
 import { Text } from '../atoms/Typography';
 import NotificationItem from '../molecules/NotificationItem';
 import SearchBar from '../molecules/SearchBar';
@@ -148,9 +149,7 @@ export default function Navbar() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
-            <Link href="/" className="text-2xl font-bold text-text tracking-tight shrink-0">
-              Fitoo
-            </Link>
+            <Logo className="h-9 w-auto" priority />
 
             {/* Desktop nav — only from lg up, so tablets don't get crammed */}
             <div className="hidden lg:flex items-center space-x-1">

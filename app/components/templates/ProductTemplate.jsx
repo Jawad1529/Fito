@@ -199,6 +199,33 @@ export default function ProductTemplate({ id, initialProduct = null }) {
                     </motion.div>
                 </div>
 
+                {product.nutritionFacts?.length > 0 && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6, delay: 0.3 }}
+                        className="mt-16 max-w-2xl"
+                    >
+                        <H3 className="text-2xl font-bold text-white mb-6">Nutrition Facts</H3>
+                        <div className="border border-white/10 rounded-xl overflow-hidden">
+                            <table className="w-full text-sm">
+                                <tbody>
+                                    {product.nutritionFacts.map((row, idx) => (
+                                        <tr key={row.key} className={idx % 2 === 0 ? 'bg-white/[0.02]' : ''}>
+                                            <td className="px-4 py-3 text-gray-300 border-b border-white/5 font-medium">
+                                                {row.key}
+                                            </td>
+                                            <td className="px-4 py-3 text-white border-b border-white/5 text-right">
+                                                {row.value}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </motion.div>
+                )}
+
                 <ReviewSection
                     productId={product.id}
                     rating={product.rating ?? 0}
