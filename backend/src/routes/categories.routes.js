@@ -1,10 +1,9 @@
 import express from 'express';
-import { listProducts, getProduct } from '../controllers/products.controller.js';
+import { listCategories } from '../controllers/categories.controller.js';
 
 const router = express.Router();
 
 // Public catalogue — no auth, browsing doesn't require an account.
-router.get('/', listProducts);
-router.get('/:id', getProduct);
+router.get('/', listCategories);
 
 export default router;

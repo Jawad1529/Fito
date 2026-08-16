@@ -2,6 +2,8 @@ import express from 'express';
 import {
     loginAdmin,
     signupAdmin,
+    verifyAdminOtp,
+    resendAdminOtp,
     getMeAdmin,
     createAdmin,
     listAdmins,
@@ -13,8 +15,11 @@ const router = express.Router();
 
 router.post('/login', loginAdmin);
 // Public self-serve signup — always creates an inactive plain admin, see
-// signupAdmin. Anyone can call this; login is blocked until activated.
+// signupAdmin. Anyone can call this; login is blocked until the email is
+// OTP-verified AND a super admin activates the account.
 router.post('/signup', signupAdmin);
+router.post('/verify-otp', verifyAdminOtp);
+router.post('/resend-otp', resendAdminOtp);
 router.get('/me', protectAdmin, getMeAdmin);
 // Only an authenticated super admin can create new admin accounts.
 router.post('/create', protectAdmin, requireSuperAdmin, createAdmin);

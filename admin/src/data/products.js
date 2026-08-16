@@ -2,7 +2,7 @@ export const products = [
     {
         id: 1,
         name: 'Whey Protein Isolate',
-        category: 'Protein Powders',
+        category: 'protein-powders',
         price: 49.99,
         discountPercent: 20,
         stock: 120,
@@ -15,7 +15,7 @@ export const products = [
     {
         id: 2,
         name: 'Casein Protein',
-        category: 'Protein Powders',
+        category: 'protein-powders',
         price: 44.99,
         stock: 80,
         rating: 4.7,
@@ -27,7 +27,7 @@ export const products = [
     {
         id: 3,
         name: 'Protein Crunch Bar',
-        category: 'Protein Bars',
+        category: 'protein-bars',
         price: 29.99,
         stock: 200,
         rating: 4.6,
@@ -39,7 +39,7 @@ export const products = [
     {
         id: 4,
         name: 'Collagen Protein Bar',
-        category: 'Protein Bars',
+        category: 'protein-bars',
         price: 32.99,
         stock: 0,
         rating: 4.5,
@@ -51,7 +51,7 @@ export const products = [
     {
         id: 5,
         name: 'Whey Protein Shake',
-        category: 'Protein Shakes',
+        category: 'protein-shakes',
         price: 39.99,
         stock: 150,
         rating: 4.4,
@@ -63,7 +63,7 @@ export const products = [
     {
         id: 6,
         name: 'Vegan Protein Shake',
-        category: 'Protein Shakes',
+        category: 'protein-shakes',
         price: 42.99,
         stock: 60,
         rating: 4.3,
@@ -75,7 +75,7 @@ export const products = [
     {
         id: 7,
         name: 'Creatine Monohydrate',
-        category: 'Creatine',
+        category: 'creatine',
         price: 27.99,
         stock: 300,
         rating: 4.9,
@@ -87,7 +87,7 @@ export const products = [
     {
         id: 8,
         name: 'Creatine + HMB',
-        category: 'Creatine',
+        category: 'creatine',
         price: 34.99,
         stock: 45,
         rating: 4.6,

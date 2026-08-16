@@ -10,6 +10,16 @@ export const signupAdmin = async ({ name, email, password }) => {
     return data;
 };
 
+export const verifyAdminOtp = async ({ email, otp }) => {
+    const { data } = await apiClient.post('/admin/auth/verify-otp', { email, otp });
+    return data;
+};
+
+export const resendAdminOtp = async ({ email }) => {
+    const { data } = await apiClient.post('/admin/auth/resend-otp', { email });
+    return data;
+};
+
 export const fetchAdmins = async (params = {}) => {
     const { data } = await apiClient.get('/admin/auth', { params });
     return data;

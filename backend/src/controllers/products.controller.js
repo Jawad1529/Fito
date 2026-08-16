@@ -31,12 +31,6 @@ export const listProducts = asyncHandler(async (req, res) => {
     res.json({ products: products.map(toPublicProduct) });
 });
 
-// GET /api/products/categories — distinct list for the shop filter dropdown.
-export const listProductCategories = asyncHandler(async (req, res) => {
-    const categories = await Product.distinct('category', PUBLIC_FILTER);
-    res.json({ categories: categories.sort() });
-});
-
 // GET /api/products/:id — accepts either the ObjectId or the SEO slug so the
 // app can move to /product/<slug> URLs without breaking existing id links.
 export const getProduct = asyncHandler(async (req, res) => {

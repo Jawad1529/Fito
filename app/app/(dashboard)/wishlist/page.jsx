@@ -7,6 +7,7 @@ import { H2, Text } from '@/components/atoms/Typography';
 import Button from '@/components/atoms/Button';
 import Icon from '@/components/atoms/Icon';
 import imageUrl from '@/utils/imageUrl';
+import formatCategory from '@/utils/formatCategory';
 import useAuth from '@/hooks/useAuth';
 import useTestingMode from '@/hooks/useTestingMode';
 import useWishlist from '@/hooks/useWishlist';
@@ -91,7 +92,9 @@ export default function WishlistPage() {
                 >
                   {item.name}
                 </Link>
-                {item.category && <span className="text-sm text-text-muted">{item.category}</span>}
+                {item.category && (
+                  <span className="text-sm text-text-muted">{formatCategory(item.category)}</span>
+                )}
 
                 <div className="flex items-center justify-between mt-3">
                   <span className="text-text font-semibold">PKR {price.toFixed(2)}</span>

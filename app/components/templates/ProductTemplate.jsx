@@ -7,7 +7,7 @@ import { H2, H3, Text } from '../atoms/Typography';
 import ImageGallery from '../organisms/ImageGallery';
 import Button from '../atoms/Button';
 import Icon from '../atoms/Icon';
-import Spinner from '../atoms/Spinner';
+import ProductDetailSkeleton from './ProductDetailSkeleton';
 import FeaturedProducts from '../organisms/FeaturedProducts';
 import ReviewSection from '../organisms/ReviewSection';
 import QuantitySelector from '../molecules/QuantitySelector';
@@ -16,6 +16,7 @@ import useWishlist from '../../hooks/useWishlist';
 import useTestingMode from '../../hooks/useTestingMode';
 import useApiResource from '../../hooks/useApiResource';
 import { getProduct } from '../../services/product.service';
+import formatCategory from '../../utils/formatCategory';
 import productsData from '../../data/products.json';
 
 // Interactive half of the product page. The route's server component owns
@@ -45,11 +46,7 @@ export default function ProductTemplate({ id, initialProduct = null }) {
     const { isWishlisted, toggleWishlist } = useWishlist();
 
     if (loading && !product) {
-        return (
-            <div className="pt-24 pb-16 min-h-screen flex justify-center">
-                <Spinner className="w-8 h-8" />
-            </div>
-        );
+        return <ProductDetailSkeleton />;
     }
 
     if (error || !product) {
@@ -103,7 +100,7 @@ export default function ProductTemplate({ id, initialProduct = null }) {
                     >
                         <div>
                             <Text className="text-yellow-400 font-medium uppercase tracking-wider mb-1">
-                                {product.category}
+                                {formatCategory(product.category)}
                             </Text>
                             {/* Single H1 per page, carrying the generated headline for keyword relevance. */}
                             <h1 className="text-3xl font-bold text-white">{product.name}</h1>

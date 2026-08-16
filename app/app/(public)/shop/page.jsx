@@ -1,17 +1,21 @@
 'use client';
 
-import { useCallback, useMemo, useState } from 'react';
+import { Suspense, useCallback, useMemo, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { H2, Text } from '../../../components/atoms/Typography';
 import ProductCard from '../../../components/organisms/ProductCard';
+import ProductCardSkeleton from '../../../components/molecules/ProductCardSkeleton';
 import Icon from '../../../components/atoms/Icon';
 import Button from '../../../components/atoms/Button';
-import Spinner from '../../../components/atoms/Spinner';
 import useTestingMode from '../../../hooks/useTestingMode';
 import useDebounce from '../../../hooks/useDebounce';
 import useApiResource from '../../../hooks/useApiResource';
 import useWishlist from '../../../hooks/useWishlist';
-import { getProducts, getProductCategories } from '../../../services/product.service';
+import formatCategory from '../../../utils/formatCategory';
+import { getProducts } from '../../../services/product.service';
+import { getCategories } from '../../../services/category.service';
 import productsData from '../../../data/products.json';
+import { categories as mockCategories } from '../../../data/categories';
 
 // Applied only in testing mode; with the API on, the backend does the work.
 const filterLocally = (products, { search, category, sort }) => {
@@ -23,7 +27,7 @@ const filterLocally = (products, { search, category, sort }) => {
       (p) =>
         p.name.toLowerCase().includes(query) ||
         p.description.toLowerCase().includes(query) ||
-        p.category.toLowerCase().includes(query)
+        formatCategory(p.category).toLowerCase().includes(query)
     );
   }
   if (category !== 'all') {
@@ -37,17 +41,27 @@ const filterLocally = (products, { search, category, sort }) => {
 };
 
 export default function ShopPage() {
+  return (
+    <Suspense fallback={null}>
+      <ShopPageInner />
+    </Suspense>
+  );
+}
+
+function ShopPageInner() {
   const { testingMode } = useTestingMode();
+  const searchParams = useSearchParams();
 
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('all');
+  // Pre-selected from footer/nav links like /shop?category=protein-powders.
+  const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || 'all');
   const [sortBy, setSortBy] = useState('default');
   const { isWishlisted, toggleWishlist } = useWishlist();
 
   // Avoids firing a request on every keystroke.
   const debouncedSearch = useDebounce(searchQuery, 350);
 
-  const { data: apiCategories } = useApiResource(getProductCategories, [], {
+  const { data: apiCategories } = useApiResource(getCategories, [], {
     skip: testingMode,
     fallback: [],
   });
@@ -64,8 +78,11 @@ export default function ShopPage() {
   );
 
   const categories = useMemo(() => {
-    const source = testingMode ? productsData.map((p) => p.category) : apiCategories ?? [];
-    return ['all', ...new Set(source)];
+    const source = testingMode ? mockCategories : apiCategories ?? [];
+    return [
+      { value: 'all', label: 'All Categories' },
+      ...source.map((c) => ({ value: c.slug, label: c.name })),
+    ];
   }, [testingMode, apiCategories]);
 
   const products = useMemo(() => {
@@ -128,8 +145,8 @@ export default function ShopPage() {
                 className="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-yellow-400/50 transition appearance-none"
               >
                 {categories.map((cat) => (
-                  <option key={cat} value={cat} className="bg-black">
-                    {cat === 'all' ? 'All Categories' : cat}
+                  <option key={cat.value} value={cat.value} className="bg-black">
+                    {cat.label}
                   </option>
                 ))}
               </select>
@@ -173,8 +190,10 @@ export default function ShopPage() {
         </div>
 
         {loading ? (
-          <div className="flex justify-center py-20">
-            <Spinner className="w-8 h-8" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {Array.from({ length: 8 }, (_, i) => (
+              <ProductCardSkeleton key={i} />
+            ))}
           </div>
         ) : error ? (
           <div className="text-center py-16">

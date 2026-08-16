@@ -144,6 +144,13 @@ export const toPublicConsultation = (consultation) => ({
     updatedAt: consultation.updatedAt,
 });
 
+export const toPublicCategory = (category) => ({
+    id: category._id,
+    name: category.name,
+    slug: category.slug,
+    status: category.status,
+});
+
 // Same discount shape as toPublicProduct: `price` is the admin-edited base
 // price, `discountedPrice` the amount actually charged.
 export const toPublicConsultationPlan = (plan) => ({

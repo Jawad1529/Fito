@@ -2,8 +2,8 @@
 
 import { useMemo } from 'react';
 import { H2, Text } from '../../components/atoms/Typography';
-import Spinner from '../atoms/Spinner';
 import ProductCard from './ProductCard';
+import ProductCardSkeleton from '../molecules/ProductCardSkeleton';
 import useTestingMode from '../../hooks/useTestingMode';
 import useApiResource from '../../hooks/useApiResource';
 import useWishlist from '../../hooks/useWishlist';
@@ -44,8 +44,10 @@ export default function FeaturedProducts({
         )}
 
         {loading ? (
-          <div className="flex justify-center py-16">
-            <Spinner className="w-8 h-8" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {Array.from({ length: limit }, (_, i) => (
+              <ProductCardSkeleton key={i} />
+            ))}
           </div>
         ) : products.length === 0 ? (
           <Text muted className="text-center py-10">

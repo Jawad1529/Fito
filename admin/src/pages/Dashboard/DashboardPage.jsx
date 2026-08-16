@@ -10,6 +10,8 @@ import {
     StarOutlined,
     DollarOutlined,
     UserOutlined,
+    FireOutlined,
+    WarningOutlined,
 } from '@ant-design/icons';
 import PageHeading from '../../components/atoms/PageHeading';
 import SummaryCard from '../../components/molecules/SummaryCard';
@@ -20,10 +22,30 @@ import { dashboardSummary } from '../../data/analytics';
 import { appUsers } from '../../data/appUsers';
 import { recentOrders as staticRecentOrders } from '../../data/orders';
 import { reviews as staticReviews } from '../../data/reviews';
+import { products as mockProducts } from '../../data/products';
+import { consultationsByGoal } from '../../data/consultations';
 import { BRAND } from '../../constants/theme';
-import { ROUTES } from '../../constants/routes';
+import { ROUTES, consultationDetailPath } from '../../constants/routes';
 import { useTestingMode } from '../../context/TestingModeContext';
 import { fetchDashboardSummary } from '../../api/adminDashboard.api';
+import { useAuth } from '../../context/AuthContext';
+import imageUrl from '../../utils/imageUrl';
+
+// Mock data has no real sales figures, so "best selling" is approximated by
+// review count — good enough for testing-mode illustration only.
+const mockBestSelling = () =>
+    [...mockProducts]
+        .sort((a, b) => (b.reviews ?? 0) - (a.reviews ?? 0))
+        .slice(0, 5)
+        .map((p) => ({ ...p, unitsSold: p.reviews ?? 0 }));
+
+const mockOutOfStock = () => mockProducts.filter((p) => p.stock <= 0).slice(0, 5);
+
+const mockRecentConsultations = () =>
+    Object.values(consultationsByGoal)
+        .flat()
+        .sort((a, b) => (b.submittedAt ?? '').localeCompare(a.submittedAt ?? ''))
+        .slice(0, 5);
 
 const EMPTY_SUMMARY = {
     totalUsers: 0,
@@ -50,10 +72,14 @@ export default function DashboardPage() {
 
 function DashboardPageInner({ testingMode }) {
     const navigate = useNavigate();
+    const { isSuperAdmin } = useAuth();
     const [summary, setSummary] = useState(testingMode ? dashboardSummary : EMPTY_SUMMARY);
     const [recentUsers, setRecentUsers] = useState(testingMode ? appUsers.slice(0, 5) : []);
     const [recentOrders, setRecentOrders] = useState(testingMode ? staticRecentOrders : []);
     const [recentReviews, setRecentReviews] = useState(testingMode ? staticReviews.slice(0, 5) : []);
+    const [bestSellingProducts, setBestSellingProducts] = useState(testingMode ? mockBestSelling() : []);
+    const [outOfStockProducts, setOutOfStockProducts] = useState(testingMode ? mockOutOfStock() : []);
+    const [recentConsultations, setRecentConsultations] = useState(testingMode ? mockRecentConsultations() : []);
 
     useEffect(() => {
         if (testingMode) return undefined;
@@ -65,6 +91,9 @@ function DashboardPageInner({ testingMode }) {
                 setRecentUsers(data.recentUsers);
                 setRecentOrders(data.recentOrders);
                 setRecentReviews(data.recentReviews);
+                setBestSellingProducts(data.bestSellingProducts);
+                setOutOfStockProducts(data.outOfStockProducts);
+                setRecentConsultations(data.recentConsultations);
             })
             .catch(() => {
                 if (!cancelled) message.error('Failed to load dashboard data');
@@ -97,10 +126,12 @@ function DashboardPageInner({ testingMode }) {
             </Row>
 
             <Row gutter={[16, 16]}>
-                <Col xs={24} lg={16}>
-                    <SalesChart testingMode={testingMode} />
-                </Col>
-                <Col xs={24} lg={8}>
+                {isSuperAdmin && (
+                    <Col xs={24} lg={16}>
+                        <SalesChart testingMode={testingMode} />
+                    </Col>
+                )}
+                <Col xs={24} lg={isSuperAdmin ? 8 : 24}>
                     <RecentListCard
                         title="Recent Users"
                         dataSource={recentUsers}
@@ -151,6 +182,66 @@ function DashboardPageInner({ testingMode }) {
                                     description={review.comment}
                                 />
                                 <Tag color="gold">{review.rating}★</Tag>
+                            </List.Item>
+                        )}
+                    />
+                </Col>
+            </Row>
+
+            <Row gutter={[16, 16]} className="mt-6">
+                <Col xs={24} lg={8}>
+                    <RecentListCard
+                        title="Best Selling Products"
+                        dataSource={bestSellingProducts}
+                        renderItem={(product) => (
+                            <List.Item
+                                className="cursor-pointer hover:bg-gray-50 rounded-lg transition-colors"
+                                onClick={() => navigate(ROUTES.PRODUCTS, { state: { highlightProductId: product.id } })}
+                            >
+                                <List.Item.Meta
+                                    avatar={<Avatar shape="square" src={imageUrl(product.image)} icon={<FireOutlined />} />}
+                                    title={product.name}
+                                    description={`Rs. ${product.price.toFixed(2)}`}
+                                />
+                                <Tag color="volcano">{product.unitsSold} sold</Tag>
+                            </List.Item>
+                        )}
+                    />
+                </Col>
+                <Col xs={24} lg={8}>
+                    <RecentListCard
+                        title="Out of Stock Products"
+                        dataSource={outOfStockProducts}
+                        renderItem={(product) => (
+                            <List.Item
+                                className="cursor-pointer hover:bg-gray-50 rounded-lg transition-colors"
+                                onClick={() => navigate(ROUTES.PRODUCTS, { state: { highlightProductId: product.id } })}
+                            >
+                                <List.Item.Meta
+                                    avatar={<Avatar shape="square" src={imageUrl(product.image)} icon={<WarningOutlined />} />}
+                                    title={product.name}
+                                    description={`Rs. ${product.price.toFixed(2)}`}
+                                />
+                                <StatusTag status="out_of_stock" />
+                            </List.Item>
+                        )}
+                    />
+                </Col>
+                <Col xs={24} lg={8}>
+                    <RecentListCard
+                        title="Recent Consultations"
+                        dataSource={recentConsultations}
+                        renderItem={(consultation) => (
+                            <List.Item
+                                className="cursor-pointer hover:bg-gray-50 rounded-lg transition-colors"
+                                onClick={() => navigate(consultationDetailPath(consultation.id))}
+                            >
+                                <List.Item.Meta
+                                    avatar={<Avatar icon={<MedicineBoxOutlined />} className="bg-primary-light text-primary" />}
+                                    title={consultation.personalInfo?.fullName}
+                                    description={consultation.goal?.replace(/-/g, ' ')}
+                                />
+                                <StatusTag status={consultation.status} />
                             </List.Item>
                         )}
                     />

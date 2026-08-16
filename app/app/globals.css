@@ -127,6 +127,35 @@ html {
   }
 }
 
+/* Loading-skeleton placeholders: a soft base tone with a light band sweeping
+   across it left-to-right, on a loop. */
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background-color: var(--overlay-strong);
+}
+
+.skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background-image: linear-gradient(90deg, transparent, var(--overlay-medium), transparent);
+  animation: skeleton-sweep 1.6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton::after {
+    animation: none;
+  }
+}
+
+@keyframes skeleton-sweep {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
 .bg-grid-pattern {
   background-image:
     linear-gradient(color-mix(in srgb, var(--primary) 60%, transparent) 1px, transparent 1px),

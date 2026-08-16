@@ -2,6 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { memo } from 'react';
 import imageUrl from '../../utils/imageUrl';
+import formatCategory from '../../utils/formatCategory';
 import ProductCardActions from './ProductCardActions';
 
 // Static star geometry — hoisted out of render so it isn't rebuilt per card.
@@ -66,7 +67,7 @@ function ProductCard({ product, isWishlisted = false, onToggleWishlist }) {
           </Link>
         </h3>
 
-        <span className="text-sm text-text-muted mb-1">{product.category}</span>
+        <span className="text-sm text-text-muted mb-1">{formatCategory(product.category)}</span>
 
         <div className="flex items-center gap-2 mt-1">
           <Stars rating={product.rating ?? 0} />

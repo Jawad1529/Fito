@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Modal, Descriptions, Image, Button, Tag, Table, message } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import PageHeading from '../../components/atoms/PageHeading';
@@ -11,7 +11,7 @@ import DataTable from '../../components/organisms/DataTable';
 import useTableQuery from '../../hooks/useTableQuery';
 import useServerTableQuery from '../../hooks/useServerTableQuery';
 import useMockProducts from '../../hooks/useMockProducts';
-import { PRODUCT_CATEGORIES } from '../../constants/productCategories';
+import useCategories from '../../hooks/useCategories';
 import { ROUTES, productEditPath } from '../../constants/routes';
 import { useTestingMode } from '../../context/TestingModeContext';
 import imageUrl from '../../utils/imageUrl';
@@ -38,11 +38,24 @@ function ProductManagementPageInner({ testingMode }) {
     const [mockProducts, setMockProducts] = useMockProducts();
     const clientQuery = useTableQuery(mockProducts, { searchKeys: ['name', 'category'] });
     const serverQuery = useServerTableQuery(fetchProducts, { enabled: !testingMode });
+    const { categories } = useCategories();
+    const categoryName = (slug) => categories.find((c) => c.slug === slug)?.name ?? slug;
 
     const products = testingMode ? clientQuery.filteredData : serverQuery.items;
     const searchText = testingMode ? clientQuery.searchText : serverQuery.searchInput;
     const setSearchText = testingMode ? clientQuery.setSearchText : serverQuery.setSearchInput;
     const loading = !testingMode && serverQuery.loading;
+
+    // Set when arriving from the dashboard's "Best Selling"/"Out of Stock"
+    // lists — highlights and scrolls to the product that was clicked.
+    const location = useLocation();
+    const highlightProductId = location.state?.highlightProductId;
+
+    useEffect(() => {
+        if (!highlightProductId || loading) return;
+        const row = document.querySelector(`tr[data-row-key="${highlightProductId}"]`);
+        row?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, [highlightProductId, loading]);
 
     const [viewing, setViewing] = useState(null);
 
@@ -73,9 +86,10 @@ function ProductManagementPageInner({ testingMode }) {
         {
             title: 'Category',
             dataIndex: 'category',
-            filters: PRODUCT_CATEGORIES.map((c) => ({ text: c, value: c })),
+            filters: categories.map((c) => ({ text: c.name, value: c.slug })),
             filteredValue: testingMode ? undefined : [serverQuery.filters.category].filter(Boolean),
             onFilter: testingMode ? (value, record) => record.category === value : undefined,
+            render: (category) => categoryName(category),
         },
         {
             title: 'Price',
@@ -145,6 +159,7 @@ function ProductManagementPageInner({ testingMode }) {
                 columns={columns}
                 data={products}
                 loading={loading}
+                rowClassName={(record) => (record.id === highlightProductId ? 'row-highlight' : '')}
                 pagination={testingMode ? undefined : { ...serverQuery.pagination, total: serverQuery.total }}
                 onChange={testingMode ? undefined : serverQuery.handleTableChange}
             />
@@ -168,7 +183,7 @@ function ProductManagementPageInner({ testingMode }) {
                         />
                         <Descriptions column={1} bordered size="small">
                             <Descriptions.Item label="Name">{viewing.name}</Descriptions.Item>
-                            <Descriptions.Item label="Category">{viewing.category}</Descriptions.Item>
+                            <Descriptions.Item label="Category">{categoryName(viewing.category)}</Descriptions.Item>
                             <Descriptions.Item label="Price">
                                 {viewing.discountPercent > 0 ? (
                                     <>

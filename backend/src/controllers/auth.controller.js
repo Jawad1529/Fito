@@ -4,79 +4,11 @@ import generateToken from '../utils/generateToken.js';
 import User from '../models/User.model.js';
 import { USER_STATUS } from '../constants/userStatus.js';
 import { OTP_PURPOSE } from '../constants/otpPurpose.js';
-import {
-    generateOtp,
-    hashOtp,
-    compareOtp,
-    OTP_TTL_MS,
-    OTP_RESEND_COOLDOWN_MS,
-    OTP_MAX_ATTEMPTS,
-} from '../utils/otp.util.js';
-import { sendOtpEmail } from '../utils/mailer.util.js';
+import { issueOtp, checkOtp } from '../utils/otpFlow.util.js';
 import { toPublicUser } from '../utils/serializers.js';
 
 const OTP_FIELDS = '+otp.codeHash +otp.purpose +otp.expiresAt +otp.attempts';
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
-
-// Generates a fresh OTP, stores its hash on the user, and emails it.
-// Shared by registration and forgot-password so both go through one
-// cooldown/expiry/attempt-reset path.
-const issueOtp = async (user, purpose) => {
-    const issuedAt = user.otp?.expiresAt ? user.otp.expiresAt.getTime() - OTP_TTL_MS : 0;
-    if (Date.now() - issuedAt < OTP_RESEND_COOLDOWN_MS) {
-        const waitSeconds = Math.ceil((OTP_RESEND_COOLDOWN_MS - (Date.now() - issuedAt)) / 1000);
-        const err = new Error(`Please wait ${waitSeconds}s before requesting another code`);
-        err.statusCode = 429;
-        throw err;
-    }
-
-    const otp = generateOtp();
-    const codeHash = await hashOtp(otp);
-
-    // Send before persisting: if delivery fails, we don't want a stored code
-    // the user never received — that would also wrongly trip the cooldown
-    // above on their very next (immediate) retry.
-    await sendOtpEmail({ to: user.email, otp, purpose });
-
-    user.otp = {
-        codeHash,
-        purpose,
-        expiresAt: new Date(Date.now() + OTP_TTL_MS),
-        attempts: 0,
-    };
-    await user.save();
-};
-
-// Validates a submitted OTP against the stored hash for the given purpose,
-// tracking failed attempts. Throws with an appropriate status on failure.
-const checkOtp = async (user, purpose, submittedOtp) => {
-    if (!user.otp?.codeHash || user.otp.purpose !== purpose) {
-        const err = new Error('No pending verification code for this account. Please request a new one.');
-        err.statusCode = 400;
-        throw err;
-    }
-
-    if (user.otp.expiresAt < new Date()) {
-        const err = new Error('This code has expired. Please request a new one.');
-        err.statusCode = 400;
-        throw err;
-    }
-
-    if (user.otp.attempts >= OTP_MAX_ATTEMPTS) {
-        const err = new Error('Too many incorrect attempts. Please request a new code.');
-        err.statusCode = 429;
-        throw err;
-    }
-
-    const isMatch = await compareOtp(submittedOtp, user.otp.codeHash);
-    if (!isMatch) {
-        user.otp.attempts += 1;
-        await user.save();
-        const err = new Error('Invalid code. Please try again.');
-        err.statusCode = 400;
-        throw err;
-    }
-};
 
 // POST /api/auth/register
 // New signups start as USER_STATUS.INACTIVE (schema default) and get an OTP

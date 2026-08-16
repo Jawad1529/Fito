@@ -8,6 +8,10 @@ import { buildProductSeo, buildProductSlug } from '../utils/productSeo.js';
 const productSchema = new mongoose.Schema(
     {
         name: { type: String, required: true, trim: true },
+        // Stores a Category.slug (see Category.model.js), not a display name.
+        // Kept as a plain string rather than a schema-level enum since the
+        // admin-managed category list changes at runtime; validated against
+        // the Category collection in adminProducts.controller.js instead.
         category: { type: String, required: true, trim: true },
         price: { type: Number, required: true, min: 0 },
         // Percentage off `price`, shown as a struck-through original price on

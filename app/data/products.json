@@ -2,7 +2,7 @@
   {
     "id": 1,
     "name": "Whey Protein Isolate",
-    "category": "Protein Powders",
+    "category": "protein-powders",
     "price": 49.99,
     "discountPercent": 20,
     "discountedPrice": 39.99,
@@ -28,7 +28,7 @@
   {
     "id": 2,
     "name": "Casein Protein",
-    "category": "Protein Powders",
+    "category": "protein-powders",
     "price": 44.99,
     "rating": 4.7,
     "reviews": 215,
@@ -44,7 +44,7 @@
   {
     "id": 3,
     "name": "Protein Crunch Bar",
-    "category": "Protein Bars",
+    "category": "protein-bars",
     "price": 29.99,
     "rating": 4.6,
     "reviews": 189,
@@ -60,7 +60,7 @@
   {
     "id": 4,
     "name": "Collagen Protein Bar",
-    "category": "Protein Bars",
+    "category": "protein-bars",
     "price": 32.99,
     "rating": 4.5,
     "reviews": 124,
@@ -76,7 +76,7 @@
   {
     "id": 5,
     "name": "Whey Protein Shake",
-    "category": "Protein Shakes",
+    "category": "protein-shakes",
     "price": 39.99,
     "rating": 4.4,
     "reviews": 278,
@@ -92,7 +92,7 @@
   {
     "id": 6,
     "name": "Vegan Protein Shake",
-    "category": "Protein Shakes",
+    "category": "protein-shakes",
     "price": 42.99,
     "rating": 4.3,
     "reviews": 95,
@@ -108,7 +108,7 @@
   {
     "id": 7,
     "name": "Creatine Monohydrate",
-    "category": "Creatine",
+    "category": "creatine",
     "price": 27.99,
     "rating": 4.9,
     "reviews": 512,
@@ -124,7 +124,7 @@
   {
     "id": 8,
     "name": "Creatine + HMB",
-    "category": "Creatine",
+    "category": "creatine",
     "price": 34.99,
     "rating": 4.6,
     "reviews": 167,

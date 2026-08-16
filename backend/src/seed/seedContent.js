@@ -8,21 +8,31 @@ import mongoose from 'mongoose';
 import connectDB from '../config/db.js';
 import Product from '../models/Product.model.js';
 import Blog from '../models/Blog.model.js';
+import Category from '../models/Category.model.js';
 import slugify from '../utils/slugify.js';
 import { PRODUCT_STATUS, BLOG_STATUS } from '../constants/contentStatus.js';
+import { CATEGORY_STATUS } from '../constants/categoryStatus.js';
 
 const PLACEHOLDER_IMAGE =
     'https://img.magnific.com/free-photo/protein-gym_23-2151980040.jpg?semt=ais_hybrid&w=740&q=80';
 
+// `category` below is a Category.slug (see Category.model.js), not a display name.
+const categories = [
+    { name: 'Protein Powders', slug: 'protein-powders' },
+    { name: 'Protein Bars', slug: 'protein-bars' },
+    { name: 'Protein Shakes', slug: 'protein-shakes' },
+    { name: 'Creatine', slug: 'creatine' },
+];
+
 const products = [
-    { name: 'Whey Protein Isolate', category: 'Protein Powders', price: 49.99, stock: 120, description: 'Pure whey isolate with 25g protein per serving, zero sugar.', status: PRODUCT_STATUS.PUBLISHED },
-    { name: 'Casein Protein', category: 'Protein Powders', price: 44.99, stock: 80, description: 'Slow-release casein for overnight muscle recovery.', status: PRODUCT_STATUS.PUBLISHED },
-    { name: 'Protein Crunch Bar', category: 'Protein Bars', price: 29.99, stock: 200, description: 'Crispy protein bar with 20g protein, low sugar, great taste.', status: PRODUCT_STATUS.PUBLISHED },
-    { name: 'Collagen Protein Bar', category: 'Protein Bars', price: 32.99, stock: 0, description: 'Protein bar with collagen peptides for joint and skin health.', status: PRODUCT_STATUS.OUT_OF_STOCK },
-    { name: 'Whey Protein Shake', category: 'Protein Shakes', price: 39.99, stock: 150, description: 'Ready-to-drink whey protein shake, delicious and convenient.', status: PRODUCT_STATUS.PUBLISHED },
-    { name: 'Vegan Protein Shake', category: 'Protein Shakes', price: 42.99, stock: 60, description: 'Plant-based protein shake with pea and rice protein blend.', status: PRODUCT_STATUS.PUBLISHED },
-    { name: 'Creatine Monohydrate', category: 'Creatine', price: 27.99, stock: 300, description: 'Pure micronized creatine monohydrate for strength and power.', status: PRODUCT_STATUS.PUBLISHED },
-    { name: 'Creatine + HMB', category: 'Creatine', price: 34.99, stock: 45, description: 'Advanced creatine formula with HMB for muscle preservation.', status: PRODUCT_STATUS.PUBLISHED },
+    { name: 'Whey Protein Isolate', category: 'protein-powders', price: 49.99, stock: 120, description: 'Pure whey isolate with 25g protein per serving, zero sugar.', status: PRODUCT_STATUS.PUBLISHED },
+    { name: 'Casein Protein', category: 'protein-powders', price: 44.99, stock: 80, description: 'Slow-release casein for overnight muscle recovery.', status: PRODUCT_STATUS.PUBLISHED },
+    { name: 'Protein Crunch Bar', category: 'protein-bars', price: 29.99, stock: 200, description: 'Crispy protein bar with 20g protein, low sugar, great taste.', status: PRODUCT_STATUS.PUBLISHED },
+    { name: 'Collagen Protein Bar', category: 'protein-bars', price: 32.99, stock: 0, description: 'Protein bar with collagen peptides for joint and skin health.', status: PRODUCT_STATUS.OUT_OF_STOCK },
+    { name: 'Whey Protein Shake', category: 'protein-shakes', price: 39.99, stock: 150, description: 'Ready-to-drink whey protein shake, delicious and convenient.', status: PRODUCT_STATUS.PUBLISHED },
+    { name: 'Vegan Protein Shake', category: 'protein-shakes', price: 42.99, stock: 60, description: 'Plant-based protein shake with pea and rice protein blend.', status: PRODUCT_STATUS.PUBLISHED },
+    { name: 'Creatine Monohydrate', category: 'creatine', price: 27.99, stock: 300, description: 'Pure micronized creatine monohydrate for strength and power.', status: PRODUCT_STATUS.PUBLISHED },
+    { name: 'Creatine + HMB', category: 'creatine', price: 34.99, stock: 45, description: 'Advanced creatine formula with HMB for muscle preservation.', status: PRODUCT_STATUS.PUBLISHED },
 ];
 
 const blogs = [
@@ -116,6 +126,13 @@ const blogs = [
 const run = async () => {
     await connectDB();
 
+    let categoriesCreated = 0;
+    for (const category of categories) {
+        if (await Category.exists({ slug: category.slug })) continue;
+        await Category.create({ ...category, status: CATEGORY_STATUS.ACTIVE });
+        categoriesCreated += 1;
+    }
+
     let productsCreated = 0;
     for (const product of products) {
         if (await Product.exists({ name: product.name })) continue;
@@ -140,7 +157,9 @@ const run = async () => {
         blogsCreated += 1;
     }
 
-    console.log(`Seed complete — ${productsCreated} products, ${blogsCreated} blog posts created.`);
+    console.log(
+        `Seed complete — ${categoriesCreated} categories, ${productsCreated} products, ${blogsCreated} blog posts created.`
+    );
     await mongoose.disconnect();
 };
 

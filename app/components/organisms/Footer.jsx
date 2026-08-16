@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Icon from '../atoms/Icon';
 import Input from '../atoms/Input';
@@ -7,13 +8,9 @@ import Button from '../atoms/Button';
 import Divider from '../atoms/Divider';
 import Logo from '../shared/Logo';
 import { Caption, Text } from '../atoms/Typography';
-
-const shopLinks = [
-  { label: 'All Products', href: '/shop' },
-  { label: 'Protein Powder', href: '/shop/protein-powder' },
-  { label: 'Protein Bars', href: '/shop/protein-bars' },
-  { label: 'Creatine', href: '/shop/creatine' },
-];
+import useTestingMode from '../../hooks/useTestingMode';
+import { getCategories } from '../../services/category.service';
+import { categories as mockCategories } from '../../data/categories';
 
 const companyLinks = [
   { label: 'About Us', href: '/about' },
@@ -38,6 +35,41 @@ const socialLinks = [
   { name: 'facebook', href: 'https://www.facebook.com/share/1B2UCHJ3cB/' },
   { name: 'instagram', href: 'https://www.instagram.com/fitoo.pro?igsh=MW56dTF0Ym1taHo2eA==&igsi=MW56dTF0Ym1taHo2eA==' },
 ];
+
+// Categories are admin-managed (see Category Management in the admin panel),
+// so the Shop column is built from the live list instead of a hardcoded one.
+function ShopFooterColumn() {
+  const { testingMode } = useTestingMode();
+  // Remounts (resetting local state) whenever testing mode is toggled,
+  // instead of syncing that reset through an effect.
+  return <ShopFooterColumnInner key={testingMode} testingMode={testingMode} />;
+}
+
+function ShopFooterColumnInner({ testingMode }) {
+  const [categories, setCategories] = useState(testingMode ? mockCategories : []);
+
+  useEffect(() => {
+    if (testingMode) return undefined;
+    let cancelled = false;
+    getCategories()
+      .then((data) => {
+        if (!cancelled) setCategories(data ?? []);
+      })
+      .catch(() => {
+        if (!cancelled) setCategories([]);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [testingMode]);
+
+  const links = [
+    { label: 'All Products', href: '/shop' },
+    ...categories.map((c) => ({ label: c.name, href: `/shop?category=${encodeURIComponent(c.slug)}` })),
+  ];
+
+  return <FooterColumn title="Shop" links={links} />;
+}
 
 function FooterColumn({ title, links }) {
   return (
@@ -94,7 +126,7 @@ export default function Footer() {
             </div>
           </div>
 
-          <FooterColumn title="Shop" links={shopLinks} />
+          <ShopFooterColumn />
           <FooterColumn title="Company" links={companyLinks} />
           <FooterColumn title="Support" links={supportLinks} />
 

@@ -3,6 +3,7 @@ import JsonLd from '@/components/shared/JsonLd';
 import { getProductForSeo } from '@/services/seo.server';
 import { buildProductMetadata } from '@/lib/seo';
 import { productJsonLd, breadcrumbJsonLd } from '@/lib/jsonld';
+import formatCategory from '@/utils/formatCategory';
 
 // Metadata comes straight from the SEO block the backend generates when the
 // admin saves a product, so nothing here needs to be maintained per product.
@@ -27,7 +28,10 @@ export default async function ProductDetailPage({ params }) {
           breadcrumbJsonLd([
             { name: 'Home', href: '/' },
             { name: 'Shop', href: '/shop' },
-            { name: product.category, href: `/shop?category=${encodeURIComponent(product.category)}` },
+            {
+              name: formatCategory(product.category),
+              href: `/shop?category=${encodeURIComponent(product.category)}`,
+            },
             { name: product.name, href: `/product/${product.slug || product.id}` },
           ]),
         ].filter(Boolean)}

@@ -1,10 +1,15 @@
 import asyncHandler from '../utils/asyncHandler.js';
 import Product from '../models/Product.model.js';
 import Review from '../models/Review.model.js';
+import Category from '../models/Category.model.js';
 import { toPublicProduct } from '../utils/serializers.js';
 import { PRODUCT_STATUS } from '../constants/contentStatus.js';
+import { CATEGORY_STATUS } from '../constants/categoryStatus.js';
 import { toImageUrl } from '../middleware/upload.middleware.js';
 import { parsePagination, buildSearchFilter } from '../utils/queryHelpers.js';
+
+// Products may only be assigned to an active, admin-defined category.
+const isValidCategory = (category) => Category.exists({ slug: category, status: CATEGORY_STATUS.ACTIVE });
 
 // Multipart bodies arrive as strings, so numeric fields need coercing.
 const parseNumber = (value, fallback) => {
@@ -78,6 +83,10 @@ export const createProduct = asyncHandler(async (req, res) => {
         res.status(400);
         throw new Error(`Status must be one of: ${Object.values(PRODUCT_STATUS).join(', ')}`);
     }
+    if (!(await isValidCategory(category))) {
+        res.status(400);
+        throw new Error('Invalid category');
+    }
 
     const product = await Product.create({
         name,
@@ -110,6 +119,10 @@ export const updateProduct = asyncHandler(async (req, res) => {
     if (status && !Object.values(PRODUCT_STATUS).includes(status)) {
         res.status(400);
         throw new Error(`Status must be one of: ${Object.values(PRODUCT_STATUS).join(', ')}`);
+    }
+    if (category !== undefined && !(await isValidCategory(category))) {
+        res.status(400);
+        throw new Error('Invalid category');
     }
     if (discountPercent !== undefined) {
         const parsedDiscount = parseNumber(discountPercent, product.discountPercent);

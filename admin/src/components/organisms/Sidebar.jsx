@@ -11,6 +11,7 @@ import {
     BellOutlined,
     SettingOutlined,
     LogoutOutlined,
+    TagsOutlined,
 } from '@ant-design/icons';
 import { useAuth } from '../../context/AuthContext';
 import { ROUTES } from '../../constants/routes';
@@ -26,6 +27,7 @@ export default function Sidebar({ collapsed }) {
         isSuperAdmin && { key: ROUTES.USERS, icon: <TeamOutlined />, label: 'User Management' },
         { key: ROUTES.CONSULTATIONS, icon: <MedicineBoxOutlined />, label: 'Consultation Management' },
         { key: ROUTES.PRODUCTS, icon: <ShoppingOutlined />, label: 'Product Management' },
+        { key: ROUTES.CATEGORIES, icon: <TagsOutlined />, label: 'Category Management' },
         isSuperAdmin && { key: ROUTES.REVIEWS, icon: <StarOutlined />, label: 'Review Management' },
         isSuperAdmin && { key: ROUTES.ORDERS, icon: <ShoppingCartOutlined />, label: 'Order Management' },
         { key: ROUTES.BLOGS, icon: <ReadOutlined />, label: 'Blog Management' },

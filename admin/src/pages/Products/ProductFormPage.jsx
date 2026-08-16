@@ -17,10 +17,10 @@ import {
 } from 'antd';
 import { PlusOutlined, DeleteOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import PageHeading from '../../components/atoms/PageHeading';
-import { PRODUCT_CATEGORIES } from '../../constants/productCategories';
 import { ROUTES } from '../../constants/routes';
 import { useTestingMode } from '../../context/TestingModeContext';
 import useMockProducts from '../../hooks/useMockProducts';
+import useCategories from '../../hooks/useCategories';
 import imageUrl from '../../utils/imageUrl';
 import {
     fetchProduct,
@@ -42,6 +42,8 @@ function ProductFormPageInner({ id, testingMode }) {
     const navigate = useNavigate();
     const [form] = Form.useForm();
     const [mockProducts, setMockProducts] = useMockProducts();
+    const { categories } = useCategories();
+    const activeCategories = categories.filter((c) => c.status === 'active');
 
     const isEdit = Boolean(id);
     const mockProduct = isEdit ? mockProducts.find((p) => String(p.id) === String(id)) : null;
@@ -171,7 +173,11 @@ function ProductFormPageInner({ id, testingMode }) {
                             </Form.Item>
 
                             <Form.Item name="category" label="Category" rules={[{ required: true }]}>
-                                <Select options={PRODUCT_CATEGORIES.map((c) => ({ label: c, value: c }))} />
+                                <Select
+                                    placeholder="Select a category"
+                                    options={activeCategories.map((c) => ({ label: c.name, value: c.slug }))}
+                                    notFoundContent="No active categories — add one under Category Management"
+                                />
                             </Form.Item>
 
                             <Row gutter={16}>

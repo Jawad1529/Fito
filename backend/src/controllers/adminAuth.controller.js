@@ -3,8 +3,12 @@ import generateToken from '../utils/generateToken.js';
 import Admin from '../models/Admin.model.js';
 import { ROLES } from '../constants/roles.js';
 import { ADMIN_STATUS } from '../constants/adminStatus.js';
+import { OTP_PURPOSE } from '../constants/otpPurpose.js';
+import { issueOtp, checkOtp } from '../utils/otpFlow.util.js';
 import { toPublicAdmin } from '../utils/serializers.js';
 import { parsePagination, buildSearchFilter } from '../utils/queryHelpers.js';
+
+const OTP_FIELDS = '+otp.codeHash +otp.purpose +otp.expiresAt +otp.attempts';
 
 // POST /api/admin/auth/login
 export const loginAdmin = asyncHandler(async (req, res) => {
@@ -14,6 +18,11 @@ export const loginAdmin = asyncHandler(async (req, res) => {
     if (!admin || !(await admin.comparePassword(password))) {
         res.status(401);
         throw new Error('Invalid email or password');
+    }
+
+    if (!admin.isEmailVerified) {
+        res.status(403);
+        throw new Error('Please verify your email before logging in.');
     }
 
     // Missing status (admins created before this field existed) is treated
@@ -30,8 +39,10 @@ export const loginAdmin = asyncHandler(async (req, res) => {
 });
 
 // POST /api/admin/auth/signup — public self-serve signup. Always creates a
-// plain admin (never super_admin) and leaves it inactive until a super
-// admin activates it via updateAdminStatus below.
+// plain admin (never super_admin), emails an OTP to verify the address (see
+// verifyAdminOtp below), and leaves it inactive until a super admin
+// activates it via updateAdminStatus — activation is independent of and in
+// addition to email verification.
 export const signupAdmin = asyncHandler(async (req, res) => {
     const { name, email, password } = req.body;
 
@@ -42,8 +53,14 @@ export const signupAdmin = asyncHandler(async (req, res) => {
 
     const existing = await Admin.findOne({ email });
     if (existing) {
-        res.status(409);
-        throw new Error('An admin with this email already exists');
+        if (existing.isEmailVerified) {
+            res.status(409);
+            throw new Error('An admin with this email already exists');
+        }
+        // A prior signup attempt never got its OTP verified — most likely the
+        // email send itself failed. Let this attempt replace it instead of
+        // permanently blocking the address with a 409 it can never clear.
+        await existing.deleteOne();
     }
 
     const admin = await Admin.create({
@@ -52,12 +69,82 @@ export const signupAdmin = asyncHandler(async (req, res) => {
         password,
         role: ROLES.ADMIN,
         status: ADMIN_STATUS.INACTIVE,
+        isEmailVerified: false,
     });
+
+    try {
+        await issueOtp(admin, OTP_PURPOSE.VERIFY_EMAIL);
+    } catch (err) {
+        // Don't leave an orphaned, OTP-less admin behind to block the next attempt.
+        await admin.deleteOne();
+        throw err;
+    }
 
     res.status(201).json({
         admin: toPublicAdmin(admin),
-        message: 'Signup successful. A super admin needs to activate your account before you can log in.',
+        message: 'We emailed you a verification code. Once verified, a super admin still needs to activate your account before you can log in.',
     });
+});
+
+// POST /api/admin/auth/verify-otp
+// Confirms the emailed code and marks the address as verified. This alone
+// doesn't unlock login — status still needs a super admin's approval.
+export const verifyAdminOtp = asyncHandler(async (req, res) => {
+    const { email, otp } = req.body;
+    if (!email || !otp) {
+        res.status(400);
+        throw new Error('Email and code are required');
+    }
+
+    const admin = await Admin.findOne({ email }).select(OTP_FIELDS);
+    if (!admin) {
+        res.status(404);
+        throw new Error('No admin account found with this email');
+    }
+
+    try {
+        await checkOtp(admin, OTP_PURPOSE.VERIFY_EMAIL, otp);
+    } catch (err) {
+        res.status(err.statusCode || 400);
+        throw err;
+    }
+
+    admin.isEmailVerified = true;
+    admin.otp = undefined;
+    await admin.save();
+
+    res.json({
+        message: 'Email verified. A super admin needs to activate your account before you can log in.',
+    });
+});
+
+// POST /api/admin/auth/resend-otp
+// Re-sends the email-verification code for a not-yet-verified admin.
+export const resendAdminOtp = asyncHandler(async (req, res) => {
+    const { email } = req.body;
+    if (!email) {
+        res.status(400);
+        throw new Error('Email is required');
+    }
+
+    const admin = await Admin.findOne({ email }).select(OTP_FIELDS);
+    if (!admin) {
+        res.status(404);
+        throw new Error('No admin account found with this email');
+    }
+    if (admin.isEmailVerified) {
+        res.status(409);
+        throw new Error('This email is already verified');
+    }
+
+    try {
+        await issueOtp(admin, OTP_PURPOSE.VERIFY_EMAIL);
+    } catch (err) {
+        res.status(err.statusCode || 500);
+        throw err;
+    }
+
+    res.json({ message: 'Verification code resent' });
 });
 
 // GET /api/admin/auth?page=&limit=&search=&status=&role= — super admin only,

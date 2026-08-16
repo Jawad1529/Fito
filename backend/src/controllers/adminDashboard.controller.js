@@ -6,12 +6,35 @@ import Consultation from '../models/Consultation.model.js';
 import Blog from '../models/Blog.model.js';
 import Review from '../models/Review.model.js';
 import Order from '../models/Order.model.js';
-import { toPublicUser, toPublicOrder, toPublicReview } from '../utils/serializers.js';
+import { toPublicUser, toPublicOrder, toPublicReview, toPublicProduct, toPublicConsultation } from '../utils/serializers.js';
 import { ORDER_STATUS } from '../constants/orderStatus.js';
 
 // Cancelled orders never collected payment, so they're excluded from every
 // revenue figure on the dashboard (summary total + sales chart).
 const paidOrderFilter = { status: { $ne: ORDER_STATUS.CANCELLED } };
+
+// Order line items only snapshot the product's `name` (not its id), so units
+// sold per product can only be tallied by grouping on that name and matching
+// it back to a live Product afterwards. Products renamed or deleted since
+// they last sold won't match — dropped rather than shown with stale data.
+const getBestSellingProducts = async () => {
+    const sold = await Order.aggregate([
+        { $match: paidOrderFilter },
+        { $unwind: '$items' },
+        { $group: { _id: '$items.name', unitsSold: { $sum: '$items.qty' } } },
+        { $sort: { unitsSold: -1 } },
+        { $limit: 5 },
+    ]);
+    if (!sold.length) return [];
+
+    const products = await Product.find({ name: { $in: sold.map((s) => s._id) } });
+    return sold
+        .map((s) => {
+            const product = products.find((p) => p.name === s._id);
+            return product && { ...toPublicProduct(product), unitsSold: s.unitsSold };
+        })
+        .filter(Boolean);
+};
 
 // GET /api/admin/dashboard/summary
 export const getDashboardSummary = asyncHandler(async (req, res) => {
@@ -26,6 +49,9 @@ export const getDashboardSummary = asyncHandler(async (req, res) => {
         recentUsers,
         recentOrders,
         recentReviews,
+        bestSellingProducts,
+        outOfStockProducts,
+        recentConsultations,
     ] = await Promise.all([
         User.countDocuments(),
         Admin.countDocuments(),
@@ -37,6 +63,9 @@ export const getDashboardSummary = asyncHandler(async (req, res) => {
         User.find().sort({ createdAt: -1 }).limit(5),
         Order.find().sort({ createdAt: -1 }).limit(5),
         Review.find().populate('product', 'name').sort({ createdAt: -1 }).limit(5),
+        getBestSellingProducts(),
+        Product.find({ stock: { $lte: 0 } }).sort({ updatedAt: -1 }).limit(5),
+        Consultation.find().sort({ createdAt: -1 }).limit(5),
     ]);
 
     res.json({
@@ -52,6 +81,9 @@ export const getDashboardSummary = asyncHandler(async (req, res) => {
         recentUsers: recentUsers.map(toPublicUser),
         recentOrders: recentOrders.map(toPublicOrder),
         recentReviews: recentReviews.map(toPublicReview),
+        bestSellingProducts,
+        outOfStockProducts: outOfStockProducts.map(toPublicProduct),
+        recentConsultations: recentConsultations.map(toPublicConsultation),
     });
 });
 
