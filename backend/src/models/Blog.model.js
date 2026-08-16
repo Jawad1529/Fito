@@ -3,8 +3,9 @@ import { BLOG_STATUS } from '../constants/contentStatus.js';
 import slugify from '../utils/slugify.js';
 import { buildBlogSeo, estimateReadTime } from '../utils/blogSeo.js';
 
-// `content` is an array of paragraphs — the app renders one <Text> per entry
-// (see app/app/(public)/blog/[slug]/page.jsx), so the shape is preserved here.
+// `content` is sanitized HTML (see adminBlogs.controller.js) written with the
+// admin panel's Tiptap editor — the app renders it directly (see
+// app/components/templates/BlogTemplate.jsx).
 const blogSchema = new mongoose.Schema(
     {
         title: { type: String, required: true, trim: true },
@@ -12,7 +13,7 @@ const blogSchema = new mongoose.Schema(
         category: { type: String, required: true, trim: true },
         author: { type: String, required: true, trim: true },
         excerpt: { type: String, required: true, trim: true },
-        content: [{ type: String }],
+        content: { type: String, default: '' },
         readTime: { type: String, trim: true },
         image: { type: String },
         publishedAt: { type: Date, default: Date.now },

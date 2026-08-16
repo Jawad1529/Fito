@@ -1,7 +1,7 @@
 import apiClient from './client';
 
 // Blogs take a single cover image, so the body is multipart/form-data with an
-// optional `image` File. `content` is sent as JSON so paragraph breaks survive.
+// optional `image` File. `content` is HTML from the Tiptap editor.
 const toFormData = ({ image, content, ...fields }) => {
     const formData = new FormData();
 
@@ -9,9 +9,7 @@ const toFormData = ({ image, content, ...fields }) => {
         if (value !== undefined && value !== null) formData.append(key, value);
     });
 
-    if (content !== undefined) {
-        formData.append('content', Array.isArray(content) ? JSON.stringify(content) : content);
-    }
+    if (content !== undefined) formData.append('content', content);
     if (image instanceof File) formData.append('image', image);
 
     return formData;
@@ -20,6 +18,11 @@ const toFormData = ({ image, content, ...fields }) => {
 export const fetchBlogs = async (params = {}) => {
     const { data } = await apiClient.get('/admin/blogs', { params });
     return data;
+};
+
+export const fetchBlog = async (id) => {
+    const { data } = await apiClient.get(`/admin/blogs/${id}`);
+    return data.blog;
 };
 
 export const createBlog = async (payload) => {

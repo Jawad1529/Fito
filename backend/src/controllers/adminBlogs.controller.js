@@ -1,3 +1,4 @@
+import sanitizeHtml from 'sanitize-html';
 import asyncHandler from '../utils/asyncHandler.js';
 import Blog from '../models/Blog.model.js';
 import { toPublicBlog } from '../utils/serializers.js';
@@ -6,21 +7,19 @@ import { toImageUrl } from '../middleware/upload.middleware.js';
 import slugify from '../utils/slugify.js';
 import { parsePagination, buildSearchFilter } from '../utils/queryHelpers.js';
 
-// The panel sends body paragraphs either as a JSON array or as one textarea
-// blob; both normalize to the array shape the app renders.
+// The panel's Tiptap editor only exposes bold, italic, strike and links, but
+// the body is still saved as raw HTML — strip anything outside that set so a
+// crafted request can't smuggle scripts/attributes into the public blog page.
 const parseContent = (content) => {
     if (content === undefined) return undefined;
-    if (Array.isArray(content)) return content.map((p) => String(p).trim()).filter(Boolean);
-    try {
-        const parsed = JSON.parse(content);
-        if (Array.isArray(parsed)) return parsed.map((p) => String(p).trim()).filter(Boolean);
-    } catch {
-        // Not JSON — treat it as plain text split on blank lines.
-    }
-    return String(content)
-        .split(/\n\s*\n/)
-        .map((p) => p.trim())
-        .filter(Boolean);
+    return sanitizeHtml(String(content), {
+        allowedTags: ['p', 'strong', 'em', 's', 'a', 'br'],
+        allowedAttributes: { a: ['href', 'target', 'rel'] },
+        allowedSchemes: ['http', 'https', 'mailto'],
+        transformTags: {
+            a: sanitizeHtml.simpleTransform('a', { target: '_blank', rel: 'noopener noreferrer nofollow' }),
+        },
+    }).trim();
 };
 
 // GET /api/admin/blogs?page=&limit=&search=&category=&status= — includes drafts.
@@ -37,6 +36,16 @@ export const listBlogs = asyncHandler(async (req, res) => {
         Blog.countDocuments(filter),
     ]);
     res.json({ items: blogs.map(toPublicBlog), total, page, limit });
+});
+
+// GET /api/admin/blogs/:id
+export const getBlog = asyncHandler(async (req, res) => {
+    const blog = await Blog.findById(req.params.id);
+    if (!blog) {
+        res.status(404);
+        throw new Error('Blog post not found');
+    }
+    res.json({ blog: toPublicBlog(blog) });
 });
 
 // POST /api/admin/blogs (multipart/form-data, field name: image)
@@ -66,7 +75,7 @@ export const createBlog = asyncHandler(async (req, res) => {
         excerpt,
         readTime,
         status,
-        content: parseContent(content) ?? [],
+        content: parseContent(content) ?? '',
         publishedAt: date ? new Date(date) : undefined,
         image: toImageUrl(req.file),
     });

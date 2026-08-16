@@ -12,6 +12,7 @@ import {
     SettingOutlined,
     LogoutOutlined,
     TagsOutlined,
+    MailOutlined,
 } from '@ant-design/icons';
 import { useAuth } from '../../context/AuthContext';
 import { ROUTES } from '../../constants/routes';
@@ -32,6 +33,7 @@ export default function Sidebar({ collapsed }) {
         isSuperAdmin && { key: ROUTES.ORDERS, icon: <ShoppingCartOutlined />, label: 'Order Management' },
         { key: ROUTES.BLOGS, icon: <ReadOutlined />, label: 'Blog Management' },
         { key: ROUTES.NOTIFICATIONS, icon: <BellOutlined />, label: 'Notification Management' },
+        { key: ROUTES.SUBSCRIBERS, icon: <MailOutlined />, label: 'Newsletter Subscribers' },
     ].filter(Boolean);
 
     // Kept in a separate Menu so this section stays pinned to the bottom of

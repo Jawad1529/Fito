@@ -15,10 +15,11 @@ import useCart from '../../../hooks/useCart';
 import useTestingMode from '../../../hooks/useTestingMode';
 import { createOrder } from '../../../services/order.service';
 import { WHATSAPP_NUMBER } from '../../../utils/siteConfig';
+import { ALLOWED_IMAGE_TYPES, MAX_UPLOAD_SIZE_MB } from '../../../utils/uploadValidation';
 
 function buildWhatsAppMessage(order) {
   const lines = [
-    `New Order #${order.id}`,
+    `New Order #${order.orderNumber || order.id}`,
     '',
     'Items:',
     ...order.items.map(
@@ -42,7 +43,7 @@ export default function CheckoutPage() {
   const { items, totalPrice, clearCart } = useCart();
   const { testingMode } = useTestingMode();
 
-  const [shipping, setShipping] = useState({ name: '', phone: '', address: '', city: '' });
+  const [shipping, setShipping] = useState({ name: '', email: '', phone: '', address: '', city: '' });
   const [paymentMethod, setPaymentMethod] = useState('cod');
   const [transactionId, setTransactionId] = useState('');
   const [screenshot, setScreenshot] = useState([]);
@@ -64,11 +65,13 @@ export default function CheckoutPage() {
 
     try {
       if (testingMode) {
+        const shortId =
+          typeof crypto !== 'undefined' && crypto.randomUUID
+            ? crypto.randomUUID().slice(0, 8)
+            : `${Date.now()}`;
         const orderRecord = {
-          id:
-            typeof crypto !== 'undefined' && crypto.randomUUID
-              ? crypto.randomUUID().slice(0, 8)
-              : `${Date.now()}`,
+          id: shortId,
+          orderNumber: `FT-${shortId.toUpperCase()}`,
           placedAt: new Date().toISOString(),
           items,
           total: totalPrice,
@@ -94,6 +97,7 @@ export default function CheckoutPage() {
 
         setOrder({
           id: createdOrder.id,
+          orderNumber: createdOrder.orderNumber,
           placedAt: createdOrder.placedAt,
           items,
           total: createdOrder.total,
@@ -127,10 +131,19 @@ export default function CheckoutPage() {
           </div>
           <H2>Order Placed!</H2>
           <Text muted className="mt-2">
-            Order #{order.id} —{' '}
+            Order #{order.orderNumber || order.id} —{' '}
             {order.paymentMethod === 'cod'
               ? 'pay on delivery.'
               : "we'll confirm once payment is verified."}
+          </Text>
+
+          <Text muted className="mt-3 text-sm">
+            Save your order number — you can use it with your phone number to{' '}
+            <Link href="/track-order" className="text-primary underline">
+              track your order
+            </Link>{' '}
+            anytime.
+            {order.shipping.email && ' We’ve also emailed your confirmation to ' + order.shipping.email + '.'}
           </Text>
 
           {order.paymentMethod === 'online' && (
@@ -201,6 +214,13 @@ export default function CheckoutPage() {
                   value={shipping.phone}
                   onChange={updateShipping('phone')}
                 />
+                <Input
+                  type="email"
+                  label="Email (Optional)"
+                  placeholder="you@example.com"
+                  value={shipping.email}
+                  onChange={updateShipping('email')}
+                />
                 <div className="sm:col-span-2">
                   <Input
                     label="Address"
@@ -263,7 +283,14 @@ export default function CheckoutPage() {
                   <label className="block text-sm text-text-secondary mb-1.5">
                     Payment Screenshot
                   </label>
-                  <Upload value={screenshot} onChange={setScreenshot} picture>
+                  <Upload
+                    value={screenshot}
+                    onChange={setScreenshot}
+                    picture
+                    accept="image/*"
+                    allowedTypes={ALLOWED_IMAGE_TYPES}
+                    maxSizeMB={MAX_UPLOAD_SIZE_MB}
+                  >
                     <UploadOutlined />
                     <span className="ml-2">Upload Screenshot</span>
                   </Upload>

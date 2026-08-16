@@ -72,7 +72,7 @@ function OrderManagementPageInner({ testingMode }) {
     };
 
     const columns = [
-        { title: 'Order ID', dataIndex: 'id' },
+        { title: 'Order #', dataIndex: 'orderNumber', render: (value) => value || '—' },
         { title: 'Customer', dataIndex: ['shipping', 'name'] },
         { title: 'City', dataIndex: ['shipping', 'city'] },
         {
@@ -145,10 +145,11 @@ function OrderManagementPageInner({ testingMode }) {
                 {viewing && (
                     <>
                         <Descriptions column={1} bordered size="small">
-                            <Descriptions.Item label="Order ID">{viewing.id}</Descriptions.Item>
+                            <Descriptions.Item label="Order #">{viewing.orderNumber || '—'}</Descriptions.Item>
                             <Descriptions.Item label="Status"><StatusTag status={viewing.status} /></Descriptions.Item>
                             <Descriptions.Item label="Placed At">{new Date(viewing.placedAt).toLocaleString()}</Descriptions.Item>
                             <Descriptions.Item label="Customer">{viewing.shipping.name}</Descriptions.Item>
+                            <Descriptions.Item label="Email">{viewing.shipping.email || '—'}</Descriptions.Item>
                             <Descriptions.Item label="Phone">{viewing.shipping.phone}</Descriptions.Item>
                             <Descriptions.Item label="Address">{`${viewing.shipping.address}, ${viewing.shipping.city}`}</Descriptions.Item>
                             <Descriptions.Item label="Payment Method">{paymentLabel(viewing.paymentMethod)}</Descriptions.Item>

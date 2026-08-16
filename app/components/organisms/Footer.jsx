@@ -10,6 +10,7 @@ import Logo from '../shared/Logo';
 import { Caption, Text } from '../atoms/Typography';
 import useTestingMode from '../../hooks/useTestingMode';
 import { getCategories } from '../../services/category.service';
+import { subscribeNewsletter } from '../../services/newsletter.service';
 import { categories as mockCategories } from '../../data/categories';
 
 const companyLinks = [
@@ -92,9 +93,21 @@ function FooterColumn({ title, links }) {
 }
 
 export default function Footer() {
-  const handleSubmit = (e) => {
+  const [email, setEmail] = useState('');
+  const [status, setStatus] = useState('idle'); // idle | loading | done | error
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // TODO: Add newsletter subscription logic here
+    if (!email || status === 'loading') return;
+
+    setStatus('loading');
+    try {
+      await subscribeNewsletter(email);
+      setStatus('done');
+      setEmail('');
+    } catch {
+      setStatus('error');
+    }
   };
 
   return (
@@ -140,26 +153,41 @@ export default function Footer() {
               New drops, diet tips, and member-only offers — no spam.
             </Text>
 
-            <form
-              onSubmit={handleSubmit}
-              className="mt-4 flex items-center gap-2"
-            >
-              <Input
-                type="email"
-                placeholder="you@email.com"
-                icon={<Icon name="mail" className="w-4 h-4" />}
-                aria-label="Email address"
-              />
+            {status === 'done' ? (
+              <Text className="mt-4 text-sm text-primary">
+                You&apos;re subscribed! 🎉
+              </Text>
+            ) : (
+              <form
+                onSubmit={handleSubmit}
+                className="mt-4 flex items-center gap-2"
+              >
+                <Input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="you@email.com"
+                  icon={<Icon name="mail" className="w-4 h-4" />}
+                  aria-label="Email address"
+                  disabled={status === 'loading'}
+                />
 
-              <Button
-                type="submit"
-                variant="primary"
-                size="md"
-                className="shrink-0"
-                aria-label="Subscribe"
-                icon={<Icon name="arrowRight" className="w-4 h-4" />}
-              />
-            </form>
+                <Button
+                  type="submit"
+                  variant="primary"
+                  size="md"
+                  className="shrink-0"
+                  aria-label="Subscribe"
+                  loading={status === 'loading'}
+                  icon={<Icon name="arrowRight" className="w-4 h-4" />}
+                />
+              </form>
+            )}
+            {status === 'error' && (
+              <Text className="mt-2 text-xs text-danger">
+                Something went wrong. Please try again.
+              </Text>
+            )}
           </div>
         </div>
 

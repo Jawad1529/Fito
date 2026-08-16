@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Button, Typography, Tag, Divider, Row, Col, Image, Card, Spin, message, Result } from 'antd';
-import { ArrowLeftOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, FilePdfOutlined } from '@ant-design/icons';
 import KeyValueGrid from '../../components/molecules/KeyValueGrid';
 import ConsultationConversation from '../../components/organisms/consultations/ConsultationConversation';
 import { CONSULTATION_GOALS, STATUS_COLORS } from '../../constants/consultationGoals';
@@ -34,20 +34,46 @@ const toConversationView = (conversation, testingMode) =>
               timestamp: m.createdAt,
           }));
 
+const isPdfUrl = (url) => /\.pdf(\?|$)/i.test(url || '');
+
+// Cloudinary flag that makes the response Content-Disposition: attachment,
+// so clicking downloads the file instead of navigating to Cloudinary's bare
+// PDF URL.
+const toDownloadUrl = (url) =>
+    url?.includes('/upload/') ? url.replace('/upload/', '/upload/fl_attachment/') : url;
+
 function UploadGallery({ title, images }) {
+    const files = images || [];
+    // PDFs can't render through <Image> (it's an <img> under the hood, and
+    // application/pdf isn't image data) — show them as a download link instead.
+    const photos = files.filter((src) => !isPdfUrl(src));
+    const pdfs = files.filter(isPdfUrl);
+
     return (
         <div className="mb-4">
             <Text className="!text-gray-400 text-xs block mb-2">
-                {title} ({(images || []).length})
+                {title} ({files.length})
             </Text>
-            {(images || []).length > 0 ? (
-                <Image.PreviewGroup>
-                    <div className="flex gap-2 flex-wrap">
-                        {images.map((src, idx) => (
-                            <Image key={idx} src={src} width={88} height={88} className="rounded-lg object-cover" />
-                        ))}
-                    </div>
-                </Image.PreviewGroup>
+            {files.length > 0 ? (
+                <div className="flex gap-2 flex-wrap">
+                    {photos.length > 0 && (
+                        <Image.PreviewGroup>
+                            {photos.map((src, idx) => (
+                                <Image key={idx} src={src} width={88} height={88} className="rounded-lg object-cover" />
+                            ))}
+                        </Image.PreviewGroup>
+                    )}
+                    {pdfs.map((src, idx) => (
+                        <a
+                            key={idx}
+                            href={toDownloadUrl(src)}
+                            className="w-[88px] h-[88px] flex flex-col items-center justify-center gap-1 rounded-lg border border-gray-200 bg-gray-50 text-gray-500 hover:border-red-400 hover:text-red-500 text-xs"
+                        >
+                            <FilePdfOutlined className="text-2xl" />
+                            <span>PDF</span>
+                        </a>
+                    ))}
+                </div>
             ) : (
                 <Text type="secondary">No files uploaded</Text>
             )}

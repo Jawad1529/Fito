@@ -14,10 +14,12 @@ export const listOrders = asyncHandler(async (req, res) => {
     if (Object.values(ORDER_STATUS).includes(status)) filter.status = status;
     if (search?.trim()) {
         const trimmed = search.trim();
-        // Order "id" the admin panel searches by is the Mongo _id itself, so
-        // only match it when the search text is actually a valid ObjectId.
+        // The Mongo _id is only matched when the search text is actually a
+        // valid ObjectId — orderNumber is the human-friendly id admins are
+        // more likely to type or paste in.
         filter.$or = [
             { transactionId: searchRegex(trimmed) },
+            { orderNumber: searchRegex(trimmed) },
             ...(mongoose.isValidObjectId(trimmed) ? [{ _id: trimmed }] : []),
         ];
     }

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Modal, Descriptions, Image, Button, message } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import PageHeading from '../../components/atoms/PageHeading';
@@ -6,18 +7,14 @@ import SearchBar from '../../components/molecules/SearchBar';
 import RowActions from '../../components/molecules/RowActions';
 import StatusTag from '../../components/atoms/StatusTag';
 import DataTable from '../../components/organisms/DataTable';
-import BlogFormDrawer from '../../components/organisms/blogs/BlogFormDrawer';
 import useTableQuery from '../../hooks/useTableQuery';
 import useServerTableQuery from '../../hooks/useServerTableQuery';
-import { blogs as initialBlogs, BLOG_CATEGORIES } from '../../data/blogs';
+import useMockBlogs from '../../hooks/useMockBlogs';
+import { BLOG_CATEGORIES } from '../../data/blogs';
 import { useTestingMode } from '../../context/TestingModeContext';
 import imageUrl from '../../utils/imageUrl';
-import {
-    fetchBlogs,
-    createBlog as createBlogApi,
-    updateBlog as updateBlogApi,
-    deleteBlog as deleteBlogApi,
-} from '../../api/adminBlogs.api';
+import { ROUTES, blogEditPath } from '../../constants/routes';
+import { fetchBlogs, deleteBlog as deleteBlogApi } from '../../api/adminBlogs.api';
 
 const apiError = (err, fallback) => err?.response?.data?.message || fallback;
 
@@ -27,7 +24,8 @@ export default function BlogManagementPage() {
 }
 
 function BlogManagementPageInner({ testingMode }) {
-    const [mockBlogs, setMockBlogs] = useState(initialBlogs);
+    const navigate = useNavigate();
+    const [mockBlogs, setMockBlogs] = useMockBlogs();
     const clientQuery = useTableQuery(mockBlogs, { searchKeys: ['title', 'author', 'category'] });
     const serverQuery = useServerTableQuery(fetchBlogs, { enabled: !testingMode });
 
@@ -35,59 +33,8 @@ function BlogManagementPageInner({ testingMode }) {
     const searchText = testingMode ? clientQuery.searchText : serverQuery.searchInput;
     const setSearchText = testingMode ? clientQuery.setSearchText : serverQuery.setSearchInput;
     const loading = !testingMode && serverQuery.loading;
-    const [saving, setSaving] = useState(false);
 
     const [viewing, setViewing] = useState(null);
-    const [drawerOpen, setDrawerOpen] = useState(false);
-    const [editingBlog, setEditingBlog] = useState(null);
-
-    const openCreate = () => {
-        setEditingBlog(null);
-        setDrawerOpen(true);
-    };
-
-    const openEdit = (blog) => {
-        setEditingBlog(blog);
-        setDrawerOpen(true);
-    };
-
-    const handleSubmit = async (values) => {
-        if (testingMode) {
-            if (editingBlog) {
-                setMockBlogs((prev) => prev.map((b) => (b.id === editingBlog.id ? { ...b, ...values } : b)));
-                message.success('Blog updated');
-            } else {
-                setMockBlogs((prev) => [
-                    {
-                        ...values,
-                        id: Math.max(...prev.map((b) => b.id), 0) + 1,
-                        slug: values.title.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
-                    },
-                    ...prev,
-                ]);
-                message.success('Blog created');
-            }
-            setDrawerOpen(false);
-            return;
-        }
-
-        setSaving(true);
-        try {
-            if (editingBlog) {
-                await updateBlogApi(editingBlog.id, values);
-                message.success('Blog updated');
-            } else {
-                await createBlogApi(values);
-                message.success('Blog created');
-            }
-            serverQuery.refetch();
-            setDrawerOpen(false);
-        } catch (err) {
-            message.error(apiError(err, 'Failed to save blog'));
-        } finally {
-            setSaving(false);
-        }
-    };
 
     const handleDelete = async (id) => {
         if (testingMode) {
@@ -140,7 +87,7 @@ function BlogManagementPageInner({ testingMode }) {
             render: (_, record) => (
                 <RowActions
                     onView={() => setViewing(record)}
-                    onEdit={() => openEdit(record)}
+                    onEdit={() => navigate(blogEditPath(record.id))}
                     onDelete={() => handleDelete(record.id)}
                 />
             ),
@@ -155,7 +102,7 @@ function BlogManagementPageInner({ testingMode }) {
                 actions={
                     <>
                         <SearchBar value={searchText} onChange={setSearchText} placeholder="Search blogs..." />
-                        <Button type="primary" icon={<PlusOutlined />} onClick={openCreate}>
+                        <Button type="primary" icon={<PlusOutlined />} onClick={() => navigate(ROUTES.BLOG_ADD)}>
                             Add Blog
                         </Button>
                     </>
@@ -200,15 +147,6 @@ function BlogManagementPageInner({ testingMode }) {
                     </div>
                 )}
             </Modal>
-
-            <BlogFormDrawer
-                open={drawerOpen}
-                onClose={() => setDrawerOpen(false)}
-                onSubmit={handleSubmit}
-                initialValues={editingBlog}
-                uploadMode={!testingMode}
-                saving={saving}
-            />
         </div>
     );
 }

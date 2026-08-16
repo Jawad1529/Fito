@@ -2,6 +2,7 @@
 
 import { Suspense, useCallback, useMemo, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { Select } from 'antd';
 import { H2, Text } from '../../../components/atoms/Typography';
 import ProductCard from '../../../components/organisms/ProductCard';
 import ProductCardSkeleton from '../../../components/molecules/ProductCardSkeleton';
@@ -16,6 +17,13 @@ import { getProducts } from '../../../services/product.service';
 import { getCategories } from '../../../services/category.service';
 import productsData from '../../../data/products.json';
 import { categories as mockCategories } from '../../../data/categories';
+
+const SORT_OPTIONS = [
+  { value: 'default', label: 'Default' },
+  { value: 'price-low', label: 'Price: Low to High' },
+  { value: 'price-high', label: 'Price: High to Low' },
+  { value: 'rating', label: 'Top Rated' },
+];
 
 // Applied only in testing mode; with the API on, the backend does the work.
 const filterLocally = (products, { search, category, sort }) => {
@@ -138,35 +146,28 @@ function ShopPageInner() {
               <label htmlFor="category" className="block text-sm font-medium text-gray-300 mb-1">
                 Category
               </label>
-              <select
+              <Select
                 id="category"
                 value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-                className="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-yellow-400/50 transition appearance-none"
-              >
-                {categories.map((cat) => (
-                  <option key={cat.value} value={cat.value} className="bg-black">
-                    {cat.label}
-                  </option>
-                ))}
-              </select>
+                onChange={setSelectedCategory}
+                options={categories}
+                size="large"
+                className="w-full"
+              />
             </div>
 
             <div className="sm:w-48">
               <label htmlFor="sort" className="block text-sm font-medium text-gray-300 mb-1">
                 Sort By
               </label>
-              <select
+              <Select
                 id="sort"
                 value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-yellow-400/50 transition appearance-none"
-              >
-                <option value="default" className="bg-black">Default</option>
-                <option value="price-low" className="bg-black">Price: Low to High</option>
-                <option value="price-high" className="bg-black">Price: High to Low</option>
-                <option value="rating" className="bg-black">Top Rated</option>
-              </select>
+                onChange={setSortBy}
+                options={SORT_OPTIONS}
+                size="large"
+                className="w-full"
+              />
             </div>
 
             <Button

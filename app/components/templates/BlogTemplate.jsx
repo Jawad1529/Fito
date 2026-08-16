@@ -125,11 +125,21 @@ export default function BlogTemplate({ slug, initialData = null }) {
                     transition={{ duration: 0.6, delay: 0.2 }}
                     className="flex flex-col gap-5 mt-8"
                 >
-                    {(post.content ?? []).map((paragraph, i) => (
-                        <Text key={i} className="text-text-secondary leading-relaxed">
-                            {paragraph}
-                        </Text>
-                    ))}
+                    {Array.isArray(post.content) ? (
+                        // Testing-mode data (data/blogs.json) still ships as paragraph arrays.
+                        post.content.map((paragraph, i) => (
+                            <Text key={i} className="text-text-secondary leading-relaxed">
+                                {paragraph}
+                            </Text>
+                        ))
+                    ) : (
+                        // Real posts store `content` as sanitized HTML from the admin's
+                        // Tiptap editor (bold/italic/strike/links only).
+                        <div
+                            className="flex flex-col gap-5 text-base text-text-secondary leading-relaxed [&_p]:m-0 [&_a]:text-primary [&_a]:underline [&_a]:underline-offset-2 [&_strong]:font-semibold [&_strong]:text-text [&_em]:italic [&_s]:line-through"
+                            dangerouslySetInnerHTML={{ __html: post.content ?? '' }}
+                        />
+                    )}
                 </motion.div>
             </article>
 

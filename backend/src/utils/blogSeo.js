@@ -12,12 +12,20 @@ import {
 
 const WORDS_PER_MINUTE = 200;
 
-// Body paragraphs plus the excerpt are what a reader actually gets through.
-const wordCount = (paragraphs = [], excerpt = '') =>
-    [...paragraphs, excerpt].join(' ').trim().split(/\s+/).filter(Boolean).length;
+// `content` is HTML (see Blog.model.js) — strip tags before counting words or
+// pulling a summary sentence out of it.
+const stripTags = (html = '') =>
+    String(html)
+        .replace(/<[^>]*>/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
 
-export const estimateReadTime = (paragraphs, excerpt) => {
-    const minutes = Math.max(1, Math.round(wordCount(paragraphs, excerpt) / WORDS_PER_MINUTE));
+// Body text plus the excerpt are what a reader actually gets through.
+const wordCount = (bodyText = '', excerpt = '') =>
+    [bodyText, excerpt].join(' ').trim().split(/\s+/).filter(Boolean).length;
+
+export const estimateReadTime = (content, excerpt) => {
+    const minutes = Math.max(1, Math.round(wordCount(stripTags(content), excerpt) / WORDS_PER_MINUTE));
     return `${minutes} min read`;
 };
 
@@ -26,7 +34,7 @@ const buildBlogSeo = (blog) => {
     const category = String(blog.category ?? '').trim();
     const author = String(blog.author ?? '').trim();
     const excerpt = String(blog.excerpt ?? '').trim();
-    const paragraphs = (blog.content ?? []).map((p) => String(p));
+    const bodyText = stripTags(blog.content);
 
     const metaTitle = composeTitle(title, category);
 
@@ -35,7 +43,7 @@ const buildBlogSeo = (blog) => {
     // excerpt or body still needs something indexable, hence the title fallback.
     const summary =
         firstSentence(excerpt) ||
-        firstSentence(paragraphs[0]) ||
+        firstSentence(bodyText) ||
         [title, category].filter(Boolean).join(' - ');
     const metaDescription = clamp(
         `${summary}${author ? ` By ${author} on ${BRAND}.` : ''}`,
@@ -60,7 +68,7 @@ const buildBlogSeo = (blog) => {
         keywords,
         imageAlt: clamp([title, category].filter(Boolean).join(' - '), 120),
         // Word count feeds schema.org Article and the read-time label.
-        wordCount: wordCount(paragraphs, excerpt),
+        wordCount: wordCount(bodyText, excerpt),
         generatedAt: new Date(),
     };
 };

@@ -19,10 +19,13 @@ export const antTheme = {
       colorBorder: 'var(--border)',
       colorText: 'var(--text)',
     },
+    // colorBgElevated pinned like Popover below — the dropdown panel is a
+    // floating surface too and reads as page background without it.
     Select: {
       colorBgContainer: 'var(--overlay)',
       colorBorder: 'var(--border)',
       colorText: 'var(--text)',
+      colorBgElevated: 'var(--surface)',
     },
     DatePicker: {
       colorBgContainer: 'var(--overlay)',

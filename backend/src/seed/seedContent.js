@@ -144,12 +144,15 @@ const run = async () => {
     }
 
     let blogsCreated = 0;
-    for (const { date, ...blog } of blogs) {
+    for (const { date, content, ...blog } of blogs) {
         const slug = slugify(blog.title);
         if (await Blog.exists({ slug })) continue;
         await Blog.create({
             ...blog,
             slug,
+            // Seed data is written as paragraph arrays for readability; the
+            // model stores content as HTML (see Blog.model.js).
+            content: content.map((paragraph) => `<p>${paragraph}</p>`).join(''),
             publishedAt: new Date(date),
             image: PLACEHOLDER_IMAGE,
             status: BLOG_STATUS.PUBLISHED,

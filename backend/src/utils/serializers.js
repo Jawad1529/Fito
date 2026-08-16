@@ -30,6 +30,7 @@ export const toPublicAdmin = (admin) => ({
 
 export const toPublicOrder = (order) => ({
     id: order._id,
+    orderNumber: order.orderNumber,
     user: order.user,
     items: order.items,
     total: order.total,
@@ -82,7 +83,7 @@ export const toPublicBlog = (blog) => ({
     category: blog.category,
     author: blog.author,
     excerpt: blog.excerpt,
-    content: blog.content ?? [],
+    content: blog.content ?? '',
     readTime: blog.readTime,
     image: blog.image,
     // The app renders `date` as a plain YYYY-MM-DD string.
@@ -162,6 +163,12 @@ export const toPublicConsultationPlan = (plan) => ({
     discountPercent: plan.discountPercent ?? 0,
     discountedPrice: computeDiscountedPrice(plan.price, plan.discountPercent ?? 0),
     features: plan.features ?? [],
+});
+
+export const toPublicSubscriber = (subscriber) => ({
+    id: subscriber._id,
+    email: subscriber.email,
+    createdAt: subscriber.createdAt,
 });
 
 export const toPublicReview = (review) => ({

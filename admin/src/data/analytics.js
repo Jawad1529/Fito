@@ -24,5 +24,6 @@ export const dashboardSummary = {
     totalConsultations: 25,
     totalBlogs: 6,
     totalReviews: 13,
+    totalSubscribers: 5,
     totalSales: 184320,
 };

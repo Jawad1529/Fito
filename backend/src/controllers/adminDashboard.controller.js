@@ -6,6 +6,7 @@ import Consultation from '../models/Consultation.model.js';
 import Blog from '../models/Blog.model.js';
 import Review from '../models/Review.model.js';
 import Order from '../models/Order.model.js';
+import Subscriber from '../models/Subscriber.model.js';
 import { toPublicUser, toPublicOrder, toPublicReview, toPublicProduct, toPublicConsultation } from '../utils/serializers.js';
 import { ORDER_STATUS } from '../constants/orderStatus.js';
 
@@ -45,6 +46,7 @@ export const getDashboardSummary = asyncHandler(async (req, res) => {
         totalConsultations,
         totalBlogs,
         totalReviews,
+        totalSubscribers,
         salesAgg,
         recentUsers,
         recentOrders,
@@ -59,6 +61,7 @@ export const getDashboardSummary = asyncHandler(async (req, res) => {
         Consultation.countDocuments(),
         Blog.countDocuments(),
         Review.countDocuments(),
+        Subscriber.countDocuments(),
         Order.aggregate([{ $match: paidOrderFilter }, { $group: { _id: null, total: { $sum: '$total' } } }]),
         User.find().sort({ createdAt: -1 }).limit(5),
         Order.find().sort({ createdAt: -1 }).limit(5),
@@ -76,6 +79,7 @@ export const getDashboardSummary = asyncHandler(async (req, res) => {
             totalConsultations,
             totalBlogs,
             totalReviews,
+            totalSubscribers,
             totalSales: salesAgg[0]?.total ?? 0,
         },
         recentUsers: recentUsers.map(toPublicUser),

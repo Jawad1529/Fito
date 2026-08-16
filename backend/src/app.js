@@ -21,6 +21,8 @@ import adminConsultationPlansRoutes from './routes/adminConsultationPlans.routes
 import notificationsRoutes from './routes/notifications.routes.js';
 import adminNotificationsRoutes from './routes/adminNotifications.routes.js';
 import adminDashboardRoutes from './routes/adminDashboard.routes.js';
+import newsletterRoutes from './routes/newsletter.routes.js';
+import adminSubscribersRoutes from './routes/adminSubscribers.routes.js';
 import { notFound, errorHandler } from './middleware/error.middleware.js';
 
 const app = express();
@@ -55,6 +57,8 @@ app.use('/api/admin/consultation-plans', adminConsultationPlansRoutes);
 app.use('/api/notifications', notificationsRoutes);
 app.use('/api/admin/notifications', adminNotificationsRoutes);
 app.use('/api/admin/dashboard', adminDashboardRoutes);
+app.use('/api/newsletter', newsletterRoutes);
+app.use('/api/admin/subscribers', adminSubscribersRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

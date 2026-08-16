@@ -92,7 +92,7 @@ export default function TrackOrderContent() {
         <div className="text-center mb-10">
           <H2>Track Your Order</H2>
           <Text muted className="mt-3">
-            Enter your order ID and the phone number used at checkout.
+            Enter your order number and the phone number used at checkout.
           </Text>
         </div>
 
@@ -102,8 +102,8 @@ export default function TrackOrderContent() {
         >
           <Input
             id="track-order-id"
-            label="Order ID"
-            placeholder="e.g. 65f2a1c9b8e4a30012ab34cd"
+            label="Order Number"
+            placeholder="e.g. FT-A1B2C3D4"
             value={orderId}
             onChange={(e) => setOrderId(e.target.value)}
           />
@@ -128,7 +128,7 @@ export default function TrackOrderContent() {
                 <Text muted className="text-xs uppercase tracking-wide">
                   Order
                 </Text>
-                <H4 className="mt-0.5">#{order.id}</H4>
+                <H4 className="mt-0.5">#{order.orderNumber || order.id}</H4>
                 <Text muted className="text-sm mt-1">
                   Placed {new Date(order.placedAt).toLocaleDateString()}
                 </Text>

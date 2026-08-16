@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { H2, Text } from '../../components/atoms/Typography';
 import Button from '../../components/atoms/Button';
 import Icon from '../../components/atoms/Icon';
+import { subscribeNewsletter } from '../../services/newsletter.service';
 
 export default function Newsletter() {
   const [email, setEmail] = useState('');
@@ -32,14 +33,11 @@ export default function Newsletter() {
 
     setIsLoading(true);
 
-    // Simulate API call
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      await subscribeNewsletter(email);
       setIsSubscribed(true);
       setEmail('');
-      // In production, send to your newsletter API
-      console.log('Subscribed:', email);
-    } catch (error) {
+    } catch {
       setError('Something went wrong. Please try again.');
     } finally {
       setIsLoading(false);

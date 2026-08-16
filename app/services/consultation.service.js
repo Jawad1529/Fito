@@ -23,7 +23,13 @@ const buildFormData = ({ goal, plan, personalInfo, goalData, uploads, transactio
 // required boundary itself when the body is a FormData instance. Setting it
 // manually strips the boundary and the server can't parse the body.
 export const submitConsultation = async (payload) => {
-  const { data } = await apiClient.post('/consultations', buildFormData(payload));
+  // Up to 11 files (6 body photos + 4 reports + 1 payment screenshot, 5MB
+  // each) upload straight to Cloudinary inside this request, which can
+  // legitimately take longer than the global 20s default — hence the
+  // longer override instead of raising the default for every request.
+  const { data } = await apiClient.post('/consultations', buildFormData(payload), {
+    timeout: 90000,
+  });
   return data.consultation;
 };
 

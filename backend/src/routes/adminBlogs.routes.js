@@ -1,6 +1,7 @@
 import express from 'express';
 import {
     listBlogs,
+    getBlog,
     createBlog,
     updateBlog,
     deleteBlog,
@@ -15,6 +16,7 @@ const router = express.Router();
 router.use(protectAdmin);
 
 router.get('/', listBlogs);
+router.get('/:id', getBlog);
 router.post('/', uploadSingleImage, createBlog);
 router.patch('/:id', uploadSingleImage, updateBlog);
 router.delete('/:id', deleteBlog);

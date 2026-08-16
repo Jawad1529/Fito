@@ -12,6 +12,7 @@ import {
     UserOutlined,
     FireOutlined,
     WarningOutlined,
+    MailOutlined,
 } from '@ant-design/icons';
 import PageHeading from '../../components/atoms/PageHeading';
 import SummaryCard from '../../components/molecules/SummaryCard';
@@ -54,6 +55,7 @@ const EMPTY_SUMMARY = {
     totalConsultations: 0,
     totalBlogs: 0,
     totalReviews: 0,
+    totalSubscribers: 0,
     totalSales: 0,
 };
 
@@ -80,6 +82,7 @@ function DashboardPageInner({ testingMode }) {
     const [bestSellingProducts, setBestSellingProducts] = useState(testingMode ? mockBestSelling() : []);
     const [outOfStockProducts, setOutOfStockProducts] = useState(testingMode ? mockOutOfStock() : []);
     const [recentConsultations, setRecentConsultations] = useState(testingMode ? mockRecentConsultations() : []);
+    const [loading, setLoading] = useState(!testingMode);
 
     useEffect(() => {
         if (testingMode) return undefined;
@@ -97,6 +100,9 @@ function DashboardPageInner({ testingMode }) {
             })
             .catch(() => {
                 if (!cancelled) message.error('Failed to load dashboard data');
+            })
+            .finally(() => {
+                if (!cancelled) setLoading(false);
             });
         return () => {
             cancelled = true;
@@ -110,6 +116,7 @@ function DashboardPageInner({ testingMode }) {
         { icon: <MedicineBoxOutlined />, label: 'Total Consultations', value: summary.totalConsultations, accent: '#3F9B7B' },
         { icon: <ReadOutlined />, label: 'Total Blogs', value: summary.totalBlogs, accent: '#9C5FBF' },
         { icon: <StarOutlined />, label: 'Total Reviews', value: summary.totalReviews, accent: '#D4A72C' },
+        { icon: <MailOutlined />, label: 'Newsletter Subscribers', value: summary.totalSubscribers, accent: '#C24E7A' },
         { icon: <DollarOutlined />, label: 'Total Sales', value: `Rs. ${summary.totalSales.toLocaleString()}`, accent: '#33587A' },
     ];
 
@@ -120,7 +127,7 @@ function DashboardPageInner({ testingMode }) {
             <Row gutter={[16, 16]} className="mb-6">
                 {cards.map((c) => (
                     <Col xs={24} sm={12} md={8} lg={6} key={c.label}>
-                        <SummaryCard {...c} />
+                        <SummaryCard {...c} loading={loading} />
                     </Col>
                 ))}
             </Row>
@@ -134,6 +141,7 @@ function DashboardPageInner({ testingMode }) {
                 <Col xs={24} lg={isSuperAdmin ? 8 : 24}>
                     <RecentListCard
                         title="Recent Users"
+                        loading={loading}
                         dataSource={recentUsers}
                         renderItem={(user) => (
                             <List.Item>
@@ -153,6 +161,7 @@ function DashboardPageInner({ testingMode }) {
                 <Col xs={24} lg={12}>
                     <RecentListCard
                         title="Recent Orders"
+                        loading={loading}
                         dataSource={recentOrders}
                         renderItem={(order) => (
                             <List.Item
@@ -174,6 +183,7 @@ function DashboardPageInner({ testingMode }) {
                 <Col xs={24} lg={12}>
                     <RecentListCard
                         title="Latest Reviews"
+                        loading={loading}
                         dataSource={recentReviews}
                         renderItem={(review) => (
                             <List.Item>
@@ -192,6 +202,7 @@ function DashboardPageInner({ testingMode }) {
                 <Col xs={24} lg={8}>
                     <RecentListCard
                         title="Best Selling Products"
+                        loading={loading}
                         dataSource={bestSellingProducts}
                         renderItem={(product) => (
                             <List.Item
@@ -211,6 +222,7 @@ function DashboardPageInner({ testingMode }) {
                 <Col xs={24} lg={8}>
                     <RecentListCard
                         title="Out of Stock Products"
+                        loading={loading}
                         dataSource={outOfStockProducts}
                         renderItem={(product) => (
                             <List.Item
@@ -230,6 +242,7 @@ function DashboardPageInner({ testingMode }) {
                 <Col xs={24} lg={8}>
                     <RecentListCard
                         title="Recent Consultations"
+                        loading={loading}
                         dataSource={recentConsultations}
                         renderItem={(consultation) => (
                             <List.Item

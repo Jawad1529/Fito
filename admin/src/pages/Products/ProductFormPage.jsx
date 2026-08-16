@@ -11,12 +11,12 @@ import {
     Card,
     Row,
     Col,
-    Spin,
     Result,
     message,
 } from 'antd';
 import { PlusOutlined, DeleteOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import PageHeading from '../../components/atoms/PageHeading';
+import ProductFormSkeleton from './ProductFormSkeleton';
 import { ROUTES } from '../../constants/routes';
 import { useTestingMode } from '../../context/TestingModeContext';
 import useMockProducts from '../../hooks/useMockProducts';
@@ -87,14 +87,6 @@ function ProductFormPageInner({ id, testingMode }) {
         };
     }, [id, isEdit, testingMode, form]);
 
-    if (loading) {
-        return (
-            <div className="flex justify-center py-16">
-                <Spin />
-            </div>
-        );
-    }
-
     if (notFound) {
         return (
             <Result
@@ -159,6 +151,9 @@ function ProductFormPageInner({ id, testingMode }) {
                 }
             />
 
+            {loading ? (
+                <ProductFormSkeleton />
+            ) : (
             <Form
                 form={form}
                 layout="vertical"
@@ -362,6 +357,7 @@ function ProductFormPageInner({ id, testingMode }) {
                     </Button>
                 </div>
             </Form>
+            )}
         </div>
     );
 }

@@ -12,6 +12,8 @@ import ba201 from '@/assets/images/ba201.jpeg';
 import ba202 from '@/assets/images/ba202.jpeg';
 import ba301 from '@/assets/images/ba301.jpeg';
 import ba302 from '@/assets/images/ba302.jpeg';
+import ba401 from '@/assets/images/ba401.jpeg';
+import ba402 from '@/assets/images/ba402.jpeg';
 
 const transformations = [
   {
@@ -50,6 +52,18 @@ const transformations = [
     beforeImage: ba301,
     afterImage: ba302,
   },
+  {
+    id: 't4',
+    name: 'Asmara',
+    program: 'Weight Loss Program',
+    goal: 'Weight Loss',
+    beforeWeight: 85,
+    afterWeight: 60,
+    duration: '3 months',
+    story: 'Asmara dropped from 85 kg to 60 kg in just 3 months, transforming her health and confidence.',
+    beforeImage: ba401,
+    afterImage: ba402,
+  },
 ];
 
 export default function TransformationStories() {
@@ -63,7 +77,7 @@ export default function TransformationStories() {
           </Text>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 reveal">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 reveal">
           {transformations.map((story) => {
             const delta = story.beforeWeight - story.afterWeight;
 
@@ -91,7 +105,7 @@ export default function TransformationStories() {
                       src={story.beforeImage}
                       alt={`${story.name} before transformation`}
                       fill
-                      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
                       className="object-cover"
                     />
                     <div className="absolute inset-0 bg-background/20" />
@@ -110,7 +124,7 @@ export default function TransformationStories() {
                       src={story.afterImage}
                       alt={`${story.name} after transformation`}
                       fill
-                      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
                       className="object-cover"
                     />
                     <div className="absolute inset-0 bg-background/20" />

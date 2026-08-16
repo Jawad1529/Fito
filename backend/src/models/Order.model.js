@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import crypto from 'crypto';
 import { ORDER_STATUS } from '../constants/orderStatus.js';
 
 // `user` is optional — checkout doesn't require login (guest checkout), so
@@ -6,6 +7,10 @@ import { ORDER_STATUS } from '../constants/orderStatus.js';
 // are still accepted.
 const orderSchema = new mongoose.Schema(
     {
+        // Human-friendly identifier shown to customers (order confirmation,
+        // email, track-order lookup) — the raw Mongo _id is neither easy to
+        // read nor to type back in.
+        orderNumber: { type: String, unique: true },
         user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
         items: [
             {
@@ -20,6 +25,9 @@ const orderSchema = new mongoose.Schema(
         screenshotAttached: { type: Boolean, default: false },
         shipping: {
             name: { type: String, required: true, trim: true },
+            // Optional — collected alongside phone so a customer can get an
+            // order confirmation email, but checkout doesn't require it.
+            email: { type: String, trim: true, lowercase: true },
             phone: { type: String, required: true, trim: true },
             address: { type: String, required: true, trim: true },
             city: { type: String, required: true, trim: true },
@@ -32,5 +40,20 @@ const orderSchema = new mongoose.Schema(
     },
     { timestamps: true }
 );
+
+// Generated pre-validate (rather than a static default) so it can check
+// uniqueness against the collection — collisions are extremely unlikely
+// given the random space, but the retry loop guards against them anyway.
+orderSchema.pre('validate', async function generateOrderNumber() {
+    if (this.orderNumber) return;
+
+    let candidate;
+    let exists = true;
+    while (exists) {
+        candidate = `FT-${crypto.randomBytes(4).toString('hex').toUpperCase()}`;
+        exists = await this.constructor.exists({ orderNumber: candidate });
+    }
+    this.orderNumber = candidate;
+});
 
 export default mongoose.model('Order', orderSchema);

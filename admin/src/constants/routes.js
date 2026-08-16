@@ -13,7 +13,10 @@ export const ROUTES = {
     REVIEWS: '/reviews',
     ORDERS: '/orders',
     BLOGS: '/blogs',
+    BLOG_ADD: '/blogs/add',
+    BLOG_EDIT: '/blogs/:id/edit',
     NOTIFICATIONS: '/notifications',
+    SUBSCRIBERS: '/subscribers',
     SETTINGS: '/settings',
     UNAUTHORIZED: '/unauthorized',
 };
@@ -21,3 +24,4 @@ export const ROUTES = {
 export const consultationDetailPath = (id) => `/consultations/${id}`;
 export const consultationPricingPath = (goalId) => `/consultations/goal/${goalId}/pricing`;
 export const productEditPath = (id) => `/products/${id}/edit`;
+export const blogEditPath = (id) => `/blogs/${id}/edit`;

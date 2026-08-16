@@ -10,12 +10,18 @@ cloudinary.config({
 
 const storage = new CloudinaryStorage({
     cloudinary,
-    params: {
-        folder: 'fito',
-        allowed_formats: ['jpg', 'jpeg', 'png', 'webp', 'gif', 'avif', 'pdf'],
-        // 'auto' so medical-report PDFs upload as a raw resource instead of
-        // being rejected as an invalid image.
-        resource_type: 'auto',
+    params: (req, file) => {
+        // 'auto' resolves PDFs to Cloudinary's "image" resource type, which
+        // Cloudinary blocks from unauthenticated delivery by default (its
+        // anti-XSS policy for PDF/SVG served as images) — that 401s every
+        // report download. 'raw' serves the bytes as-is and isn't subject
+        // to that restriction, so route PDFs there explicitly.
+        const isPdf = file.mimetype === 'application/pdf';
+        return {
+            folder: 'fito',
+            resource_type: isPdf ? 'raw' : 'image',
+            allowed_formats: isPdf ? undefined : ['jpg', 'jpeg', 'png', 'webp', 'gif', 'avif'],
+        };
     },
 });
 

@@ -17,7 +17,9 @@ import ProductManagementPage from './pages/Products/ProductManagementPage';
 import ProductFormPage from './pages/Products/ProductFormPage';
 import CategoryManagementPage from './pages/Categories/CategoryManagementPage';
 import BlogManagementPage from './pages/Blogs/BlogManagementPage';
+import BlogFormPage from './pages/Blogs/BlogFormPage';
 import NotificationManagementPage from './pages/Notifications/NotificationManagementPage';
+import SubscriberManagementPage from './pages/Subscribers/SubscriberManagementPage';
 import ReviewManagementPage from './pages/Reviews/ReviewManagementPage';
 import OrderManagementPage from './pages/Orders/OrderManagementPage';
 import SettingsPage from './pages/Settings/SettingsPage';
@@ -78,7 +80,10 @@ export default function App() {
                   <Route path={ROUTES.PRODUCT_EDIT} element={<ProductFormPage />} />
                   <Route path={ROUTES.CATEGORIES} element={<CategoryManagementPage />} />
                   <Route path={ROUTES.BLOGS} element={<BlogManagementPage />} />
+                  <Route path={ROUTES.BLOG_ADD} element={<BlogFormPage />} />
+                  <Route path={ROUTES.BLOG_EDIT} element={<BlogFormPage />} />
                   <Route path={ROUTES.NOTIFICATIONS} element={<NotificationManagementPage />} />
+                  <Route path={ROUTES.SUBSCRIBERS} element={<SubscriberManagementPage />} />
                   <Route path={ROUTES.SETTINGS} element={<SettingsPage />} />
                   <Route path={ROUTES.UNAUTHORIZED} element={<UnauthorizedPage />} />
 

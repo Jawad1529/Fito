@@ -9,6 +9,13 @@ import { H3, H5, Text } from '../../atoms/Typography';
 import Alert from '../../atoms/Alert';
 import Upload from '../../atoms/Upload';
 import { uploadsValidationSchema } from '../../../utils/consultationValidation';
+import {
+  ALLOWED_IMAGE_TYPES,
+  ALLOWED_REPORT_TYPES,
+  MAX_UPLOAD_SIZE_MB,
+  MAX_BODY_PHOTOS,
+  MAX_REPORTS,
+} from '../../../utils/uploadValidation';
 
 const PhotoUploadStep = forwardRef(function PhotoUploadStep(
   { formData, updateField, onValid },
@@ -91,6 +98,9 @@ const PhotoUploadStep = forwardRef(function PhotoUploadStep(
                 picture
                 multiple
                 accept="image/*"
+                allowedTypes={ALLOWED_IMAGE_TYPES}
+                maxSizeMB={MAX_UPLOAD_SIZE_MB}
+                maxFiles={MAX_BODY_PHOTOS}
                 value={values.bodyPhotos || []}
                 onChange={(files) => setFieldValue('bodyPhotos', files)}
                 triggerClassName="w-24 h-24 flex flex-col items-center justify-center gap-1 rounded-xl border-2 border-dashed border-border-light text-text-secondary hover:border-primary hover:text-primary hover:bg-primary/5 transition-colors text-xs"
@@ -98,6 +108,10 @@ const PhotoUploadStep = forwardRef(function PhotoUploadStep(
                 <PlusOutlined className="text-lg" />
                 <div className="mt-1 text-xs">Upload</div>
               </Upload>
+
+              <Text muted className="block mt-2 text-xs">
+                Up to {MAX_BODY_PHOTOS} photos, {MAX_UPLOAD_SIZE_MB}MB each.
+              </Text>
 
               {touched.bodyPhotos && errors.bodyPhotos && (
                 <p className="mt-2 text-xs text-danger">{errors.bodyPhotos}</p>
@@ -127,6 +141,10 @@ const PhotoUploadStep = forwardRef(function PhotoUploadStep(
 
               <Upload
                 multiple
+                accept="image/*,application/pdf"
+                allowedTypes={ALLOWED_REPORT_TYPES}
+                maxSizeMB={MAX_UPLOAD_SIZE_MB}
+                maxFiles={MAX_REPORTS}
                 value={values.reports || []}
                 onChange={(files) => setFieldValue('reports', files)}
                 triggerClassName="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg border-2 border-dashed border-border-light text-text-secondary hover:border-primary hover:text-primary hover:bg-primary/5 transition-colors"
@@ -134,6 +152,10 @@ const PhotoUploadStep = forwardRef(function PhotoUploadStep(
                 <FileTextOutlined />
                 <span>Upload Reports</span>
               </Upload>
+
+              <Text muted className="block mt-2 text-xs">
+                Up to {MAX_REPORTS} files (images or PDF), {MAX_UPLOAD_SIZE_MB}MB each.
+              </Text>
 
             </Card>
 

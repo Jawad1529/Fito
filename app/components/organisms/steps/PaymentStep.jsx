@@ -17,6 +17,7 @@ import { H3, H5, Text } from '../../atoms/Typography';
 import Alert from '../../atoms/Alert';
 import Input from '../../atoms/Input';
 import Upload from '../../atoms/Upload';
+import { ALLOWED_IMAGE_TYPES, MAX_UPLOAD_SIZE_MB } from '../../../utils/uploadValidation';
 
 const PAYMENT_DETAILS = [
   { label: 'Bank Name', value: 'Meezan Bank', icon: <BankOutlined />, copyable: false },
@@ -186,6 +187,9 @@ export default function PaymentStep({
         </div>
 
         <Upload
+          accept="image/*"
+          allowedTypes={ALLOWED_IMAGE_TYPES}
+          maxSizeMB={MAX_UPLOAD_SIZE_MB}
           value={uploads.paymentScreenshot || []}
           onChange={handlePaymentUpload}
           triggerClassName="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg border-2 border-dashed border-border-light text-text-secondary hover:border-primary hover:text-primary hover:bg-primary/5 transition-colors"
@@ -193,6 +197,10 @@ export default function PaymentStep({
           <UploadOutlined />
           <span className="ml-2">Upload Screenshot</span>
         </Upload>
+
+        <Text muted className="block mt-2 text-xs">
+          Max {MAX_UPLOAD_SIZE_MB}MB.
+        </Text>
 
       </Card>
 

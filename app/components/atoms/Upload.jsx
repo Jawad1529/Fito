@@ -1,15 +1,24 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { message } from 'antd';
 
 // Purely client-side selection (matches the old beforeUpload={() => false}
 // antd usage — nothing here ever hits a server). value/onChange carry plain
 // File[] instead of antd's {fileList} wrapper.
+//
+// allowedTypes/maxSizeMB/maxFiles are optional — pass them to reject bad
+// files here instead of letting them fail later in the multipart request
+// (a big/oversized file used to just blow past the request timeout, or get
+// rejected by multer with a raw "File too large" error).
 export default function Upload({
   value = [],
   onChange,
   multiple = false,
   accept,
+  allowedTypes,
+  maxSizeMB,
+  maxFiles,
   picture = false,
   triggerClassName = '',
   children,
@@ -28,9 +37,37 @@ export default function Upload({
 
   const handleSelect = (e) => {
     const selected = Array.from(e.target.files || []);
-    if (!selected.length) return;
-    onChange?.(multiple ? [...value, ...selected] : selected);
     e.target.value = '';
+    if (!selected.length) return;
+
+    const valid = [];
+    selected.forEach((file) => {
+      if (allowedTypes && !allowedTypes.includes(file.type)) {
+        message.error(`${file.name} isn't a supported file type.`);
+        return;
+      }
+      if (maxSizeMB && file.size > maxSizeMB * 1024 * 1024) {
+        message.error(`${file.name} is larger than ${maxSizeMB}MB.`);
+        return;
+      }
+      valid.push(file);
+    });
+    if (!valid.length) return;
+
+    if (!multiple) {
+      onChange?.(valid.slice(0, 1));
+      return;
+    }
+
+    const room = maxFiles ? maxFiles - value.length : valid.length;
+    if (room <= 0) {
+      message.error(`You can upload up to ${maxFiles} files.`);
+      return;
+    }
+    if (valid.length > room) {
+      message.error(`Only ${room} of those file${room === 1 ? '' : 's'} were added — the limit is ${maxFiles}.`);
+    }
+    onChange?.([...value, ...valid.slice(0, room)]);
   };
 
   const removeAt = (index) => {
