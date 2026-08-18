@@ -217,7 +217,9 @@ export default function Navbar() {
               )}
               {isAuthenticated ? (
                 <div className="flex items-center gap-3">
-                  <span className="text-sm text-text-secondary">Hi, {user?.name}</span>
+                  <Link href="/profile" className="text-sm text-text-secondary hover:text-text transition-colors">
+                    Hi, {user?.name}
+                  </Link>
                   <Button variant="outline" onClick={handleLogout}>
                     Logout
                   </Button>
@@ -333,7 +335,13 @@ export default function Navbar() {
 
                 {isAuthenticated ? (
                   <div className="mt-6">
-                    <p className="text-sm text-text-secondary mb-2">Signed in as {user?.name}</p>
+                    <Link
+                      href="/profile"
+                      onClick={() => setMobileOpen(false)}
+                      className="text-sm text-text-secondary hover:text-text mb-2 block"
+                    >
+                      Signed in as {user?.name}
+                    </Link>
                     <Button
                       variant="outline"
                       fullWidth
