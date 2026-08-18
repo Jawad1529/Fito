@@ -1,10 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Form, message } from 'antd';
-import { UserOutlined, MailOutlined, LockOutlined } from '@ant-design/icons';
+import { UserOutlined, MailOutlined, LockOutlined, GiftOutlined } from '@ant-design/icons';
 import { motion } from 'framer-motion';
 
 import Input from '@/components/atoms/Input';
@@ -14,10 +14,14 @@ import Divider from '@/components/atoms/Divider';
 import GoogleAuthButton from '@/components/molecules/GoogleAuthButton';
 import useAuth from '@/hooks/useAuth';
 
-export default function RegisterPage() {
+function RegisterForm() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const { register } = useAuth();
+  const searchParams = useSearchParams();
+  const referralCodeParam = searchParams.get('ref') || '';
+  const [form] = Form.useForm();
+  const referralCode = Form.useWatch('referralCode', form);
 
   const onFinish = async (values) => {
     setLoading(true);
@@ -44,11 +48,13 @@ export default function RegisterPage() {
       </div>
 
       <Form
+        form={form}
         name="register"
         layout="vertical"
         onFinish={onFinish}
         autoComplete="off"
         requiredMark={false}
+        initialValues={{ referralCode: referralCodeParam }}
       >
         <Form.Item
           name="name"
@@ -95,6 +101,10 @@ export default function RegisterPage() {
           <Input type="password" icon={<LockOutlined />} placeholder="Confirm password" />
         </Form.Item>
 
+        <Form.Item name="referralCode">
+          <Input icon={<GiftOutlined />} placeholder="Referral code (optional)" />
+        </Form.Item>
+
         <Form.Item
           name="terms"
           valuePropName="checked"
@@ -119,7 +129,7 @@ export default function RegisterPage() {
           <span className="text-text-muted text-sm">or sign up with</span>
         </Divider>
 
-        <GoogleAuthButton onAuthenticated={() => router.push('/')} />
+        <GoogleAuthButton onAuthenticated={() => router.push('/')} referralCode={referralCode} />
 
         <div className="text-center mt-6 text-text-muted">
           Already have an account?{' '}
@@ -129,5 +139,13 @@ export default function RegisterPage() {
         </div>
       </Form>
     </motion.div>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={null}>
+      <RegisterForm />
+    </Suspense>
   );
 }

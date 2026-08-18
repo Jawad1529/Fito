@@ -3,6 +3,7 @@ export const ROUTES = {
     SIGNUP: '/signup',
     DASHBOARD: '/',
     USERS: '/users',
+    REFERRALS: '/referrals',
     CONSULTATIONS: '/consultations',
     CONSULTATION_DETAIL: '/consultations/:id',
     CONSULTATION_PRICING: '/consultations/goal/:goalId/pricing',

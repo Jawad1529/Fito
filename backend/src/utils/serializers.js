@@ -16,6 +16,7 @@ export const toPublicUser = (user) => ({
     // Derived rather than stored: accounts with a googleId signed up (or later
     // linked) via "Sign in with Google"; everyone else registered in-app.
     provider: user.googleId ? 'google' : 'app',
+    referralCode: user.referralCode,
     createdAt: user.createdAt,
 });
 
@@ -169,6 +170,30 @@ export const toPublicSubscriber = (subscriber) => ({
     id: subscriber._id,
     email: subscriber.email,
     createdAt: subscriber.createdAt,
+});
+
+// `referrer`/`referredUser` are expected to be populated with at least
+// `name email createdAt` by the calling controller.
+export const toPublicReferralCommission = (commission) => ({
+    id: commission._id,
+    referrer: commission.referrer && {
+        id: commission.referrer._id,
+        name: commission.referrer.name,
+        email: commission.referrer.email,
+    },
+    referredUser: commission.referredUser && {
+        id: commission.referredUser._id,
+        name: commission.referredUser.name,
+        email: commission.referredUser.email,
+        joinedAt: commission.referredUser.createdAt,
+    },
+    status: commission.status,
+    amount: commission.amount,
+    proofScreenshot: commission.proofScreenshot,
+    notes: commission.notes,
+    sentAt: commission.sentAt,
+    createdAt: commission.createdAt,
+    updatedAt: commission.updatedAt,
 });
 
 export const toPublicReview = (review) => ({

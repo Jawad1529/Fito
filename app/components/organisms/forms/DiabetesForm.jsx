@@ -44,6 +44,7 @@ export default function DiabetesForm({
               onChange={(value)=>
                 setFieldValue("diabetesType", value)
               }
+              placeholder="Select diabetes type"
               options={[
                 {
                   label:"Type 1",

@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Modal, Descriptions, Button, message } from 'antd';
+import { Descriptions, Button, message } from 'antd';
+import Modal from '../../components/atoms/AppModal';
 import { PlusOutlined } from '@ant-design/icons';
 import PageHeading from '../../components/atoms/PageHeading';
 import SearchBar from '../../components/molecules/SearchBar';

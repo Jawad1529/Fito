@@ -1,7 +1,7 @@
 import apiClient from './api';
 
-export const registerUser = async ({ name, email, password, phone }) => {
-  const { data } = await apiClient.post('/auth/register', { name, email, password, phone });
+export const registerUser = async ({ name, email, password, phone, referralCode }) => {
+  const { data } = await apiClient.post('/auth/register', { name, email, password, phone, referralCode });
   return data;
 };
 
@@ -35,7 +35,7 @@ export const resetPassword = async ({ email, otp, newPassword }) => {
   return data;
 };
 
-export const googleAuth = async ({ credential }) => {
-  const { data } = await apiClient.post('/auth/google', { credential });
+export const googleAuth = async ({ credential, referralCode }) => {
+  const { data } = await apiClient.post('/auth/google', { credential, referralCode });
   return data;
 };

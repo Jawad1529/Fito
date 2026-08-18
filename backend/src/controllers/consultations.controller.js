@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import asyncHandler from '../utils/asyncHandler.js';
 import Consultation from '../models/Consultation.model.js';
 import ConsultationPlan from '../models/ConsultationPlan.model.js';
+import ReferralCommission from '../models/ReferralCommission.model.js';
 import { CONSULTATION_GOALS } from '../constants/consultationGoals.js';
 import { GENDERS, ACTIVITY_LEVELS, PHONE_REGEX, EMAIL_REGEX } from '../constants/personalInfo.js';
 import { REPLY_AUTHOR } from '../constants/contentStatus.js';
@@ -124,6 +125,23 @@ export const createConsultation = asyncHandler(async (req, res) => {
         },
         transactionId,
     });
+
+    // First consultation from a referred user creates their (single) commission
+    // record for their referrer to be tracked/paid against; upsert with
+    // $setOnInsert so later consultations from the same user don't duplicate it.
+    if (req.user.referredBy) {
+        await ReferralCommission.updateOne(
+            { referredUser: req.user._id },
+            {
+                $setOnInsert: {
+                    referrer: req.user.referredBy,
+                    referredUser: req.user._id,
+                    triggeringConsultation: consultation._id,
+                },
+            },
+            { upsert: true }
+        );
+    }
 
     res.status(201).json({ consultation: toPublicConsultation(consultation) });
 });

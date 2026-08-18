@@ -37,11 +37,11 @@ export function AuthProvider({ children }) {
   );
 
   const register = useCallback(
-    async ({ name, email, password, phone }) => {
+    async ({ name, email, password, phone, referralCode }) => {
       if (testingMode) {
         return { message: 'Registration successful.' };
       }
-      return registerUser({ name, email, password, phone });
+      return registerUser({ name, email, password, phone, referralCode });
     },
     [testingMode]
   );
@@ -92,13 +92,13 @@ export function AuthProvider({ children }) {
   );
 
   const loginWithGoogle = useCallback(
-    async ({ credential }) => {
+    async ({ credential, referralCode }) => {
       if (testingMode) {
         const nextUser = { name: 'Google User', email: 'google-user@example.com', token: 'testing-mode-token' };
         setUser(nextUser);
         return nextUser;
       }
-      const { user: apiUser, token } = await googleAuthRequest({ credential });
+      const { user: apiUser, token } = await googleAuthRequest({ credential, referralCode });
       const nextUser = { ...apiUser, token };
       setUser(nextUser);
       return nextUser;

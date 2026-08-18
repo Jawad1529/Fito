@@ -82,6 +82,7 @@ export default function FatLossForm({
               onChange={(value)=>
                 setFieldValue("activity", value)
               }
+              placeholder="Select activity level"
               options={[
                 {
                   label:"Sedentary",
@@ -146,6 +147,7 @@ export default function FatLossForm({
               onChange={(value)=>
                 setFieldValue("meals", value)
               }
+              placeholder="Select meals per day"
               options={[
                 {label:"2",value:2},
                 {label:"3",value:3},

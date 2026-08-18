@@ -68,6 +68,7 @@ export default function MuscleGainForm({
               onChange={(value)=>
                 setFieldValue("trainingExperience", value)
               }
+              placeholder="Select training experience"
               options={[
                 { label: "Beginner", value: "beginner" },
                 { label: "Intermediate", value: "intermediate" },
@@ -94,6 +95,7 @@ export default function MuscleGainForm({
                 onChange={(value)=>
                   setFieldValue("gymAccess", value)
                 }
+                placeholder="Select an option"
                 options={[
                   { label: "Yes", value: "yes" },
                   { label: "No", value: "no" },
@@ -119,6 +121,7 @@ export default function MuscleGainForm({
               onChange={(value)=>
                 setFieldValue("mealsPerDay", value)
               }
+              placeholder="Select meals per day"
               options={[
                 { label: "2", value: 2 },
                 { label: "3", value: 3 },

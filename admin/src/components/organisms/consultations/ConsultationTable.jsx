@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Modal, Form, Select, DatePicker, message } from 'antd';
+import { Form, Select, DatePicker, message } from 'antd';
+import Modal from '../../atoms/AppModal';
 import dayjs from 'dayjs';
 import SearchBar from '../../molecules/SearchBar';
 import RowActions from '../../molecules/RowActions';

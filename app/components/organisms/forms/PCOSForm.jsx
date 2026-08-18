@@ -127,6 +127,7 @@ export default function PCOSForm({
               onChange={(value)=>
                 setFieldValue("cycle", value)
               }
+              placeholder="Select cycle regularity"
               options={[
                 {
                   label:"Regular",

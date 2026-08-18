@@ -7,7 +7,7 @@ import useAuth from '@/hooks/useAuth';
 
 // Google's button needs an explicit pixel width, so we measure our own
 // wrapper and keep it in sync with the container instead of hardcoding one.
-export default function GoogleAuthButton({ onAuthenticated }) {
+export default function GoogleAuthButton({ onAuthenticated, referralCode }) {
   const wrapperRef = useRef(null);
   const [width, setWidth] = useState(320);
   const { loginWithGoogle } = useAuth();
@@ -23,7 +23,7 @@ export default function GoogleAuthButton({ onAuthenticated }) {
 
   const handleSuccess = async (credentialResponse) => {
     try {
-      await loginWithGoogle({ credential: credentialResponse.credential });
+      await loginWithGoogle({ credential: credentialResponse.credential, referralCode });
       onAuthenticated?.();
     } catch (error) {
       message.error(error?.response?.data?.message || 'Google sign-in failed. Please try again.');

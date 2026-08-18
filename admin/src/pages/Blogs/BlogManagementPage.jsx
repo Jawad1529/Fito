@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Modal, Descriptions, Image, Button, message } from 'antd';
+import { Descriptions, Image, Button, message } from 'antd';
+import Modal from '../../components/atoms/AppModal';
 import { PlusOutlined } from '@ant-design/icons';
 import PageHeading from '../../components/atoms/PageHeading';
 import SearchBar from '../../components/molecules/SearchBar';

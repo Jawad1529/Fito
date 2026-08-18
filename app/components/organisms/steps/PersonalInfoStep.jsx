@@ -162,6 +162,7 @@ const PersonalInfoStep = forwardRef(function PersonalInfoStep(
                   <Select
                     value={values.gender}
                     onChange={(value) => setFieldValue('gender', value)}
+                    placeholder="Select gender"
                     options={[
                       {label:"Male",value:"male"},
                       {label:"Female",value:"female"},
@@ -174,6 +175,7 @@ const PersonalInfoStep = forwardRef(function PersonalInfoStep(
                   <Select
                     value={values.activityLevel}
                     onChange={(value) => setFieldValue('activityLevel', value)}
+                    placeholder="Select activity level"
                     options={[
                       {
                         label:"Sedentary",

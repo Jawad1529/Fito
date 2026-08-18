@@ -59,6 +59,7 @@ export default function MotherWellnessForm({
               onChange={(value) =>
                 setFieldValue("numChildren", value)
               }
+              placeholder="Select number of children"
               options={[
                 { label: "1", value: 1 },
                 { label: "2", value: 2 },
@@ -73,6 +74,7 @@ export default function MotherWellnessForm({
               onChange={(value) =>
                 setFieldValue("deliveryType", value)
               }
+              placeholder="Select delivery type"
               options={[
                 { label: "Vaginal Delivery", value: "vaginal" },
                 { label: "C-Section", value: "c-section" },
@@ -157,6 +159,7 @@ export default function MotherWellnessForm({
               onChange={(value) =>
                 setFieldValue("meals", value)
               }
+              placeholder="Select meals per day"
               options={[
                 { label: "2", value: 2 },
                 { label: "3", value: 3 },

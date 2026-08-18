@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Modal, Descriptions, Select, Table, message } from 'antd';
+import { Descriptions, Select, Table, message } from 'antd';
+import Modal from '../../components/atoms/AppModal';
 import PageHeading from '../../components/atoms/PageHeading';
 import SearchBar from '../../components/molecules/SearchBar';
 import RowActions from '../../components/molecules/RowActions';

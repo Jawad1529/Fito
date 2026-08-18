@@ -15,7 +15,7 @@ const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 // emailed to verify ownership of the address; verifying it (see verifyOtp)
 // activates the account, so no token is issued here yet.
 export const registerUser = asyncHandler(async (req, res) => {
-    const { name, email, password, phone } = req.body;
+    const { name, email, password, phone, referralCode } = req.body;
 
     if (!name || !email || !password) {
         res.status(400);
@@ -34,7 +34,13 @@ export const registerUser = asyncHandler(async (req, res) => {
         await existing.deleteOne();
     }
 
-    const user = await User.create({ name, email, password, phone });
+    // An unknown/mistyped code is ignored rather than rejected — a typo
+    // shouldn't be able to block someone from signing up.
+    const referrer = referralCode?.trim()
+        ? await User.findOne({ referralCode: referralCode.trim().toUpperCase() })
+        : null;
+
+    const user = await User.create({ name, email, password, phone, referredBy: referrer?._id ?? null });
     try {
         await issueOtp(user, OTP_PURPOSE.VERIFY_EMAIL);
     } catch (err) {
@@ -200,7 +206,7 @@ export const loginUser = asyncHandler(async (req, res) => {
 // has already confirmed the email, so this activates the account (or links
 // googleId onto an existing email/password account) with no OTP step.
 export const googleAuth = asyncHandler(async (req, res) => {
-    const { credential } = req.body;
+    const { credential, referralCode } = req.body;
     if (!credential) {
         res.status(400);
         throw new Error('Missing Google credential');
@@ -235,6 +241,12 @@ export const googleAuth = asyncHandler(async (req, res) => {
             }
             await user.save();
         } else {
+            // Referral only applies to a brand-new account, not to linking/
+            // logging into an existing one via the branches above.
+            const referrer = referralCode?.trim()
+                ? await User.findOne({ referralCode: referralCode.trim().toUpperCase() })
+                : null;
+
             user = await User.create({
                 // Use the email's local part rather than Google's display name so
                 // app-user names stay consistent/scannable in the admin panel.
@@ -243,6 +255,7 @@ export const googleAuth = asyncHandler(async (req, res) => {
                 googleId: payload.sub,
                 isEmailVerified: true,
                 status: USER_STATUS.ACTIVE,
+                referredBy: referrer?._id ?? null,
             });
         }
     }

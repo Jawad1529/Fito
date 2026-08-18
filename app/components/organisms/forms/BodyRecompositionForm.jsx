@@ -100,6 +100,7 @@ export default function BodyRecompositionForm({
                 onChange={(value) =>
                   setFieldValue("experience", value)
                 }
+                placeholder="Select training experience"
                 options={[
                   { label: "Beginner", value: "beginner" },
                   { label: "Intermediate", value: "intermediate" },
@@ -124,6 +125,7 @@ export default function BodyRecompositionForm({
               onChange={(value) =>
                 setFieldValue("meals", value)
               }
+              placeholder="Select meals per day"
               options={[
                 { label: "2", value: 2 },
                 { label: "3", value: 3 },

@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Modal, Descriptions, Form, Input, Select, message } from 'antd';
+import { Descriptions, Form, Input, Select, message } from 'antd';
+import Modal from '../../atoms/AppModal';
 import PageHeading from '../../atoms/PageHeading';
 import SearchBar from '../../molecules/SearchBar';
 import RowActions from '../../molecules/RowActions';

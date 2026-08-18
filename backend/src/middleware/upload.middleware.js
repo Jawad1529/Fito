@@ -58,5 +58,8 @@ export const uploadConsultationFiles = upload.fields([
     { name: 'paymentScreenshot', maxCount: 1 },
 ]);
 
+// Admin-uploaded proof of a commission payment.
+export const uploadCommissionProof = upload.single('proofScreenshot');
+
 // With CloudinaryStorage, multer puts the hosted URL on file.path.
 export const toImageUrl = (file) => file?.path;
