@@ -7,9 +7,14 @@ import { PRODUCT_STATUS } from '../constants/contentStatus.js';
 import { CATEGORY_STATUS } from '../constants/categoryStatus.js';
 import { toImageUrl } from '../middleware/upload.middleware.js';
 import { parsePagination, buildSearchFilter } from '../utils/queryHelpers.js';
+import sanitizeRichText from '../utils/sanitizeRichText.js';
 
 // Products may only be assigned to an active, admin-defined category.
 const isValidCategory = (category) => Category.exists({ slug: category, status: CATEGORY_STATUS.ACTIVE });
+
+// `description` is HTML from the panel's Tiptap editor — an "empty" editor
+// still sends `<p></p>`, so a plain falsy/blank check isn't enough.
+const isContentEmpty = (html) => !html || !String(html).replace(/<[^>]*>/g, '').trim();
 
 // Multipart bodies arrive as strings, so numeric fields need coercing.
 const parseNumber = (value, fallback) => {
@@ -67,10 +72,29 @@ export const listProducts = asyncHandler(async (req, res) => {
     if (Object.values(PRODUCT_STATUS).includes(status)) filter.status = status;
 
     const [products, total] = await Promise.all([
-        Product.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit),
+        Product.find(filter).sort({ sortOrder: 1, createdAt: -1 }).skip(skip).limit(limit),
         Product.countDocuments(filter),
     ]);
     res.json({ items: products.map(toPublicProduct), total, page, limit });
+});
+
+// PATCH /api/admin/products/reorder — body: `{ ids }`, product ids in the
+// desired display order. Only meaningful against the full, unfiltered list
+// (see the admin panel's reorder mode), since it assigns 0..n-1 by position.
+export const reorderProducts = asyncHandler(async (req, res) => {
+    const { ids } = req.body;
+    if (!Array.isArray(ids) || ids.length === 0) {
+        res.status(400);
+        throw new Error('ids must be a non-empty array');
+    }
+
+    await Product.bulkWrite(
+        ids.map((id, index) => ({
+            updateOne: { filter: { _id: id }, update: { $set: { sortOrder: index } } },
+        }))
+    );
+
+    res.json({ message: 'Product order updated' });
 });
 
 // GET /api/admin/products/:id — includes drafts, unlike the public endpoint.
@@ -88,7 +112,7 @@ export const createProduct = asyncHandler(async (req, res) => {
     const { name, category, price, discountPercent, stock, description, status, nutritionFacts, variants, metaDescription } =
         req.body;
 
-    if (!name || !category || !description) {
+    if (!name || !category || isContentEmpty(description)) {
         res.status(400);
         throw new Error('Name, category and description are required');
     }
@@ -111,13 +135,18 @@ export const createProduct = asyncHandler(async (req, res) => {
         throw new Error('Invalid category');
     }
 
+    // New products go to the end of the manual order, not the front.
+    const last = await Product.findOne().sort('-sortOrder').select('sortOrder');
+    const nextSortOrder = (last?.sortOrder ?? -1) + 1;
+
     const product = await Product.create({
         name,
         category,
         price: parsedPrice,
         discountPercent: parsedDiscount,
         stock: parseNumber(stock, 0),
-        description,
+        sortOrder: nextSortOrder,
+        description: sanitizeRichText(description),
         status,
         images: (req.files ?? []).map(toImageUrl),
         nutritionFacts: parseNutritionFacts(nutritionFacts) ?? [],
@@ -168,9 +197,14 @@ export const updateProduct = asyncHandler(async (req, res) => {
         }
     }
 
+    if (description !== undefined && isContentEmpty(description)) {
+        res.status(400);
+        throw new Error('Description is required');
+    }
+
     if (name !== undefined) product.name = name;
     if (category !== undefined) product.category = category;
-    if (description !== undefined) product.description = description;
+    if (description !== undefined) product.description = sanitizeRichText(description);
     if (status !== undefined) product.status = status;
     if (price !== undefined) product.price = parseNumber(price, product.price);
     if (discountPercent !== undefined) product.discountPercent = parseNumber(discountPercent, product.discountPercent);

@@ -18,6 +18,7 @@ import ImgCrop from 'antd-img-crop';
 import { PlusOutlined, DeleteOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import PageHeading from '../../components/atoms/PageHeading';
 import ProductFormSkeleton from './ProductFormSkeleton';
+import RichTextEditor from '../../components/molecules/RichTextEditor';
 import { ROUTES } from '../../constants/routes';
 import { useTestingMode } from '../../context/TestingModeContext';
 import useMockProducts from '../../hooks/useMockProducts';
@@ -30,6 +31,10 @@ import {
 } from '../../api/adminProducts.api';
 
 const apiError = (err, fallback) => err?.response?.data?.message || fallback;
+
+// RichTextEditor's "empty" HTML is `<p></p>`, so a plain required rule
+// wouldn't catch it — strip tags before checking for content.
+const isContentEmpty = (html) => !html || !html.replace(/<[^>]*>/g, '').trim();
 
 export default function ProductFormPage() {
     const { id } = useParams();
@@ -236,8 +241,19 @@ function ProductFormPageInner({ id, testingMode }) {
                                 </Col>
                             </Row>
 
-                            <Form.Item name="description" label="Description" rules={[{ required: true }]}>
-                                <Input.TextArea rows={4} />
+                            <Form.Item
+                                name="description"
+                                label="Description"
+                                rules={[
+                                    {
+                                        validator: (_, value) =>
+                                            isContentEmpty(value)
+                                                ? Promise.reject(new Error('Description is required'))
+                                                : Promise.resolve(),
+                                    },
+                                ]}
+                            >
+                                <RichTextEditor placeholder="Describe the product..." />
                             </Form.Item>
                         </Card>
 

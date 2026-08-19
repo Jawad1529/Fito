@@ -1,0 +1,256 @@
+import 'dotenv/config';
+import mongoose from 'mongoose';
+import connectDB from '../config/db.js';
+import ConsultationPlan from '../models/ConsultationPlan.model.js';
+
+// Real program data from FITOO Consultation Programs - Pricing Structure & Features
+// (app/assets/pricing). Replaces any placeholder plans with the authoritative
+// set per goal. No discounts, per product decision.
+const PLANS = [
+    // 1. Fat Loss Transformation Program
+    {
+        goal: 'fat-loss',
+        label: '14-Day Trial',
+        durationMonths: 1,
+        price: 2999,
+        features: [
+            'Personalized fat loss diet plan',
+            'Customized workout plan (Home/Gym)',
+            'WhatsApp coaching support',
+            'Regular progress monitoring',
+            'Body measurement tracking',
+            'Weight tracking',
+            'Habit-building guidance',
+            'Diet modifications according to progress',
+            'Transformation progress reports',
+        ],
+    },
+    {
+        goal: 'fat-loss',
+        label: '3 Months Program',
+        durationMonths: 3,
+        price: 14999,
+        features: [
+            'Personalized fat loss diet plan',
+            'Customized workout plan (Home/Gym)',
+            'WhatsApp coaching support',
+            'Regular progress monitoring',
+            'Body measurement tracking',
+            'Weight tracking',
+            'Habit-building guidance',
+            'Diet modifications according to progress',
+            'Transformation progress reports',
+        ],
+    },
+    {
+        goal: 'fat-loss',
+        label: '6 Months Program',
+        durationMonths: 6,
+        price: 24999,
+        features: [
+            'Personalized fat loss diet plan',
+            'Customized workout plan (Home/Gym)',
+            'WhatsApp coaching support',
+            'Regular progress monitoring',
+            'Body measurement tracking',
+            'Weight tracking',
+            'Habit-building guidance',
+            'Diet modifications according to progress',
+            'Transformation progress reports',
+        ],
+    },
+
+    // 2. Muscle Gain Program
+    {
+        goal: 'muscle-gain',
+        label: '3 Months Program',
+        durationMonths: 3,
+        price: 17999,
+        features: [
+            'Personalized muscle gain nutrition plan',
+            'Strength training program',
+            'Progressive overload tracking',
+            'Workout performance monitoring',
+            'Supplement guidance',
+            'Muscle growth tracking',
+            'Body composition monitoring',
+            'Regular coaching support',
+        ],
+    },
+    {
+        goal: 'muscle-gain',
+        label: '6 Months Program',
+        durationMonths: 6,
+        price: 29999,
+        features: [
+            'Personalized muscle gain nutrition plan',
+            'Strength training program',
+            'Progressive overload tracking',
+            'Workout performance monitoring',
+            'Supplement guidance',
+            'Muscle growth tracking',
+            'Body composition monitoring',
+            'Regular coaching support',
+        ],
+    },
+
+    // 3. Body Recomposition Program
+    {
+        goal: 'body-recomposition',
+        label: '3 Months Program',
+        durationMonths: 3,
+        price: 19999,
+        features: [
+            'Complete body transformation strategy',
+            'Personalized nutrition plan',
+            'Customized workout programming',
+            'Fat loss and muscle building approach',
+            'Body composition tracking',
+            'Progress photos tracking',
+            'Strength improvement monitoring',
+            'Lifestyle optimization',
+            'Regular coaching and accountability',
+        ],
+    },
+    {
+        goal: 'body-recomposition',
+        label: '6 Months Program',
+        durationMonths: 6,
+        price: 34999,
+        features: [
+            'Complete body transformation strategy',
+            'Personalized nutrition plan',
+            'Customized workout programming',
+            'Fat loss and muscle building approach',
+            'Body composition tracking',
+            'Progress photos tracking',
+            'Strength improvement monitoring',
+            'Lifestyle optimization',
+            'Regular coaching and accountability',
+        ],
+    },
+
+    // 4. FITOO Busy Moms Program
+    {
+        goal: 'mother-wellness',
+        label: 'Personalized Coaching',
+        durationMonths: 3,
+        price: 14999,
+        features: [
+            'Family-friendly meal planning',
+            'Busy schedule workout plans',
+            'Home-based workout options',
+            'Accountability support',
+            'Lifestyle coaching',
+            'Craving management',
+            'Stress and routine management',
+        ],
+    },
+    {
+        goal: 'mother-wellness',
+        label: 'Group Coaching',
+        durationMonths: 3,
+        price: 4999,
+        features: [
+            'Family-friendly meal planning',
+            'Busy schedule workout plans',
+            'Home-based workout options',
+            'Group accountability support',
+            'Lifestyle coaching',
+            'Craving management',
+            'Stress and routine management',
+        ],
+    },
+
+    // 5. PCOS Management Program
+    {
+        goal: 'pcos',
+        label: '3 Months Program',
+        durationMonths: 3,
+        price: 14999,
+        features: [
+            'PCOS-friendly nutrition plan',
+            'Hormonal health lifestyle guidance',
+            'Weight management strategy',
+            'Menstrual cycle tracking',
+            'Symptom tracking',
+            'Exercise programming',
+            'Lifestyle modification',
+            'Lab report guidance',
+            'Regular follow-ups',
+        ],
+    },
+    {
+        goal: 'pcos',
+        label: '6 Months Program',
+        durationMonths: 6,
+        price: 24999,
+        features: [
+            'PCOS-friendly nutrition plan',
+            'Hormonal health lifestyle guidance',
+            'Weight management strategy',
+            'Menstrual cycle tracking',
+            'Symptom tracking',
+            'Exercise programming',
+            'Lifestyle modification',
+            'Lab report guidance',
+            'Regular follow-ups',
+        ],
+    },
+
+    // 6. Diabetes Management Program
+    {
+        goal: 'diabetes',
+        label: '3 Months Program',
+        durationMonths: 3,
+        price: 19999,
+        features: [
+            'Diabetes-friendly customized diet plan',
+            'Blood sugar management strategy',
+            'Exercise prescription',
+            'Glucose monitoring guidance',
+            'Lifestyle modification coaching',
+            'Diabetes education',
+            'Progress tracking',
+            'Lab parameter monitoring guidance',
+            'Regular follow-ups',
+        ],
+    },
+    {
+        goal: 'diabetes',
+        label: '6 Months Program',
+        durationMonths: 6,
+        price: 34999,
+        features: [
+            'Diabetes-friendly customized diet plan',
+            'Blood sugar management strategy',
+            'Exercise prescription',
+            'Glucose monitoring guidance',
+            'Lifestyle modification coaching',
+            'Diabetes education',
+            'Progress tracking',
+            'Lab parameter monitoring guidance',
+            'Regular follow-ups',
+        ],
+    },
+];
+
+const run = async () => {
+    await connectDB();
+
+    const goals = [...new Set(PLANS.map((p) => p.goal))];
+    const { deletedCount } = await ConsultationPlan.deleteMany({ goal: { $in: goals } });
+    console.log(`Removed ${deletedCount} existing plan(s) for: ${goals.join(', ')}`);
+
+    const created = await ConsultationPlan.insertMany(
+        PLANS.map((p) => ({ ...p, discountPercent: 0 }))
+    );
+    console.log(`Seeded ${created.length} consultation plans.`);
+
+    await mongoose.disconnect();
+};
+
+run().catch((err) => {
+    console.error(err);
+    process.exit(1);
+});

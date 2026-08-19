@@ -45,3 +45,12 @@ export const firstSentence = (text) => {
     const clean = String(text ?? '').replace(/\s+/g, ' ').trim();
     return clean.split(/(?<=[.!?])\s+/)[0] || clean;
 };
+
+// Blog `content` and product `description` are both saved as HTML from the
+// panel's Tiptap editor — strip tags before counting words or pulling a
+// summary/keywords out of either.
+export const stripTags = (html = '') =>
+    String(html)
+        .replace(/<[^>]*>/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();

@@ -8,17 +8,10 @@ import {
     composeTitle,
     firstSentence,
     keywordsFrom,
+    stripTags,
 } from './seoText.js';
 
 const WORDS_PER_MINUTE = 200;
-
-// `content` is HTML (see Blog.model.js) — strip tags before counting words or
-// pulling a summary sentence out of it.
-const stripTags = (html = '') =>
-    String(html)
-        .replace(/<[^>]*>/g, ' ')
-        .replace(/\s+/g, ' ')
-        .trim();
 
 // Body text plus the excerpt are what a reader actually gets through.
 const wordCount = (bodyText = '', excerpt = '') =>

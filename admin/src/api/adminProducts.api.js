@@ -49,3 +49,9 @@ export const deleteProduct = async (id) => {
     const { data } = await apiClient.delete(`/admin/products/${id}`);
     return data;
 };
+
+// `ids` is the full product list in the desired display order.
+export const reorderProducts = async (ids) => {
+    const { data } = await apiClient.patch('/admin/products/reorder', { ids });
+    return data;
+};

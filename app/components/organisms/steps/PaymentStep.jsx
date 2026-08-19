@@ -20,10 +20,11 @@ import Upload from '../../atoms/Upload';
 import { ALLOWED_IMAGE_TYPES, MAX_UPLOAD_SIZE_MB } from '../../../utils/uploadValidation';
 
 const PAYMENT_DETAILS = [
-  { label: 'Bank Name', value: 'Meezan Bank', icon: <BankOutlined />, copyable: false },
-  { label: 'Account Title', value: 'Fitoo Nutrition', icon: <IdcardOutlined />, copyable: false },
-  { label: 'Account Number', value: '123456789012', icon: <NumberOutlined />, copyable: true },
-  { label: 'IBAN', value: 'PK00MEEZ000000000000000', icon: <NumberOutlined />, copyable: true },
+  { label: 'Bank Name', value: 'Meezan Bank - Rewaz Garden, Lahore', icon: <BankOutlined />, copyable: false },
+  { label: 'Account Title', value: 'Umer Shabbir', icon: <IdcardOutlined />, copyable: false },
+  { label: 'Account Number', value: '02600107003289', icon: <NumberOutlined />, copyable: true },
+  { label: 'IBAN', value: 'PK66MEZN0002600107003289', icon: <NumberOutlined />, copyable: true },
+  { label: 'Swift Code', value: 'MEZNPKKALHR', icon: <NumberOutlined />, copyable: true },
 ];
 
 function CopyableRow({ label, value, icon, copyable }) {

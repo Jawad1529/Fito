@@ -24,7 +24,7 @@ export const listProducts = asyncHandler(async (req, res) => {
         'price-low': { price: 1 },
         'price-high': { price: -1 },
         rating: { rating: -1 },
-        default: { createdAt: -1 },
+        default: { sortOrder: 1, createdAt: -1 },
     };
 
     const products = await Product.find(filter).sort(SORTS[sort] ?? SORTS.default);

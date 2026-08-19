@@ -16,7 +16,9 @@ export default function FeaturedProducts({
 }) {
   const { isWishlisted, toggleWishlist } = useWishlist();
 
-  const { data: apiProducts, loading } = useApiResource(() => getProducts({ sort: 'rating' }), [], {
+  // No `sort` param: falls back to the backend's default, which follows the
+  // admin's manual drag-to-reorder order (Product.sortOrder).
+  const { data: apiProducts, loading } = useApiResource(() => getProducts(), [], {
     fallback: [],
   });
 

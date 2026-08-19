@@ -147,10 +147,6 @@ export default function ProductTemplate({ id, initialProduct = null }) {
                             )}
                         </div>
 
-                        <div className="border-t border-white/10 pt-6">
-                            <Text className="text-gray-300 leading-relaxed">{product.description}</Text>
-                        </div>
-
                         {hasVariants && (
                             <div>
                                 <Text className="text-gray-300 font-medium mb-2">Options</Text>
@@ -242,6 +238,21 @@ export default function ProductTemplate({ id, initialProduct = null }) {
                         </div>
                     </motion.div>
                 </div>
+
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: 0.3 }}
+                    className="mt-12 max-w-3xl border-t border-white/10 pt-8"
+                >
+                    <H3 className="text-2xl font-bold text-white mb-4">Description</H3>
+                    {/* `description` is sanitized HTML from the admin's Tiptap editor
+                        (bold/italic/strike/links only) — same as blog `content`. */}
+                    <div
+                        className="text-gray-300 leading-relaxed flex flex-col gap-3 [&_p]:m-0 [&_a]:text-primary [&_a]:underline [&_a]:underline-offset-2 [&_strong]:font-semibold [&_strong]:text-white [&_em]:italic [&_s]:line-through"
+                        dangerouslySetInnerHTML={{ __html: product.description ?? '' }}
+                    />
+                </motion.div>
 
                 {product.nutritionFacts?.length > 0 && (
                     <motion.div

@@ -12,9 +12,9 @@ const AUTH_ROUTE_PREFIXES = [
 ];
 
 // Decides whether the current route gets the site header and footer.
-// `footer` arrives as an already-rendered server component, so gating it here
-// costs nothing in client JS.
-export default function LayoutChrome({ children, footer }) {
+// `whatsappCta` and `footer` arrive as already-rendered server components,
+// so gating them here costs nothing in client JS.
+export default function LayoutChrome({ children, whatsappCta, footer }) {
     const pathname = usePathname();
     const isAuthRoute = AUTH_ROUTE_PREFIXES.some((prefix) => pathname.startsWith(prefix));
 
@@ -22,6 +22,7 @@ export default function LayoutChrome({ children, footer }) {
         <>
             {!isAuthRoute && <Navbar />}
             <main className="flex-1">{children}</main>
+            {!isAuthRoute && whatsappCta}
             {!isAuthRoute && footer}
         </>
     );

@@ -1,4 +1,3 @@
-import sanitizeHtml from 'sanitize-html';
 import asyncHandler from '../utils/asyncHandler.js';
 import Blog from '../models/Blog.model.js';
 import { toPublicBlog } from '../utils/serializers.js';
@@ -6,21 +5,12 @@ import { BLOG_STATUS } from '../constants/contentStatus.js';
 import { toImageUrl } from '../middleware/upload.middleware.js';
 import slugify from '../utils/slugify.js';
 import { parsePagination, buildSearchFilter } from '../utils/queryHelpers.js';
+import sanitizeRichText from '../utils/sanitizeRichText.js';
 
 // The panel's Tiptap editor only exposes bold, italic, strike and links, but
 // the body is still saved as raw HTML — strip anything outside that set so a
 // crafted request can't smuggle scripts/attributes into the public blog page.
-const parseContent = (content) => {
-    if (content === undefined) return undefined;
-    return sanitizeHtml(String(content), {
-        allowedTags: ['p', 'strong', 'em', 's', 'a', 'br'],
-        allowedAttributes: { a: ['href', 'target', 'rel'] },
-        allowedSchemes: ['http', 'https', 'mailto'],
-        transformTags: {
-            a: sanitizeHtml.simpleTransform('a', { target: '_blank', rel: 'noopener noreferrer nofollow' }),
-        },
-    }).trim();
-};
+const parseContent = (content) => (content === undefined ? undefined : sanitizeRichText(content));
 
 // GET /api/admin/blogs?page=&limit=&search=&category=&status= — includes drafts.
 export const listBlogs = asyncHandler(async (req, res) => {

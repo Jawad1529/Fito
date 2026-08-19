@@ -10,12 +10,15 @@ import {
     composeTitle,
     firstSentence,
     keywordsFrom,
+    stripTags,
 } from './seoText.js';
 
 const buildProductSeo = (product) => {
     const name = String(product.name ?? '').trim();
     const category = String(product.category ?? '').trim();
-    const description = String(product.description ?? '').trim();
+    // `description` is HTML from the panel's Tiptap editor — strip tags
+    // before it feeds the meta description/keywords, which need plain text.
+    const description = stripTags(product.description);
     const price = Number(product.price ?? 0);
     const inStock =
         Number(product.stock ?? 0) > 0 &&
@@ -52,10 +55,10 @@ const buildProductSeo = (product) => {
     };
 };
 
-// Slugs power /product/<slug> and the canonical URL. `_id` is appended so two
-// products sharing a name can't collide without a uniqueness retry loop.
-const buildProductSlug = (product) =>
-    [slugify(product.name), String(product._id).slice(-6)].filter(Boolean).join('-');
+// Base slug powering /product/<slug> and the canonical URL, before collision
+// handling. Product.model.js appends a numeric suffix (via utils/uniqueSlug.js)
+// only when this exact slug is already taken by another product.
+const buildProductSlug = (product) => slugify(product.name);
 
 export { buildProductSeo, buildProductSlug };
 export default buildProductSeo;

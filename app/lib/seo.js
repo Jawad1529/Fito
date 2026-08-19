@@ -11,6 +11,7 @@ import {
     absoluteUrl,
 } from '@/config/siteConfig';
 import imageUrl from '@/utils/imageUrl';
+import stripHtml from '@/utils/stripHtml';
 
 const clamp = (value, limit) => {
     const text = String(value ?? '').replace(/\s+/g, ' ').trim();
@@ -119,7 +120,7 @@ export const buildProductMetadata = (product) => {
 
     return buildMetadata({
         title: seo.metaTitle || `${product.name} | ${SITE_NAME}`,
-        description: seo.metaDescription || product.description,
+        description: seo.metaDescription || stripHtml(product.description),
         path: `/product/${product.slug || product.id}`,
         images: product.images?.length ? product.images : [product.image],
         imageAlt: seo.imageAlt || product.name,

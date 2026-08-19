@@ -4,7 +4,7 @@ import { CONSULTATION_GOALS } from '../constants/consultationGoals.js';
 import { CONSULTATION_PLAN_DEFAULTS } from '../constants/consultationPlanDefaults.js';
 import { toPublicConsultationPlan } from '../utils/serializers.js';
 
-// Seeds a goal's 3 default programs the first time it's read with none —
+// Seeds a goal's default programs the first time it's read with none —
 // self-healing so nothing needs to be manually seeded. Once any plan exists
 // for a goal (including ones an admin later deletes down to zero — an edge
 // case we accept re-seeding on), this is a no-op.
@@ -43,7 +43,7 @@ export const listConsultationPlans = asyncHandler(async (req, res) => {
 
 // POST /api/admin/consultation-plans — creates a new program under a goal.
 export const createConsultationPlan = asyncHandler(async (req, res) => {
-    const { goal, label, durationMonths, price, discountPercent, features } = req.body;
+    const { goal, label, durationMonths, price, discountPercent, features, isPaused } = req.body;
 
     if (!CONSULTATION_GOALS.includes(goal)) {
         res.status(400);
@@ -73,6 +73,7 @@ export const createConsultationPlan = asyncHandler(async (req, res) => {
         price,
         discountPercent: discountPercent ?? 0,
         features: cleanFeatures(features),
+        isPaused: isPaused ?? false,
     });
 
     res.status(201).json({ plan: toPublicConsultationPlan(plan) });
@@ -80,7 +81,7 @@ export const createConsultationPlan = asyncHandler(async (req, res) => {
 
 // PATCH /api/admin/consultation-plans/:id
 export const updateConsultationPlan = asyncHandler(async (req, res) => {
-    const { label, durationMonths, price, discountPercent, features } = req.body;
+    const { label, durationMonths, price, discountPercent, features, isPaused } = req.body;
 
     const plan = await ConsultationPlan.findById(req.params.id);
     if (!plan) {
@@ -117,6 +118,7 @@ export const updateConsultationPlan = asyncHandler(async (req, res) => {
         plan.discountPercent = discountPercent;
     }
     if (features !== undefined) plan.features = cleanFeatures(features);
+    if (isPaused !== undefined) plan.isPaused = Boolean(isPaused);
 
     await plan.save();
     res.json({ plan: toPublicConsultationPlan(plan) });

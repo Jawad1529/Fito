@@ -35,6 +35,7 @@ export default function useConsultationPlans() {
           discountPercent: plan.discountPercent,
           discountedPrice: plan.discountedPrice,
           features: plan.features,
+          isPaused: plan.isPaused,
         }));
 
       return goalPlans.length ? { ...goal, plans: goalPlans } : goal;

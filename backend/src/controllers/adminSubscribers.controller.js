@@ -1,21 +1,13 @@
-import sanitizeHtml from 'sanitize-html';
 import asyncHandler from '../utils/asyncHandler.js';
 import Subscriber from '../models/Subscriber.model.js';
 import { toPublicSubscriber } from '../utils/serializers.js';
 import { parsePagination, buildSearchFilter } from '../utils/queryHelpers.js';
 import { sendNewsletterBroadcast } from '../utils/mailer.util.js';
+import sanitizeRichText from '../utils/sanitizeRichText.js';
 
 // Same allowed set as adminBlogs.controller.js's Tiptap content — the panel's
 // editor only ever exposes bold, italic, strike and links.
-const sanitizeMessage = (message) =>
-    sanitizeHtml(message, {
-        allowedTags: ['p', 'strong', 'em', 's', 'a', 'br'],
-        allowedAttributes: { a: ['href', 'target', 'rel'] },
-        allowedSchemes: ['http', 'https', 'mailto'],
-        transformTags: {
-            a: sanitizeHtml.simpleTransform('a', { target: '_blank', rel: 'noopener noreferrer nofollow' }),
-        },
-    }).trim();
+const sanitizeMessage = (message) => sanitizeRichText(message);
 
 // GET /api/admin/subscribers?page=&limit=&search=
 export const listSubscribers = asyncHandler(async (req, res) => {

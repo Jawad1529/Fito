@@ -5,6 +5,7 @@ import {
     createProduct,
     updateProduct,
     deleteProduct,
+    reorderProducts,
 } from '../controllers/adminProducts.controller.js';
 import { protectAdmin } from '../middleware/adminAuth.middleware.js';
 import { uploadProductImages } from '../middleware/upload.middleware.js';
@@ -18,6 +19,8 @@ router.use(protectAdmin);
 router.get('/', listProducts);
 router.get('/:id', getProduct);
 router.post('/', uploadProductImages, createProduct);
+// Must come before the `/:id` PATCH below, or "reorder" is parsed as an id.
+router.patch('/reorder', reorderProducts);
 router.patch('/:id', uploadProductImages, updateProduct);
 router.delete('/:id', deleteProduct);
 

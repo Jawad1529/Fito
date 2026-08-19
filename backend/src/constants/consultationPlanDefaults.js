@@ -1,73 +1,71 @@
-// Starting set of 3 programs per goal (18 total), used to lazily create
-// ConsultationPlan documents the first time a goal is read with zero plans
-// (see consultationPlans.controller.js). Once created, admins fully own this
-// data — they can rename, reprice, or delete these, and add as many more
-// programs as they like. Content mirrors what app/utils/consultationConfig.js
-// shipped with before pricing/features moved into the database.
+// Starting set of programs per goal, used to lazily create ConsultationPlan
+// documents the first time a goal is read with zero plans (see
+// consultationPlans.controller.js). Once created, admins fully own this data
+// — they can rename, reprice, or delete these, and add as many more programs
+// as they like. Content mirrors FITOO Consultation Programs - Pricing
+// Structure & Features (app/assets/pricing), no discounts.
 export const CONSULTATION_PLAN_DEFAULTS = [
-    // fat-loss
-    { goal: 'fat-loss', label: 'Basic', durationMonths: 1, price: 4500, features: [
-        'Personalized fat loss nutrition plan', '2 follow-up check-ins', 'WhatsApp support (working hours)', '1 plan revision',
+    // 1. Fat Loss Transformation Program
+    { goal: 'fat-loss', label: '14-Day Trial', durationMonths: 1, price: 2999, features: [
+        'Personalized fat loss diet plan', 'Customized workout plan (Home/Gym)', 'WhatsApp coaching support', 'Regular progress monitoring',
+        'Body measurement tracking', 'Weight tracking', 'Habit-building guidance', 'Diet modifications according to progress', 'Transformation progress reports',
     ] },
-    { goal: 'fat-loss', label: 'Pro', durationMonths: 3, price: 12000, features: [
-        'Everything in the Basic plan', 'Monthly plan revisions (3 total)', '6 follow-up check-ins', 'Priority WhatsApp support',
+    { goal: 'fat-loss', label: '3 Months Program', durationMonths: 3, price: 14999, features: [
+        'Personalized fat loss diet plan', 'Customized workout plan (Home/Gym)', 'WhatsApp coaching support', 'Regular progress monitoring',
+        'Body measurement tracking', 'Weight tracking', 'Habit-building guidance', 'Diet modifications according to progress', 'Transformation progress reports',
     ] },
-    { goal: 'fat-loss', label: 'Premium', durationMonths: 6, price: 21000, features: [
-        'Everything in the Pro plan', 'Bi-weekly check-ins (12 total)', 'Unlimited plan revisions', 'Priority support, 7 days a week',
-    ] },
-
-    // muscle-gain
-    { goal: 'muscle-gain', label: 'Basic', durationMonths: 1, price: 5000, features: [
-        'Personalized muscle gain nutrition plan', '2 follow-up check-ins', 'WhatsApp support (working hours)', '1 plan revision',
-    ] },
-    { goal: 'muscle-gain', label: 'Pro', durationMonths: 3, price: 13500, features: [
-        'Everything in the Basic plan', 'Monthly plan revisions (3 total)', '6 follow-up check-ins', 'Priority WhatsApp support',
-    ] },
-    { goal: 'muscle-gain', label: 'Premium', durationMonths: 6, price: 24000, features: [
-        'Everything in the Pro plan', 'Bi-weekly check-ins (12 total)', 'Unlimited plan revisions', 'Priority support, 7 days a week',
+    { goal: 'fat-loss', label: '6 Months Program', durationMonths: 6, price: 24999, features: [
+        'Personalized fat loss diet plan', 'Customized workout plan (Home/Gym)', 'WhatsApp coaching support', 'Regular progress monitoring',
+        'Body measurement tracking', 'Weight tracking', 'Habit-building guidance', 'Diet modifications according to progress', 'Transformation progress reports',
     ] },
 
-    // body-recomposition
-    { goal: 'body-recomposition', label: 'Basic', durationMonths: 1, price: 5000, features: [
-        'Personalized body recomposition plan', '2 follow-up check-ins', 'WhatsApp support (working hours)', '1 plan revision',
+    // 2. Muscle Gain Program
+    { goal: 'muscle-gain', label: '3 Months Program', durationMonths: 3, price: 17999, features: [
+        'Personalized muscle gain nutrition plan', 'Strength training program', 'Progressive overload tracking', 'Workout performance monitoring',
+        'Supplement guidance', 'Muscle growth tracking', 'Body composition monitoring', 'Regular coaching support',
     ] },
-    { goal: 'body-recomposition', label: 'Pro', durationMonths: 3, price: 13500, features: [
-        'Everything in the Basic plan', 'Monthly plan revisions (3 total)', '6 follow-up check-ins', 'Priority WhatsApp support',
-    ] },
-    { goal: 'body-recomposition', label: 'Premium', durationMonths: 6, price: 24000, features: [
-        'Everything in the Pro plan', 'Bi-weekly check-ins (12 total)', 'Unlimited plan revisions', 'Priority support, 7 days a week',
-    ] },
-
-    // pcos
-    { goal: 'pcos', label: 'Basic', durationMonths: 1, price: 5500, features: [
-        'Personalized PCOS-friendly nutrition plan', '2 follow-up check-ins', 'WhatsApp support (working hours)', '1 plan revision',
-    ] },
-    { goal: 'pcos', label: 'Pro', durationMonths: 3, price: 15000, features: [
-        'Everything in the Basic plan', 'Monthly plan revisions (3 total)', '6 follow-up check-ins', 'Priority WhatsApp support',
-    ] },
-    { goal: 'pcos', label: 'Premium', durationMonths: 6, price: 27000, features: [
-        'Everything in the Pro plan', 'Bi-weekly check-ins (12 total)', 'Unlimited plan revisions', 'Priority support, 7 days a week',
+    { goal: 'muscle-gain', label: '6 Months Program', durationMonths: 6, price: 29999, features: [
+        'Personalized muscle gain nutrition plan', 'Strength training program', 'Progressive overload tracking', 'Workout performance monitoring',
+        'Supplement guidance', 'Muscle growth tracking', 'Body composition monitoring', 'Regular coaching support',
     ] },
 
-    // mother-wellness
-    { goal: 'mother-wellness', label: 'Basic', durationMonths: 1, price: 6000, features: [
-        'Personalized maternal nutrition plan', '2 follow-up check-ins', 'WhatsApp support (working hours)', '1 plan revision',
+    // 3. Body Recomposition Program
+    { goal: 'body-recomposition', label: '3 Months Program', durationMonths: 3, price: 19999, features: [
+        'Complete body transformation strategy', 'Personalized nutrition plan', 'Customized workout programming', 'Fat loss and muscle building approach',
+        'Body composition tracking', 'Progress photos tracking', 'Strength improvement monitoring', 'Lifestyle optimization', 'Regular coaching and accountability',
     ] },
-    { goal: 'mother-wellness', label: 'Pro', durationMonths: 3, price: 16500, features: [
-        'Everything in the Basic plan', 'Monthly plan revisions (3 total)', '6 follow-up check-ins', 'Priority WhatsApp support',
-    ] },
-    { goal: 'mother-wellness', label: 'Premium', durationMonths: 6, price: 30000, features: [
-        'Everything in the Pro plan', 'Bi-weekly check-ins (12 total)', 'Unlimited plan revisions', 'Priority support, 7 days a week',
+    { goal: 'body-recomposition', label: '6 Months Program', durationMonths: 6, price: 34999, features: [
+        'Complete body transformation strategy', 'Personalized nutrition plan', 'Customized workout programming', 'Fat loss and muscle building approach',
+        'Body composition tracking', 'Progress photos tracking', 'Strength improvement monitoring', 'Lifestyle optimization', 'Regular coaching and accountability',
     ] },
 
-    // diabetes
-    { goal: 'diabetes', label: 'Basic', durationMonths: 1, price: 5500, features: [
-        'Personalized diabetic-friendly nutrition plan', '2 follow-up check-ins', 'WhatsApp support (working hours)', '1 plan revision',
+    // 4. FITOO Busy Moms Program
+    { goal: 'mother-wellness', label: 'Personalized Coaching', durationMonths: 3, price: 14999, features: [
+        'Family-friendly meal planning', 'Busy schedule workout plans', 'Home-based workout options', 'Accountability support',
+        'Lifestyle coaching', 'Craving management', 'Stress and routine management',
     ] },
-    { goal: 'diabetes', label: 'Pro', durationMonths: 3, price: 15000, features: [
-        'Everything in the Basic plan', 'Monthly plan revisions (3 total)', '6 follow-up check-ins', 'Priority WhatsApp support',
+    { goal: 'mother-wellness', label: 'Group Coaching', durationMonths: 3, price: 4999, features: [
+        'Family-friendly meal planning', 'Busy schedule workout plans', 'Home-based workout options', 'Group accountability support',
+        'Lifestyle coaching', 'Craving management', 'Stress and routine management',
     ] },
-    { goal: 'diabetes', label: 'Premium', durationMonths: 6, price: 27000, features: [
-        'Everything in the Pro plan', 'Bi-weekly check-ins (12 total)', 'Unlimited plan revisions', 'Priority support, 7 days a week',
+
+    // 5. PCOS Management Program
+    { goal: 'pcos', label: '3 Months Program', durationMonths: 3, price: 14999, features: [
+        'PCOS-friendly nutrition plan', 'Hormonal health lifestyle guidance', 'Weight management strategy', 'Menstrual cycle tracking',
+        'Symptom tracking', 'Exercise programming', 'Lifestyle modification', 'Lab report guidance', 'Regular follow-ups',
+    ] },
+    { goal: 'pcos', label: '6 Months Program', durationMonths: 6, price: 24999, features: [
+        'PCOS-friendly nutrition plan', 'Hormonal health lifestyle guidance', 'Weight management strategy', 'Menstrual cycle tracking',
+        'Symptom tracking', 'Exercise programming', 'Lifestyle modification', 'Lab report guidance', 'Regular follow-ups',
+    ] },
+
+    // 6. Diabetes Management Program
+    { goal: 'diabetes', label: '3 Months Program', durationMonths: 3, price: 19999, features: [
+        'Diabetes-friendly customized diet plan', 'Blood sugar management strategy', 'Exercise prescription', 'Glucose monitoring guidance',
+        'Lifestyle modification coaching', 'Diabetes education', 'Progress tracking', 'Lab parameter monitoring guidance', 'Regular follow-ups',
+    ] },
+    { goal: 'diabetes', label: '6 Months Program', durationMonths: 6, price: 34999, features: [
+        'Diabetes-friendly customized diet plan', 'Blood sugar management strategy', 'Exercise prescription', 'Glucose monitoring guidance',
+        'Lifestyle modification coaching', 'Diabetes education', 'Progress tracking', 'Lab parameter monitoring guidance', 'Regular follow-ups',
     ] },
 ];

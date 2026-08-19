@@ -12,10 +12,12 @@ import Button from '@/components/atoms/Button';
 import Checkbox from '@/components/atoms/Checkbox';
 import Divider from '@/components/atoms/Divider';
 import GoogleAuthButton from '@/components/molecules/GoogleAuthButton';
+import LegalModal from '@/components/molecules/LegalModal';
 import useAuth from '@/hooks/useAuth';
 
 export default function LoginPage() {
   const [loading, setLoading] = useState(false);
+  const [legalModal, setLegalModal] = useState(null); // null | 'terms' | 'privacy'
   const router = useRouter();
   const { login } = useAuth();
 
@@ -106,7 +108,29 @@ export default function LoginPage() {
             Sign up now
           </Link>
         </div>
+
+        <div className="text-center mt-4 text-xs text-text-muted">
+          By signing in, you agree to our{' '}
+          <button
+            type="button"
+            onClick={() => setLegalModal('terms')}
+            className="text-primary hover:text-primary-hover underline-offset-2 hover:underline"
+          >
+            Terms of Service
+          </button>{' '}
+          and{' '}
+          <button
+            type="button"
+            onClick={() => setLegalModal('privacy')}
+            className="text-primary hover:text-primary-hover underline-offset-2 hover:underline"
+          >
+            Privacy Policy
+          </button>
+          .
+        </div>
       </Form>
+
+      <LegalModal type={legalModal} open={!!legalModal} onClose={() => setLegalModal(null)} />
     </motion.div>
   );
 }

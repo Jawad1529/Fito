@@ -83,3 +83,15 @@ export const TRACK_ORDER_SEO = {
     description: 'Check the delivery status of your Fitoo order using your order ID and phone number.',
     keywords: ['track fitoo order', 'order status', 'delivery tracking'],
 };
+
+export const TERMS_SEO = {
+    title: 'Terms & Conditions | Fitoo',
+    description: 'The terms that govern your use of Fitoo\'s website, consultations, coaching programs, and products.',
+    keywords: ['fitoo terms', 'terms and conditions', 'terms of service'],
+};
+
+export const PRIVACY_SEO = {
+    title: 'Privacy Policy | Fitoo',
+    description: 'How Fitoo collects, uses, and protects your personal and health information.',
+    keywords: ['fitoo privacy policy', 'data protection', 'privacy'],
+};

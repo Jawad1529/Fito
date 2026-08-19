@@ -165,6 +165,7 @@ export const toPublicConsultationPlan = (plan) => ({
     discountPercent: plan.discountPercent ?? 0,
     discountedPrice: computeDiscountedPrice(plan.price, plan.discountPercent ?? 0),
     features: plan.features ?? [],
+    isPaused: plan.isPaused ?? false,
 });
 
 export const toPublicSubscriber = (subscriber) => ({

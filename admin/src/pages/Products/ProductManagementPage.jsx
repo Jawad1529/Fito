@@ -2,13 +2,14 @@ import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Descriptions, Image, Button, Tag, Table, message } from 'antd';
 import Modal from '../../components/atoms/AppModal';
-import { PlusOutlined } from '@ant-design/icons';
+import { PlusOutlined, SwapOutlined } from '@ant-design/icons';
 import PageHeading from '../../components/atoms/PageHeading';
 import SearchBar from '../../components/molecules/SearchBar';
 import RowActions from '../../components/molecules/RowActions';
 import StatusTag from '../../components/atoms/StatusTag';
 import RatingStars from '../../components/atoms/RatingStars';
 import DataTable from '../../components/organisms/DataTable';
+import SortableProductsTable from '../../components/organisms/SortableProductsTable';
 import useTableQuery from '../../hooks/useTableQuery';
 import useServerTableQuery from '../../hooks/useServerTableQuery';
 import useMockProducts from '../../hooks/useMockProducts';
@@ -16,7 +17,7 @@ import useCategories from '../../hooks/useCategories';
 import { ROUTES, productEditPath } from '../../constants/routes';
 import { useTestingMode } from '../../context/TestingModeContext';
 import imageUrl from '../../utils/imageUrl';
-import { fetchProducts, deleteProduct as deleteProductApi } from '../../api/adminProducts.api';
+import { fetchProducts, deleteProduct as deleteProductApi, reorderProducts } from '../../api/adminProducts.api';
 
 const apiError = (err, fallback) => err?.response?.data?.message || fallback;
 
@@ -59,6 +60,51 @@ function ProductManagementPageInner({ testingMode }) {
     }, [highlightProductId, loading]);
 
     const [viewing, setViewing] = useState(null);
+
+    // Reorder mode swaps the paginated/searchable table for a flat, draggable
+    // one — search/filters/sort don't make sense against a manual order, and
+    // dragging across pages would be confusing, so it works against the full
+    // list instead.
+    const [reorderMode, setReorderMode] = useState(false);
+    const [reorderItems, setReorderItems] = useState([]);
+    const [reorderLoading, setReorderLoading] = useState(false);
+
+    const enterReorderMode = async () => {
+        if (testingMode) {
+            setReorderItems(mockProducts);
+            setReorderMode(true);
+            return;
+        }
+        setReorderLoading(true);
+        setReorderMode(true);
+        try {
+            const { items } = await fetchProducts({ page: 1, limit: 100 });
+            setReorderItems(items);
+        } catch (err) {
+            message.error(apiError(err, 'Failed to load products for reordering'));
+            setReorderMode(false);
+        } finally {
+            setReorderLoading(false);
+        }
+    };
+
+    const exitReorderMode = () => {
+        setReorderMode(false);
+        if (!testingMode) serverQuery.refetch();
+    };
+
+    const handleReorder = async (nextItems) => {
+        setReorderItems(nextItems);
+        if (testingMode) {
+            setMockProducts(nextItems);
+            return;
+        }
+        try {
+            await reorderProducts(nextItems.map((item) => item.id));
+        } catch (err) {
+            message.error(apiError(err, 'Failed to save the new order'));
+        }
+    };
 
     const handleDelete = async (id) => {
         if (testingMode) {
@@ -146,25 +192,41 @@ function ProductManagementPageInner({ testingMode }) {
         <div>
             <PageHeading
                 title="Product Management"
-                subtitle="Manage your store's products"
+                subtitle={reorderMode ? 'Drag rows to change the display order' : "Manage your store's products"}
                 actions={
-                    <>
-                        <SearchBar value={searchText} onChange={setSearchText} placeholder="Search products..." />
-                        <Button type="primary" icon={<PlusOutlined />} onClick={() => navigate(ROUTES.PRODUCT_ADD)}>
-                            Add Product
-                        </Button>
-                    </>
+                    reorderMode ? (
+                        <Button onClick={exitReorderMode}>Done Reordering</Button>
+                    ) : (
+                        <>
+                            <SearchBar value={searchText} onChange={setSearchText} placeholder="Search products..." />
+                            <Button icon={<SwapOutlined />} onClick={enterReorderMode}>
+                                Reorder
+                            </Button>
+                            <Button type="primary" icon={<PlusOutlined />} onClick={() => navigate(ROUTES.PRODUCT_ADD)}>
+                                Add Product
+                            </Button>
+                        </>
+                    )
                 }
             />
 
-            <DataTable
-                columns={columns}
-                data={products}
-                loading={loading}
-                rowClassName={(record) => (record.id === highlightProductId ? 'row-highlight' : '')}
-                pagination={testingMode ? undefined : { ...serverQuery.pagination, total: serverQuery.total }}
-                onChange={testingMode ? undefined : serverQuery.handleTableChange}
-            />
+            {reorderMode ? (
+                <SortableProductsTable
+                    items={reorderItems}
+                    onReorder={handleReorder}
+                    loading={reorderLoading}
+                    categoryName={categoryName}
+                />
+            ) : (
+                <DataTable
+                    columns={columns}
+                    data={products}
+                    loading={loading}
+                    rowClassName={(record) => (record.id === highlightProductId ? 'row-highlight' : '')}
+                    pagination={testingMode ? undefined : { ...serverQuery.pagination, total: serverQuery.total }}
+                    onChange={testingMode ? undefined : serverQuery.handleTableChange}
+                />
+            )}
 
             <Modal
                 open={!!viewing}
@@ -202,7 +264,12 @@ function ProductManagementPageInner({ testingMode }) {
                                 <RatingStars rating={viewing.rating ?? 0} /> ({viewing.reviews ?? 0} reviews)
                             </Descriptions.Item>
                             <Descriptions.Item label="Status"><StatusTag status={viewing.status} /></Descriptions.Item>
-                            <Descriptions.Item label="Description">{viewing.description}</Descriptions.Item>
+                            <Descriptions.Item label="Description">
+                                <div
+                                    className="[&_p]:m-0 [&_a]:text-primary [&_a]:underline [&_strong]:font-semibold [&_em]:italic [&_s]:line-through"
+                                    dangerouslySetInnerHTML={{ __html: viewing.description }}
+                                />
+                            </Descriptions.Item>
                         </Descriptions>
                         {viewing.nutritionFacts?.length > 0 && (
                             <div className="mt-4">

@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { memo } from 'react';
 import imageUrl from '../../utils/imageUrl';
 import formatCategory from '../../utils/formatCategory';
+import stripHtml from '../../utils/stripHtml';
 import ProductCardActions from './ProductCardActions';
 
 // Static star geometry — hoisted out of render so it isn't rebuilt per card.
@@ -79,7 +80,7 @@ function ProductCard({ product, isWishlisted = false, onToggleWishlist }) {
           <span className="text-sm text-text-muted">({product.reviews ?? 0})</span>
         </div>
 
-        <p className="text-sm text-text-muted mt-2 flex-1 line-clamp-2">{product.description}</p>
+        <p className="text-sm text-text-muted mt-2 flex-1 line-clamp-2">{stripHtml(product.description)}</p>
       </div>
 
       {/* Interactive bits are a small client island; the rest of the card stays

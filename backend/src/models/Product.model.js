@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import { PRODUCT_STATUS } from '../constants/contentStatus.js';
 import { buildProductSeo, buildProductSlug } from '../utils/productSeo.js';
+import ensureUniqueSlug from '../utils/uniqueSlug.js';
 
 // `rating` and `reviewCount` are denormalized aggregates maintained by
 // Review.model.js whenever a review is created/updated/deleted, so product
@@ -18,6 +19,10 @@ const productSchema = new mongoose.Schema(
         // the storefront. 0 means no discount.
         discountPercent: { type: Number, default: 0, min: 0, max: 100 },
         stock: { type: Number, default: 0, min: 0 },
+        // Manual display order set by dragging rows in the admin product list;
+        // lower sorts first. Both the admin list and the storefront default
+        // sort read this, so reordering there also reorders the shop.
+        sortOrder: { type: Number, default: 0, index: true },
         description: { type: String, required: true, trim: true },
         // First entry of `images` is the primary/thumbnail image. Stored as
         // absolute Cloudinary URLs (see upload.middleware.js).
@@ -71,7 +76,7 @@ const productSchema = new mongoose.Schema(
 // Fields the generated copy reads from; touching any of them invalidates the SEO block.
 const SEO_SOURCE_FIELDS = ['name', 'category', 'price', 'stock', 'status', 'description'];
 
-productSchema.pre('save', function assignSeo() {
+productSchema.pre('save', async function assignSeo() {
     if (
         this.isNew ||
         SEO_SOURCE_FIELDS.some((field) => this.isModified(field)) ||
@@ -83,8 +88,10 @@ productSchema.pre('save', function assignSeo() {
         // value means "auto-generate", so the freshly built one stands.
         if (customMetaDescription) this.seo.metaDescription = customMetaDescription;
     }
-    // Slug stays pinned to the original name so existing links keep resolving.
-    if (!this.slug) this.slug = buildProductSlug(this);
+    // Slug stays pinned to the original name so existing links keep resolving,
+    // even if the name is edited later. A numeric suffix is only added when
+    // the base slug collides with another product's.
+    if (!this.slug) this.slug = await ensureUniqueSlug(this.constructor, buildProductSlug(this), this._id);
 });
 
 // Powers the shop page's text search without a full-text index scan per keystroke.

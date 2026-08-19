@@ -56,6 +56,13 @@ export const antTheme = {
       colorBgSpotlight: 'var(--surface)',
       colorTextLightSolid: 'var(--text)',
     },
+    Modal: {
+      colorBgElevated: 'var(--surface)',
+      colorText: 'var(--text)',
+      colorTextHeading: 'var(--text)',
+      colorIcon: 'var(--text-muted)',
+      colorIconHover: 'var(--text)',
+    },
     Empty: {
       colorText: 'var(--text-secondary)',
       colorTextDescription: 'var(--text-muted)',

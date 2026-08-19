@@ -20,6 +20,9 @@ const consultationPlanSchema = new mongoose.Schema(
         // Short bullet points describing what's included — no images, per
         // product decision; the app already owns imagery at the goal level.
         features: [{ type: String, trim: true }],
+        // Admin can pause a program without deleting it — the app shows it
+        // blurred with a "Coming Soon" label and it can't be selected/bought.
+        isPaused: { type: Boolean, default: false },
     },
     { timestamps: true }
 );

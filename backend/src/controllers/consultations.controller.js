@@ -91,7 +91,7 @@ export const createConsultation = asyncHandler(async (req, res) => {
             throw new Error('Invalid plan selected');
         }
         const planDoc = await ConsultationPlan.findOne({ _id: submittedPlan.id, goal });
-        if (!planDoc) {
+        if (!planDoc || planDoc.isPaused) {
             res.status(400);
             throw new Error('Invalid plan selected');
         }

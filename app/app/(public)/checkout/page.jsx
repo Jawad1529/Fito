@@ -238,15 +238,19 @@ export default function CheckoutPage() {
                 <div className="space-y-3 mb-5">
                   <div>
                     <Text muted>Bank Name</Text>
-                    <div className="text-text font-medium">Meezan Bank</div>
+                    <div className="text-text font-medium">Bank Alfalah</div>
                   </div>
                   <div>
                     <Text muted>Account Title</Text>
-                    <div className="text-text font-medium">Fitoo Nutrition</div>
+                    <div className="text-text font-medium">FITOO</div>
                   </div>
                   <div>
                     <Text muted>Account Number</Text>
-                    <div className="text-text font-medium">123456789012</div>
+                    <div className="text-text font-medium">55215002851811</div>
+                  </div>
+                  <div>
+                    <Text muted>IBAN</Text>
+                    <div className="text-text font-medium">PK73ALFH5521005002851811</div>
                   </div>
                 </div>
 

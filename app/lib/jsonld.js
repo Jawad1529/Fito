@@ -3,6 +3,7 @@
 // https://developers.google.com/search/docs/appearance/structured-data/product
 import { SITE_NAME, SITE_URL, CURRENCY, absoluteUrl } from '@/config/siteConfig';
 import imageUrl from '@/utils/imageUrl';
+import stripHtml from '@/utils/stripHtml';
 
 const AVAILABILITY = {
   inStock: 'https://schema.org/InStock',
@@ -22,7 +23,7 @@ export const productJsonLd = (product) => {
     '@context': 'https://schema.org',
     '@type': 'Product',
     name: product.name,
-    description: product.seo?.metaDescription || product.description,
+    description: product.seo?.metaDescription || stripHtml(product.description),
     image: images,
     sku: String(product.id),
     category: product.category,

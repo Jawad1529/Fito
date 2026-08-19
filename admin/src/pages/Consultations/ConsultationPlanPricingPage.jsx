@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Button, Input, InputNumber, Card, Tag, Spin, message, Empty, Result } from 'antd';
-import { ArrowLeftOutlined, PlusOutlined, CloseOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, PlusOutlined, CloseOutlined, PauseCircleOutlined, PlayCircleOutlined } from '@ant-design/icons';
 import ConfirmDeleteButton from '../../components/molecules/ConfirmDeleteButton';
 import { CONSULTATION_GOALS } from '../../constants/consultationGoals';
 import { consultationPlans as mockConsultationPlans } from '../../data/consultationPlans';
@@ -24,6 +24,7 @@ const emptyPlan = () => ({
     price: 0,
     discountPercent: 0,
     features: [''],
+    isPaused: false,
 });
 
 const finalPrice = (plan) =>
@@ -114,6 +115,21 @@ function ConsultationPlanPricingPageInner({ testingMode }) {
 
     const addProgram = () => setPlans((prev) => [...prev, emptyPlan()]);
 
+    const togglePause = async (plan) => {
+        const isPaused = !plan.isPaused;
+        if (testingMode || plan.isNew) {
+            updatePlan(plan.key, { isPaused });
+            return;
+        }
+        try {
+            await updateConsultationPlan(plan.id, { isPaused });
+            updatePlan(plan.key, { isPaused });
+            message.success(isPaused ? 'Program paused' : 'Program resumed');
+        } catch (err) {
+            message.error(apiError(err, 'Failed to update program status'));
+        }
+    };
+
     const removePlan = async (plan) => {
         if (testingMode || plan.isNew) {
             setPlans((prev) => prev.filter((p) => p.key !== plan.key));
@@ -162,6 +178,7 @@ function ConsultationPlanPricingPageInner({ testingMode }) {
                         price: p.price,
                         discountPercent: p.discountPercent,
                         features: p.features,
+                        isPaused: p.isPaused ?? false,
                     };
                     return p.isNew ? createConsultationPlan(goal.id, payload) : updateConsultationPlan(p.id, payload);
                 })
@@ -207,16 +224,36 @@ function ConsultationPlanPricingPageInner({ testingMode }) {
                             <Card
                                 key={plan.key}
                                 title={
-                                    <Input
-                                        value={plan.label}
-                                        onChange={(e) => updatePlan(plan.key, { label: e.target.value })}
-                                        placeholder="Program name, e.g. Basic"
-                                        variant="borderless"
-                                        className="!px-0 font-semibold"
-                                    />
+                                    <div className="flex items-center gap-2">
+                                        <Input
+                                            value={plan.label}
+                                            onChange={(e) => updatePlan(plan.key, { label: e.target.value })}
+                                            placeholder="Program name, e.g. Basic"
+                                            variant="borderless"
+                                            className="!px-0 font-semibold"
+                                        />
+                                        {plan.isPaused && <Tag color="orange">Paused</Tag>}
+                                    </div>
                                 }
-                                extra={<ConfirmDeleteButton title="Remove this program?" onConfirm={() => removePlan(plan)} />}
+                                extra={
+                                    <div className="flex items-center gap-1">
+                                        <Button
+                                            type="text"
+                                            icon={plan.isPaused ? <PlayCircleOutlined /> : <PauseCircleOutlined />}
+                                            onClick={() => togglePause(plan)}
+                                            title={plan.isPaused ? 'Resume program' : 'Pause program'}
+                                        >
+                                            {plan.isPaused ? 'Resume' : 'Pause'}
+                                        </Button>
+                                        <ConfirmDeleteButton title="Remove this program?" onConfirm={() => removePlan(plan)} />
+                                    </div>
+                                }
                             >
+                                {plan.isPaused && (
+                                    <div className="text-xs text-orange-600 bg-orange-50 border border-orange-200 rounded px-2 py-1 mb-3">
+                                        Paused — shown as &quot;Coming Soon&quot; and blurred on the app; customers can&apos;t select or buy it.
+                                    </div>
+                                )}
                                 <div className="grid grid-cols-3 gap-3 mb-3">
                                     <div>
                                         <div className="text-xs text-gray-500 mb-1">Duration (months)</div>

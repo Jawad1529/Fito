@@ -8,9 +8,9 @@ const tierFeatures = (tier) =>
             : ['Everything in the Pro plan', 'Bi-weekly check-ins (12 total)', 'Unlimited plan revisions', 'Priority support, 7 days a week'];
 
 const makePlans = (goal, prices) => [
-    { id: `${goal}-basic`, goal, label: 'Basic', durationMonths: 1, price: prices[0], discountPercent: 0, features: tierFeatures('Basic') },
-    { id: `${goal}-pro`, goal, label: 'Pro', durationMonths: 3, price: prices[1], discountPercent: 0, features: tierFeatures('Pro') },
-    { id: `${goal}-premium`, goal, label: 'Premium', durationMonths: 6, price: prices[2], discountPercent: 0, features: tierFeatures('Premium') },
+    { id: `${goal}-basic`, goal, label: 'Basic', durationMonths: 1, price: prices[0], discountPercent: 0, isPaused: false, features: tierFeatures('Basic') },
+    { id: `${goal}-pro`, goal, label: 'Pro', durationMonths: 3, price: prices[1], discountPercent: 0, isPaused: false, features: tierFeatures('Pro') },
+    { id: `${goal}-premium`, goal, label: 'Premium', durationMonths: 6, price: prices[2], discountPercent: 0, isPaused: false, features: tierFeatures('Premium') },
 ];
 
 export const consultationPlans = [

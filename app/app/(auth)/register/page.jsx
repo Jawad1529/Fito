@@ -12,10 +12,12 @@ import Button from '@/components/atoms/Button';
 import Checkbox from '@/components/atoms/Checkbox';
 import Divider from '@/components/atoms/Divider';
 import GoogleAuthButton from '@/components/molecules/GoogleAuthButton';
+import LegalModal from '@/components/molecules/LegalModal';
 import useAuth from '@/hooks/useAuth';
 
 function RegisterForm() {
   const [loading, setLoading] = useState(false);
+  const [legalModal, setLegalModal] = useState(null); // null | 'terms' | 'privacy'
   const router = useRouter();
   const { register } = useAuth();
   const searchParams = useSearchParams();
@@ -116,8 +118,22 @@ function RegisterForm() {
           ]}
         >
           <Checkbox>
-            I agree to the <Link href="/terms" className="text-primary hover:text-primary-hover">Terms of Service</Link> and{' '}
-            <Link href="/privacy" className="text-primary hover:text-primary-hover">Privacy Policy</Link>
+            I agree to the{' '}
+            <button
+              type="button"
+              onClick={() => setLegalModal('terms')}
+              className="text-primary hover:text-primary-hover underline-offset-2 hover:underline"
+            >
+              Terms of Service
+            </button>{' '}
+            and{' '}
+            <button
+              type="button"
+              onClick={() => setLegalModal('privacy')}
+              className="text-primary hover:text-primary-hover underline-offset-2 hover:underline"
+            >
+              Privacy Policy
+            </button>
           </Checkbox>
         </Form.Item>
 
@@ -138,6 +154,8 @@ function RegisterForm() {
           </Link>
         </div>
       </Form>
+
+      <LegalModal type={legalModal} open={!!legalModal} onClose={() => setLegalModal(null)} />
     </motion.div>
   );
 }
