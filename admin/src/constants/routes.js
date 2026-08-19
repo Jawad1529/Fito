@@ -17,6 +17,8 @@ export const ROUTES = {
     BLOG_ADD: '/blogs/add',
     BLOG_EDIT: '/blogs/:id/edit',
     NOTIFICATIONS: '/notifications',
+    CAREERS: '/careers',
+    CAREER_APPLICATIONS: '/careers/applications',
     SUBSCRIBERS: '/subscribers',
     SETTINGS: '/settings',
     UNAUTHORIZED: '/unauthorized',

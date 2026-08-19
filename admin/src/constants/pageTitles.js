@@ -13,6 +13,8 @@ export const PAGE_TITLES = [
     { path: ROUTES.ORDERS, title: 'Order Management' },
     { path: ROUTES.BLOGS, title: 'Blog Management' },
     { path: ROUTES.NOTIFICATIONS, title: 'Notification Management' },
+    { path: ROUTES.CAREER_APPLICATIONS, title: 'Job Applications' },
+    { path: ROUTES.CAREERS, title: 'Career Management' },
     { path: ROUTES.SETTINGS, title: 'Settings' },
     { path: ROUTES.UNAUTHORIZED, title: 'Unauthorized' },
 ];

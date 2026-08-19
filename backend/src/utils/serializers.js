@@ -168,6 +168,33 @@ export const toPublicConsultationPlan = (plan) => ({
     isPaused: plan.isPaused ?? false,
 });
 
+export const toPublicCareer = (career) => ({
+    id: career._id,
+    title: career.title,
+    description: career.description,
+    link: career.link,
+    email: career.email,
+    isOpen: career.isOpen ?? true,
+    createdAt: career.createdAt,
+});
+
+// `career` is expected to be populated with at least `title` by the calling
+// controller (admin list view); it's the raw ObjectId right after creation.
+export const toPublicCareerApplication = (application) => ({
+    id: application._id,
+    career: application.career?.title
+        ? { id: application.career._id, title: application.career.title }
+        : { id: application.career },
+    name: application.name,
+    email: application.email,
+    phone: application.phone,
+    resumeLink: application.resumeLink,
+    referralName: application.referralName,
+    referralEmail: application.referralEmail,
+    referralPhone: application.referralPhone,
+    createdAt: application.createdAt,
+});
+
 export const toPublicSubscriber = (subscriber) => ({
     id: subscriber._id,
     email: subscriber.email,

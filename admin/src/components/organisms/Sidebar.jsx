@@ -14,6 +14,8 @@ import {
     TagsOutlined,
     MailOutlined,
     GiftOutlined,
+    IdcardOutlined,
+    SolutionOutlined,
 } from '@ant-design/icons';
 import { useAuth } from '../../context/AuthContext';
 import { ROUTES } from '../../constants/routes';
@@ -35,6 +37,8 @@ export default function Sidebar({ collapsed }) {
         isSuperAdmin && { key: ROUTES.ORDERS, icon: <ShoppingCartOutlined />, label: 'Order Management' },
         { key: ROUTES.BLOGS, icon: <ReadOutlined />, label: 'Blog Management' },
         { key: ROUTES.NOTIFICATIONS, icon: <BellOutlined />, label: 'Notification Management' },
+        { key: ROUTES.CAREERS, icon: <IdcardOutlined />, label: 'Career Management' },
+        { key: ROUTES.CAREER_APPLICATIONS, icon: <SolutionOutlined />, label: 'Job Applications' },
         { key: ROUTES.SUBSCRIBERS, icon: <MailOutlined />, label: 'Newsletter Subscribers' },
     ].filter(Boolean);
 
@@ -74,7 +78,7 @@ export default function Sidebar({ collapsed }) {
                 selectedKeys={selectedKeys}
                 items={primaryItems}
                 onClick={handleClick}
-                className="flex-1 border-none pt-2"
+                className="admin-scrollbar flex-1 min-h-0 overflow-y-auto border-none pt-2"
             />
 
             <Menu

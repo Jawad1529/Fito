@@ -50,8 +50,7 @@ export default function AdminLayout() {
                     collapsible
                     collapsed={collapsed}
                     width={230}
-                    className="admin-scrollbar"
-                    style={{ overflow: 'auto', height: '100vh', position: 'sticky', top: 0, left: 0 }}
+                    style={{ height: '100vh', position: 'sticky', top: 0, left: 0 }}
                 >
                     <Sidebar collapsed={collapsed} />
                 </Sider>

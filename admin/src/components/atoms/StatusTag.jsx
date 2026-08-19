@@ -20,6 +20,8 @@ const COLOR_MAP = {
     info: 'blue',
     promo: 'purple',
     alert: 'red',
+    open: 'green',
+    closed: 'default',
 };
 
 const formatLabel = (value) =>
