@@ -9,38 +9,23 @@ import Icon from '../atoms/Icon';
 import Avatar from '../atoms/Avatar';
 import Spinner from '../atoms/Spinner';
 import BlogCard from '../organisms/BlogCard';
-import useTestingMode from '../../hooks/useTestingMode';
 import useApiResource from '../../hooks/useApiResource';
 import { getBlogBySlug } from '../../services/blog.service';
 import imageUrl from '../../utils/imageUrl';
-import blogsData from '../../data/blogs.json';
 
 // Interactive half of the blog detail page. The route's server component owns
 // metadata and Article structured data.
 export default function BlogTemplate({ slug, initialData = null }) {
-    const { testingMode } = useTestingMode();
-
     const { data, loading, error } = useApiResource(() => getBlogBySlug(slug), [slug], {
         // The server component already fetched this post for metadata.
-        skip: testingMode || !slug || Boolean(initialData),
+        skip: !slug || Boolean(initialData),
         fallback: initialData,
     });
 
     const { post, relatedPosts } = useMemo(() => {
-        if (testingMode) {
-            const found = blogsData.find((p) => p.slug === slug) || null;
-            return {
-                post: found,
-                relatedPosts: found
-                    ? blogsData
-                        .filter((p) => p.slug !== found.slug && p.category === found.category)
-                        .slice(0, 3)
-                    : [],
-            };
-        }
         const resolved = data ?? initialData;
         return { post: resolved?.blog ?? null, relatedPosts: resolved?.related ?? [] };
-    }, [testingMode, data, initialData, slug]);
+    }, [data, initialData]);
 
     if (loading && !post) {
         return (
@@ -125,21 +110,12 @@ export default function BlogTemplate({ slug, initialData = null }) {
                     transition={{ duration: 0.6, delay: 0.2 }}
                     className="flex flex-col gap-5 mt-8"
                 >
-                    {Array.isArray(post.content) ? (
-                        // Testing-mode data (data/blogs.json) still ships as paragraph arrays.
-                        post.content.map((paragraph, i) => (
-                            <Text key={i} className="text-text-secondary leading-relaxed">
-                                {paragraph}
-                            </Text>
-                        ))
-                    ) : (
-                        // Real posts store `content` as sanitized HTML from the admin's
-                        // Tiptap editor (bold/italic/strike/links only).
-                        <div
-                            className="flex flex-col gap-5 text-base text-text-secondary leading-relaxed [&_p]:m-0 [&_a]:text-primary [&_a]:underline [&_a]:underline-offset-2 [&_strong]:font-semibold [&_strong]:text-text [&_em]:italic [&_s]:line-through"
-                            dangerouslySetInnerHTML={{ __html: post.content ?? '' }}
-                        />
-                    )}
+                    {/* Posts store `content` as sanitized HTML from the admin's Tiptap
+                        editor (bold/italic/strike/links only). */}
+                    <div
+                        className="flex flex-col gap-5 text-base text-text-secondary leading-relaxed [&_p]:m-0 [&_a]:text-primary [&_a]:underline [&_a]:underline-offset-2 [&_strong]:font-semibold [&_strong]:text-text [&_em]:italic [&_s]:line-through"
+                        dangerouslySetInnerHTML={{ __html: post.content ?? '' }}
+                    />
                 </motion.div>
             </article>
 

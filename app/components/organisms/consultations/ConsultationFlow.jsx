@@ -7,7 +7,6 @@ import { message } from 'antd';
 
 import useConsultation from '../../../hooks/useConsultation';
 import useAuth from '../../../hooks/useAuth';
-import useTestingMode from '../../../hooks/useTestingMode';
 import useConsultationPlans from '../../../hooks/useConsultationPlans';
 
 import GoalSelection from './GoalSelection';
@@ -26,7 +25,6 @@ import { H3, Text } from '../../atoms/Typography';
 
 export default function ConsultationFlow() {
   const { isAuthenticated } = useAuth();
-  const { testingMode } = useTestingMode();
   const consultationGoals = useConsultationPlans();
 
   const searchParams = useSearchParams();
@@ -179,7 +177,7 @@ export default function ConsultationFlow() {
     next();
   };
 
-  if (!testingMode && !isAuthenticated) {
+  if (!isAuthenticated) {
     return (
       <div className="max-w-xl mx-auto text-center py-16">
         <H3>Sign in to start your consultation</H3>

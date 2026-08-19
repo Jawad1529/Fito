@@ -2,7 +2,6 @@
 
 import { ConfigProvider } from 'antd';
 import { GoogleOAuthProvider } from '@react-oauth/google';
-import { TestingModeProvider } from '@/context/TestingModeContext';
 import { AuthProvider } from '@/context/AuthContext';
 import { CartProvider } from '@/context/CartContext';
 import { WishlistProvider } from '@/context/WishlistContext';
@@ -22,13 +21,11 @@ export default function AppProviders({ children }) {
     return (
         <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID}>
             <ConfigProvider theme={antTheme}>
-                <TestingModeProvider>
-                    <AuthProvider>
-                        <CartProvider>
-                            <WishlistProvider>{children}</WishlistProvider>
-                        </CartProvider>
-                    </AuthProvider>
-                </TestingModeProvider>
+                <AuthProvider>
+                    <CartProvider>
+                        <WishlistProvider>{children}</WishlistProvider>
+                    </CartProvider>
+                </AuthProvider>
             </ConfigProvider>
         </GoogleOAuthProvider>
     );

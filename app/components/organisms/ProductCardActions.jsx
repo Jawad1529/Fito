@@ -1,6 +1,7 @@
 'use client';
 
 import { memo } from 'react';
+import Link from 'next/link';
 import Button from '../atoms/Button';
 import Icon from '../atoms/Icon';
 import useCart from '../../hooks/useCart';
@@ -13,6 +14,7 @@ import useCart from '../../hooks/useCart';
 // land on the button and not the link.
 function ProductCardActions({ product, isWishlisted = false, onToggleWishlist }) {
     const { addToCart, isInCart } = useCart();
+    const hasVariants = Boolean(product.variants?.length);
     const inCart = isInCart(product.id);
     const hasDiscount = product.discountPercent > 0;
     const chargedPrice = product.discountedPrice ?? product.price;
@@ -41,15 +43,24 @@ function ProductCardActions({ product, isWishlisted = false, onToggleWishlist })
                         </span>
                     )}
                 </div>
-                <Button
-                    variant={inCart ? 'outline' : 'primary'}
-                    size="sm"
-                    onClick={() => !inCart && addToCart(product)}
-                    disabled={inCart}
-                    className="rounded-full px-4 py-1.5 text-xs"
-                >
-                    {inCart ? 'In Cart' : 'Quick Add'}
-                </Button>
+                {hasVariants ? (
+                    <Link
+                        href={`/product/${product.slug || product.id}`}
+                        className="relative z-10 rounded-full px-4 py-1.5 text-xs font-semibold border border-border text-text hover:bg-overlay-strong transition-colors"
+                    >
+                        Select Options
+                    </Link>
+                ) : (
+                    <Button
+                        variant={inCart ? 'outline' : 'primary'}
+                        size="sm"
+                        onClick={() => !inCart && addToCart(product)}
+                        disabled={inCart}
+                        className="rounded-full px-4 py-1.5 text-xs"
+                    >
+                        {inCart ? 'In Cart' : 'Quick Add'}
+                    </Button>
+                )}
             </div>
         </>
     );

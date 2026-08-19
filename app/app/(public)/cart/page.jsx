@@ -41,45 +41,51 @@ export default function CartPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
           <div className="lg:col-span-2 flex flex-col gap-4">
             <AnimatePresence initial={false}>
-              {items.map((item) => (
-                <motion.div
-                  key={item.id}
-                  layout
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  transition={{ duration: 0.25 }}
-                  className="flex items-center gap-4 bg-overlay border border-border-light rounded-2xl p-4"
-                >
-                  <Link href={`/product/${item.id}`} className="relative w-20 h-20 rounded-xl overflow-hidden bg-overlay shrink-0">
-                    <Image src={item.image} alt={item.name} fill unoptimized className="object-cover" />
-                  </Link>
-
-                  <div className="flex-1 min-w-0">
-                    <Link href={`/product/${item.id}`} className="text-text font-semibold truncate hover:text-primary transition-colors block">
-                      {item.name}
-                    </Link>
-                    <div className="text-text-muted text-sm">PKR {item.price.toFixed(2)}</div>
-                  </div>
-
-                  <QuantitySelector
-                    value={item.quantity}
-                    onChange={(qty) => updateQuantity(item.id, qty)}
-                  />
-
-                  <div className="text-text font-semibold w-24 text-right shrink-0 hidden sm:block">
-                    PKR {(item.price * item.quantity).toFixed(2)}
-                  </div>
-
-                  <button
-                    onClick={() => removeFromCart(item.id)}
-                    aria-label={`Remove ${item.name}`}
-                    className="text-text-muted hover:text-danger transition-colors shrink-0"
+              {items.map((item) => {
+                const lineId = item.lineId ?? item.id;
+                return (
+                  <motion.div
+                    key={lineId}
+                    layout
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    transition={{ duration: 0.25 }}
+                    className="flex items-center gap-4 bg-overlay border border-border-light rounded-2xl p-4"
                   >
-                    <Icon name="close" className="w-5 h-5" />
-                  </button>
-                </motion.div>
-              ))}
+                    <Link href={`/product/${item.id}`} className="relative w-20 h-20 rounded-xl overflow-hidden bg-overlay shrink-0">
+                      <Image src={item.image} alt={item.name} fill unoptimized className="object-cover" />
+                    </Link>
+
+                    <div className="flex-1 min-w-0">
+                      <Link href={`/product/${item.id}`} className="text-text font-semibold truncate hover:text-primary transition-colors block">
+                        {item.name}
+                      </Link>
+                      {item.variantName && (
+                        <div className="text-text-muted text-xs">{item.variantName}</div>
+                      )}
+                      <div className="text-text-muted text-sm">PKR {item.price.toFixed(2)}</div>
+                    </div>
+
+                    <QuantitySelector
+                      value={item.quantity}
+                      onChange={(qty) => updateQuantity(lineId, qty)}
+                    />
+
+                    <div className="text-text font-semibold w-24 text-right shrink-0 hidden sm:block">
+                      PKR {(item.price * item.quantity).toFixed(2)}
+                    </div>
+
+                    <button
+                      onClick={() => removeFromCart(lineId)}
+                      aria-label={`Remove ${item.name}`}
+                      className="text-text-muted hover:text-danger transition-colors shrink-0"
+                    >
+                      <Icon name="close" className="w-5 h-5" />
+                    </button>
+                  </motion.div>
+                );
+              })}
             </AnimatePresence>
           </div>
 

@@ -6,15 +6,13 @@ import Button from '@/components/atoms/Button';
 import Spinner from '@/components/atoms/Spinner';
 import NotificationItem from '@/components/molecules/NotificationItem';
 import useAuth from '@/hooks/useAuth';
-import useTestingMode from '@/hooks/useTestingMode';
 import useNotifications from '@/hooks/useNotifications';
 
 export default function NotificationsPage() {
   const { isAuthenticated } = useAuth();
-  const { testingMode } = useTestingMode();
   const { notifications, unreadCount, loading, markAsRead, markAllAsRead } = useNotifications();
 
-  if (!testingMode && !isAuthenticated) {
+  if (!isAuthenticated) {
     return (
       <div className="max-w-xl mx-auto text-center py-16">
         <H2>Notifications</H2>

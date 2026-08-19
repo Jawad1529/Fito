@@ -6,12 +6,10 @@ import { H3, Text } from '../atoms/Typography';
 import Button from '../atoms/Button';
 import Card from '../atoms/Card';
 import Avatar from '../atoms/Avatar';
-import Input from '../atoms/Input';
 import TextArea from '../atoms/TextArea';
 import Spinner from '../atoms/Spinner';
 import Rating from '../molecules/Rating';
 import useAuth from '../../hooks/useAuth';
-import useTestingMode from '../../hooks/useTestingMode';
 import useApiResource from '../../hooks/useApiResource';
 import {
   getProductReviews,
@@ -19,7 +17,6 @@ import {
   updateMyReview,
   deleteMyReview,
 } from '../../services/review.service';
-import reviewsData from '../../data/reviews.json';
 
 const errorMessage = (err, fallback) =>
   err?.response?.data?.message || err?.message || fallback;
@@ -30,7 +27,6 @@ export default function ReviewSection({
   reviewCount = 0,
   onRatingChange,
 }) {
-  const { testingMode } = useTestingMode();
   const { user, isAuthenticated } = useAuth();
 
   const {
@@ -38,20 +34,14 @@ export default function ReviewSection({
     loading,
     setData: setApiReviews,
   } = useApiResource(() => getProductReviews(productId), [productId], {
-    skip: testingMode || !productId,
+    skip: !productId,
     fallback: [],
   });
 
-  // Testing mode keeps the old local-only behaviour so the UI works offline.
-  const [localReviews, setLocalReviews] = useState(
-    () => reviewsData[String(productId)] || []
-  );
-
-  const reviews = testingMode ? localReviews : apiReviews ?? [];
+  const reviews = apiReviews ?? [];
 
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
-  const [name, setName] = useState('');
   const [score, setScore] = useState(0);
   const [comment, setComment] = useState('');
   const [error, setError] = useState('');
@@ -59,9 +49,9 @@ export default function ReviewSection({
 
   // Reviews are one-per-user, so this is either their review or undefined.
   const myReview = useMemo(() => {
-    if (testingMode || !user?.id) return null;
+    if (!user?.id) return null;
     return reviews.find((r) => String(r.userId) === String(user.id)) ?? null;
-  }, [reviews, user?.id, testingMode]);
+  }, [reviews, user?.id]);
 
   const breakdown = useMemo(() => {
     const counts = [0, 0, 0, 0, 0];
@@ -86,7 +76,6 @@ export default function ReviewSection({
   };
 
   const resetForm = () => {
-    setName('');
     setScore(0);
     setComment('');
     setError('');
@@ -104,26 +93,6 @@ export default function ReviewSection({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (testingMode) {
-      if (!name.trim() || !score || !comment.trim()) {
-        setError('Please add your name, a rating, and a comment.');
-        return;
-      }
-      setLocalReviews((prev) => [
-        {
-          id: Date.now(),
-          name: name.trim(),
-          rating: score,
-          comment: comment.trim(),
-          date: new Date().toISOString().slice(0, 10),
-          replies: [],
-        },
-        ...prev,
-      ]);
-      resetForm();
-      return;
-    }
 
     if (!score || !comment.trim()) {
       setError('Please add a rating and a comment.');
@@ -153,10 +122,6 @@ export default function ReviewSection({
   };
 
   const handleDelete = async (id) => {
-    if (testingMode) {
-      setLocalReviews((prev) => prev.filter((r) => r.id !== id));
-      return;
-    }
     try {
       await deleteMyReview(id);
       const next = (apiReviews ?? []).filter((r) => r.id !== id);
@@ -168,7 +133,7 @@ export default function ReviewSection({
     }
   };
 
-  const canWrite = testingMode || isAuthenticated;
+  const canWrite = isAuthenticated;
   const alreadyReviewed = !!myReview && !editingId;
 
   return (
@@ -220,15 +185,6 @@ export default function ReviewSection({
       {showForm && canWrite && (
         <Card className="bg-white/5 border border-white/10 mb-10">
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            {testingMode && (
-              <Input
-                id="review-name"
-                label="Your Name"
-                placeholder="Jane Doe"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
-            )}
             <div>
               <label className="block text-sm text-text-secondary mb-1.5">Your Rating</label>
               <Rating value={score} onChange={setScore} />

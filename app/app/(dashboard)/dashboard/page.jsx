@@ -6,8 +6,6 @@ import { Typography, Button, Empty, Spin } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 
 import useAuth from '@/hooks/useAuth';
-import useTestingMode from '@/hooks/useTestingMode';
-import useLocalStorageState from '@/hooks/useLocalStorageState';
 import ConsultationSummaryCard from '@/components/organisms/dashboard/ConsultationSummaryCard';
 import ConversationPanel from '@/components/organisms/dashboard/ConversationPanel';
 import { getMyConsultations } from '@/services/consultation.service';
@@ -16,28 +14,18 @@ const { Title, Paragraph } = Typography;
 
 export default function DashboardPage() {
   const { isAuthenticated } = useAuth();
-  const { testingMode } = useTestingMode();
-  // Remounts (resetting all local state) whenever testing mode or auth
-  // state changes, instead of syncing that reset through an effect.
-  return (
-    <DashboardPageInner
-      key={`${testingMode}-${isAuthenticated}`}
-      testingMode={testingMode}
-      isAuthenticated={isAuthenticated}
-    />
-  );
+  // Remounts (resetting all local state) whenever auth state changes,
+  // instead of syncing that reset through an effect.
+  return <DashboardPageInner key={isAuthenticated} isAuthenticated={isAuthenticated} />;
 }
 
-function DashboardPageInner({ testingMode, isAuthenticated }) {
+function DashboardPageInner({ isAuthenticated }) {
   const router = useRouter();
-  const [localConsultation] = useLocalStorageState('Fitoo_consultation', null);
-  const [consultations, setConsultations] = useState(
-    testingMode && localConsultation ? [localConsultation] : []
-  );
-  const [loading, setLoading] = useState(!testingMode && isAuthenticated);
+  const [consultations, setConsultations] = useState([]);
+  const [loading, setLoading] = useState(isAuthenticated);
 
   useEffect(() => {
-    if (testingMode || !isAuthenticated) return;
+    if (!isAuthenticated) return;
     let cancelled = false;
     getMyConsultations()
       .then((data) => {
@@ -50,9 +38,9 @@ function DashboardPageInner({ testingMode, isAuthenticated }) {
     return () => {
       cancelled = true;
     };
-  }, [testingMode, isAuthenticated]);
+  }, [isAuthenticated]);
 
-  if (!testingMode && !isAuthenticated) {
+  if (!isAuthenticated) {
     return (
       <div className="py-12 md:py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center">
@@ -109,8 +97,8 @@ function DashboardPageInner({ testingMode, isAuthenticated }) {
           consultations.map((consultation) => (
             <div key={consultation.id} className="mb-8">
               <ConsultationSummaryCard consultation={consultation} />
-              <div className="my-4 " > 
-              <ConversationPanel consultation={consultation} testingMode={testingMode} />
+              <div className="my-4 " >
+              <ConversationPanel consultation={consultation} />
               </div>
             </div>
           ))}

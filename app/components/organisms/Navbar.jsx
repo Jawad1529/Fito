@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Switch, Tooltip, Popover, Empty, Spin } from 'antd';
+import { Popover, Empty, Spin } from 'antd';
 import Icon from '../atoms/Icon';
 import Button from '../atoms/Button';
 import Badge from '../atoms/Badge';
@@ -15,7 +15,6 @@ import SearchBar from '../molecules/SearchBar';
 import useCart from '../../hooks/useCart';
 import useWishlist from '../../hooks/useWishlist';
 import useAuth from '../../hooks/useAuth';
-import useTestingMode from '../../hooks/useTestingMode';
 import useNotifications from '../../hooks/useNotifications';
 
 const navLinks = [
@@ -36,7 +35,6 @@ export default function Navbar() {
   const { totalItems } = useCart();
   const { totalItems: totalWishlistItems } = useWishlist();
   const { user, isAuthenticated, logout } = useAuth();
-  const { testingMode, setTestingMode } = useTestingMode();
   const {
     notifications,
     unreadCount,
@@ -44,9 +42,8 @@ export default function Navbar() {
     markAsRead,
     markAllAsRead,
   } = useNotifications();
-  // Notifications only exist for a signed-in user; testing mode previews the
-  // bell with mock data so it's still reviewable without logging in.
-  const canSeeNotifications = isAuthenticated || testingMode;
+  // Notifications only exist for a signed-in user.
+  const canSeeNotifications = isAuthenticated;
 
   // A sentinel + IntersectionObserver instead of a scroll listener.
   //
@@ -173,18 +170,6 @@ export default function Navbar() {
 
             {/* Right side */}
             <div className="hidden lg:flex items-center space-x-5">
-              <Tooltip
-                title={
-                  testingMode
-                    ? 'Testing mode is ON — using mock data, no API calls'
-                    : 'Testing mode is OFF — using the live API'
-                }
-              >
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-text-secondary">Testing</span>
-                  <Switch size="small" checked={testingMode} onChange={setTestingMode} />
-                </div>
-              </Tooltip>
               <SearchBar />
               {canSeeNotifications && (
                 <Badge count={unreadCount}>
@@ -326,11 +311,6 @@ export default function Navbar() {
                       <Icon name="dashboard" className="w-5 h-5" />
                     </Link>
                   )}
-                </div>
-
-                <div className="flex items-center justify-between pt-5">
-                  <span className="text-sm text-text-secondary">Testing Mode</span>
-                  <Switch size="small" checked={testingMode} onChange={setTestingMode} />
                 </div>
 
                 {isAuthenticated ? (

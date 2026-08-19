@@ -2,7 +2,6 @@
 
 import { createContext, useCallback, useContext, useMemo } from 'react';
 import useLocalStorageState from '../hooks/useLocalStorageState';
-import { useTestingModeContext } from './TestingModeContext';
 import {
   registerUser,
   loginUser,
@@ -17,93 +16,50 @@ const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useLocalStorageState('Fitoo_app_auth', null);
-  const { testingMode } = useTestingModeContext();
 
   const login = useCallback(
     async ({ email, password }) => {
-      let nextUser;
-
-      if (testingMode) {
-        nextUser = { name: email.split('@')[0], email, token: 'testing-mode-token' };
-      } else {
-        const { user: apiUser, token } = await loginUser({ email, password });
-        nextUser = { ...apiUser, token };
-      }
-
+      const { user: apiUser, token } = await loginUser({ email, password });
+      const nextUser = { ...apiUser, token };
       setUser(nextUser);
       return nextUser;
     },
-    [testingMode, setUser]
+    [setUser]
   );
 
   const register = useCallback(
-    async ({ name, email, password, phone, referralCode }) => {
-      if (testingMode) {
-        return { message: 'Registration successful.' };
-      }
-      return registerUser({ name, email, password, phone, referralCode });
-    },
-    [testingMode]
+    async ({ name, email, password, phone, referralCode }) =>
+      registerUser({ name, email, password, phone, referralCode }),
+    []
   );
 
   const verifyOtp = useCallback(
     async ({ email, otp }) => {
-      if (testingMode) {
-        const nextUser = { name: email.split('@')[0], email, token: 'testing-mode-token' };
-        setUser(nextUser);
-        return nextUser;
-      }
       const { user: apiUser, token } = await verifyOtpRequest({ email, otp });
       const nextUser = { ...apiUser, token };
       setUser(nextUser);
       return nextUser;
     },
-    [testingMode, setUser]
+    [setUser]
   );
 
-  const resendOtp = useCallback(
-    async ({ email }) => {
-      if (testingMode) {
-        return { message: 'Verification code resent' };
-      }
-      return resendOtpRequest({ email });
-    },
-    [testingMode]
-  );
+  const resendOtp = useCallback(async ({ email }) => resendOtpRequest({ email }), []);
 
-  const forgotPassword = useCallback(
-    async ({ email }) => {
-      if (testingMode) {
-        return { message: 'If an account with that email exists, a reset code has been sent.' };
-      }
-      return forgotPasswordRequest({ email });
-    },
-    [testingMode]
-  );
+  const forgotPassword = useCallback(async ({ email }) => forgotPasswordRequest({ email }), []);
 
   const resetPassword = useCallback(
-    async ({ email, otp, newPassword }) => {
-      if (testingMode) {
-        return { message: 'Password reset successfully. You can now log in.' };
-      }
-      return resetPasswordRequest({ email, otp, newPassword });
-    },
-    [testingMode]
+    async ({ email, otp, newPassword }) => resetPasswordRequest({ email, otp, newPassword }),
+    []
   );
 
   const loginWithGoogle = useCallback(
     async ({ credential, referralCode }) => {
-      if (testingMode) {
-        const nextUser = { name: 'Google User', email: 'google-user@example.com', token: 'testing-mode-token' };
-        setUser(nextUser);
-        return nextUser;
-      }
       const { user: apiUser, token } = await googleAuthRequest({ credential, referralCode });
       const nextUser = { ...apiUser, token };
       setUser(nextUser);
       return nextUser;
     },
-    [testingMode, setUser]
+    [setUser]
   );
 
   const logout = useCallback(() => {

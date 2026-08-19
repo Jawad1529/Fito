@@ -12,7 +12,6 @@ import Upload from '../../../components/atoms/Upload';
 import Button from '../../../components/atoms/Button';
 import Icon from '../../../components/atoms/Icon';
 import useCart from '../../../hooks/useCart';
-import useTestingMode from '../../../hooks/useTestingMode';
 import { createOrder } from '../../../services/order.service';
 import { WHATSAPP_NUMBER } from '../../../utils/siteConfig';
 import { ALLOWED_IMAGE_TYPES, MAX_UPLOAD_SIZE_MB } from '../../../utils/uploadValidation';
@@ -23,7 +22,8 @@ function buildWhatsAppMessage(order) {
     '',
     'Items:',
     ...order.items.map(
-      (item) => `- ${item.name} x${item.quantity} — PKR ${(item.price * item.quantity).toFixed(2)}`
+      (item) =>
+        `- ${item.name}${item.variantName ? ` (${item.variantName})` : ''} x${item.quantity} — PKR ${(item.price * item.quantity).toFixed(2)}`
     ),
     '',
     `Total: PKR ${order.total.toFixed(2)}`,
@@ -41,7 +41,6 @@ function buildWhatsAppMessage(order) {
 
 export default function CheckoutPage() {
   const { items, totalPrice, clearCart } = useCart();
-  const { testingMode } = useTestingMode();
 
   const [shipping, setShipping] = useState({ name: '', email: '', phone: '', address: '', city: '' });
   const [paymentMethod, setPaymentMethod] = useState('cod');
@@ -64,48 +63,31 @@ export default function CheckoutPage() {
     setSubmitting(true);
 
     try {
-      if (testingMode) {
-        const shortId =
-          typeof crypto !== 'undefined' && crypto.randomUUID
-            ? crypto.randomUUID().slice(0, 8)
-            : `${Date.now()}`;
-        const orderRecord = {
-          id: shortId,
-          orderNumber: `FT-${shortId.toUpperCase()}`,
-          placedAt: new Date().toISOString(),
-          items,
-          total: totalPrice,
-          paymentMethod,
-          transactionId,
-          shipping,
-          screenshotAttached: screenshot.length > 0,
-        };
+      const createdOrder = await createOrder({
+        // The order schema has no separate variant field, so the variant
+        // name (if any) is folded into the line item's name.
+        items: items.map((item) => ({
+          name: item.variantName ? `${item.name} (${item.variantName})` : item.name,
+          qty: item.quantity,
+          price: item.price,
+        })),
+        total: totalPrice,
+        paymentMethod,
+        transactionId,
+        screenshotAttached: screenshot.length > 0,
+        shipping,
+      });
 
-        const existingOrders = JSON.parse(localStorage.getItem('Fitoo_orders') || '[]');
-        localStorage.setItem('Fitoo_orders', JSON.stringify([...existingOrders, orderRecord]));
-
-        setOrder(orderRecord);
-      } else {
-        const createdOrder = await createOrder({
-          items: items.map((item) => ({ name: item.name, qty: item.quantity, price: item.price })),
-          total: totalPrice,
-          paymentMethod,
-          transactionId,
-          screenshotAttached: screenshot.length > 0,
-          shipping,
-        });
-
-        setOrder({
-          id: createdOrder.id,
-          orderNumber: createdOrder.orderNumber,
-          placedAt: createdOrder.placedAt,
-          items,
-          total: createdOrder.total,
-          paymentMethod: createdOrder.paymentMethod,
-          transactionId: createdOrder.transactionId,
-          shipping: createdOrder.shipping,
-        });
-      }
+      setOrder({
+        id: createdOrder.id,
+        orderNumber: createdOrder.orderNumber,
+        placedAt: createdOrder.placedAt,
+        items,
+        total: createdOrder.total,
+        paymentMethod: createdOrder.paymentMethod,
+        transactionId: createdOrder.transactionId,
+        shipping: createdOrder.shipping,
+      });
 
       clearCart();
     } catch {
@@ -309,9 +291,10 @@ export default function CheckoutPage() {
             <h3 className="text-lg font-semibold text-text mb-4">Order Summary</h3>
             <div className="flex flex-col gap-3 mb-4 max-h-64 overflow-y-auto pr-1">
               {items.map((item) => (
-                <div key={item.id} className="flex justify-between text-sm">
+                <div key={item.lineId ?? item.id} className="flex justify-between text-sm">
                   <span className="text-text-secondary">
-                    {item.name} × {item.quantity}
+                    {item.name}
+                    {item.variantName ? ` (${item.variantName})` : ''} × {item.quantity}
                   </span>
                   <span className="text-text">PKR {(item.price * item.quantity).toFixed(2)}</span>
                 </div>

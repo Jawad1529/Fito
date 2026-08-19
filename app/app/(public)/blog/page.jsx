@@ -6,17 +6,13 @@ import { H2, Text } from '../../../components/atoms/Typography';
 import BlogCard from '../../../components/organisms/BlogCard';
 import Button from '../../../components/atoms/Button';
 import Spinner from '../../../components/atoms/Spinner';
-import useTestingMode from '../../../hooks/useTestingMode';
 import useApiResource from '../../../hooks/useApiResource';
 import { getBlogs, getBlogCategories } from '../../../services/blog.service';
-import blogsData from '../../../data/blogs.json';
 
 export default function BlogPage() {
-  const { testingMode } = useTestingMode();
   const [selectedCategory, setSelectedCategory] = useState('all');
 
   const { data: apiCategories } = useApiResource(getBlogCategories, [], {
-    skip: testingMode,
     fallback: [],
   });
 
@@ -26,20 +22,14 @@ export default function BlogPage() {
     error,
     reload,
   } = useApiResource(() => getBlogs({ category: selectedCategory }), [selectedCategory], {
-    skip: testingMode,
     fallback: [],
   });
 
   const categories = useMemo(() => {
-    const source = testingMode ? blogsData.map((post) => post.category) : apiCategories ?? [];
-    return ['all', ...new Set(source)];
-  }, [testingMode, apiCategories]);
+    return ['all', ...new Set(apiCategories ?? [])];
+  }, [apiCategories]);
 
-  const posts = useMemo(() => {
-    if (!testingMode) return apiPosts ?? [];
-    if (selectedCategory === 'all') return blogsData;
-    return blogsData.filter((post) => post.category === selectedCategory);
-  }, [testingMode, apiPosts, selectedCategory]);
+  const posts = useMemo(() => apiPosts ?? [], [apiPosts]);
 
   return (
     <div className="pt-24 pb-16 min-h-screen">

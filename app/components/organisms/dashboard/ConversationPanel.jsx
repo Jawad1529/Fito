@@ -8,19 +8,9 @@ import {
   MedicineBoxOutlined,
 } from '@ant-design/icons';
 
-import useLocalStorageState from '@/hooks/useLocalStorageState';
 import { sendConsultationMessage } from '@/services/consultation.service';
 
 const { Title, Text, Paragraph } = Typography;
-
-const makeWelcomeMessage = () => ({
-  id: 'welcome',
-  sender: 'dietitian',
-  text:
-    "Hi! Thanks for submitting your consultation. I'll review your details " +
-    "and get back to you here shortly. Feel free to add any notes below.",
-  timestamp: new Date().toISOString(),
-});
 
 // The real API's conversation entries use authorType: 'admin' | 'user'; this
 // panel only ever dealt with sender: 'dietitian' | 'user', so bridge the two.
@@ -31,25 +21,13 @@ const toView = (entry) => ({
   timestamp: entry.createdAt,
 });
 
-export default function ConversationPanel({ consultation, testingMode }) {
-  const [localMessages, setLocalMessages] = useLocalStorageState(
-    'Fitoo_conversation',
-    null
-  );
-  const [remoteMessages, setRemoteMessages] = useState(() =>
+export default function ConversationPanel({ consultation }) {
+  const [messages, setMessages] = useState(() =>
     (consultation.conversation || []).map(toView)
   );
   const [sending, setSending] = useState(false);
   const bottomRef = useRef(null);
   const [draft, setDraft] = useState('');
-
-  const messages = testingMode ? localMessages : remoteMessages;
-
-  useEffect(() => {
-    if (testingMode && localMessages === null) {
-      setLocalMessages([makeWelcomeMessage()]);
-    }
-  }, [testingMode, localMessages, setLocalMessages]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -59,22 +37,10 @@ export default function ConversationPanel({ consultation, testingMode }) {
     const text = draft.trim();
     if (!text) return;
 
-    if (testingMode) {
-      const nextMessage = {
-        id: crypto.randomUUID?.() ?? `${Date.now()}`,
-        sender: 'user',
-        text,
-        timestamp: new Date().toISOString(),
-      };
-      setLocalMessages([...(localMessages || []), nextMessage]);
-      setDraft('');
-      return;
-    }
-
     setSending(true);
     try {
       const updated = await sendConsultationMessage(consultation.id, text);
-      setRemoteMessages((updated.conversation || []).map(toView));
+      setMessages((updated.conversation || []).map(toView));
       setDraft('');
     } catch {
       antdMessage.error('Failed to send message');

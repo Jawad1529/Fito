@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { H2, H3, Text } from '../atoms/Typography';
@@ -13,17 +13,13 @@ import ReviewSection from '../organisms/ReviewSection';
 import QuantitySelector from '../molecules/QuantitySelector';
 import useCart from '../../hooks/useCart';
 import useWishlist from '../../hooks/useWishlist';
-import useTestingMode from '../../hooks/useTestingMode';
 import useApiResource from '../../hooks/useApiResource';
 import { getProduct } from '../../services/product.service';
 import formatCategory from '../../utils/formatCategory';
-import productsData from '../../data/products.json';
 
 // Interactive half of the product page. The route's server component owns
 // metadata and structured data; everything stateful lives here.
 export default function ProductTemplate({ id, initialProduct = null }) {
-    const { testingMode } = useTestingMode();
-
     const {
         data: apiProduct,
         loading,
@@ -32,18 +28,31 @@ export default function ProductTemplate({ id, initialProduct = null }) {
     } = useApiResource(() => getProduct(id), [id], {
         // The server component already fetched this product for metadata, so skip
         // the duplicate request on first paint when we have it.
-        skip: testingMode || !id || Boolean(initialProduct),
+        skip: !id || Boolean(initialProduct),
         fallback: initialProduct,
     });
 
-    const product = useMemo(() => {
-        if (!testingMode) return apiProduct ?? initialProduct;
-        return productsData.find((p) => String(p.id) === String(id)) || null;
-    }, [testingMode, apiProduct, initialProduct, id]);
+    const product = apiProduct ?? initialProduct;
 
     const [quantity, setQuantity] = useState(1);
+    const [selectedVariant, setSelectedVariant] = useState(null);
     const { addToCart, isInCart } = useCart();
     const { isWishlisted, toggleWishlist } = useWishlist();
+
+    // Resets the selected variant during render (not an effect) whenever the
+    // product itself changes, so a variant never carries over onto a product
+    // it doesn't belong to. See https://react.dev/learn/you-might-not-need-an-effect#resetting-all-state-when-a-prop-changes
+    const [selectedForProductId, setSelectedForProductId] = useState(product?.id);
+    if (product?.id !== selectedForProductId) {
+        setSelectedForProductId(product?.id);
+        if (selectedVariant) setSelectedVariant(null);
+    }
+
+    const hasVariants = Boolean(product?.variants?.length);
+    // Requires a variant to be picked before add-to-cart when the product has
+    // any; the price/stock shown below follow whichever is selected.
+    const effectivePrice = selectedVariant?.price ?? product?.discountedPrice ?? product?.price;
+    const effectiveStock = selectedVariant ? selectedVariant.stock : product?.stock;
 
     if (loading && !product) {
         return <ProductDetailSkeleton />;
@@ -65,15 +74,15 @@ export default function ProductTemplate({ id, initialProduct = null }) {
         );
     }
 
-    const inCart = isInCart(product.id);
+    const inCart = isInCart(product.id, selectedVariant);
+    const needsVariant = hasVariants && !selectedVariant;
 
     const handleAddToCart = () => {
-        if (!inCart) addToCart(product, quantity);
+        if (!inCart && !needsVariant) addToCart(product, quantity, selectedVariant);
     };
 
     // Keeps the rating summary in sync after a review is written or removed.
     const handleRatingChange = ({ rating, reviewCount }) => {
-        if (testingMode) return;
         setProduct((prev) => (prev ? { ...prev, rating, reviews: reviewCount, reviewCount } : prev));
     };
 
@@ -123,9 +132,9 @@ export default function ProductTemplate({ id, initialProduct = null }) {
 
                         <div className="flex items-baseline gap-3 flex-wrap">
                             <div className="text-3xl font-bold text-white whitespace-nowrap">
-                                PKR {(product.discountedPrice ?? product.price).toFixed(2)}
+                                PKR {effectivePrice.toFixed(2)}
                             </div>
-                            {product.discountPercent > 0 && (
+                            {!selectedVariant?.price && product.discountPercent > 0 && (
                                 <>
                                     <span className="text-lg text-gray-400 line-through whitespace-nowrap">
                                         PKR {product.price.toFixed(2)}
@@ -141,13 +150,43 @@ export default function ProductTemplate({ id, initialProduct = null }) {
                             <Text className="text-gray-300 leading-relaxed">{product.description}</Text>
                         </div>
 
+                        {hasVariants && (
+                            <div>
+                                <Text className="text-gray-300 font-medium mb-2">Options</Text>
+                                <div className="flex flex-wrap gap-2">
+                                    {product.variants.map((variant) => {
+                                        const active = selectedVariant?.sku
+                                            ? selectedVariant.sku === variant.sku
+                                            : selectedVariant?.name === variant.name;
+                                        const outOfStock = Number(variant.stock ?? 0) <= 0;
+                                        return (
+                                            <button
+                                                key={variant.sku || variant.name}
+                                                type="button"
+                                                disabled={outOfStock}
+                                                onClick={() => setSelectedVariant(variant)}
+                                                className={`px-4 py-2 rounded-full text-sm font-medium border transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${
+                                                    active
+                                                        ? 'bg-primary border-primary text-text-inverse'
+                                                        : 'border-border-light text-gray-300 hover:bg-overlay-strong'
+                                                }`}
+                                            >
+                                                {variant.name}
+                                                {outOfStock && ' (Out of stock)'}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        )}
+
                         <div className="flex flex-wrap items-center gap-4 mt-4">
                             {!inCart && <QuantitySelector value={quantity} onChange={setQuantity} />}
                             <Button
                                 variant="primary"
                                 size="lg"
                                 onClick={handleAddToCart}
-                                disabled={inCart}
+                                disabled={inCart || needsVariant}
                                 className="flex-1 min-w-[150px]"
                             >
                                 {inCart ? (
@@ -158,7 +197,7 @@ export default function ProductTemplate({ id, initialProduct = null }) {
                                 ) : (
                                     <>
                                         <Icon name="cart" className="w-5 h-5 mr-2" />
-                                        Add to Cart
+                                        {needsVariant ? 'Select an Option' : 'Add to Cart'}
                                     </>
                                 )}
                             </Button>
@@ -187,7 +226,7 @@ export default function ProductTemplate({ id, initialProduct = null }) {
                         )}
 
                         <div className="text-sm text-gray-400 mt-2">
-                            {product.stock > 0 ? (
+                            {effectiveStock > 0 ? (
                                 <span className="text-green-400">In Stock</span>
                             ) : (
                                 <span className="text-red-400">Out of Stock</span>

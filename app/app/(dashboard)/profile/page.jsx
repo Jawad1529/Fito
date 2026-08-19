@@ -6,26 +6,24 @@ import { Typography, Button, Spin, message } from 'antd';
 import { CopyOutlined, GiftOutlined, TeamOutlined, MedicineBoxOutlined } from '@ant-design/icons';
 
 import useAuth from '@/hooks/useAuth';
-import useTestingMode from '@/hooks/useTestingMode';
 import { getMyReferralSummary } from '@/services/referral.service';
 
 const { Title, Paragraph, Text } = Typography;
 
 export default function ProfilePage() {
   const { user, isAuthenticated } = useAuth();
-  const { testingMode } = useTestingMode();
   return (
-    <ProfilePageInner key={`${testingMode}-${isAuthenticated}`} user={user} testingMode={testingMode} isAuthenticated={isAuthenticated} />
+    <ProfilePageInner key={isAuthenticated} user={user} isAuthenticated={isAuthenticated} />
   );
 }
 
-function ProfilePageInner({ user, testingMode, isAuthenticated }) {
+function ProfilePageInner({ user, isAuthenticated }) {
   const router = useRouter();
-  const [stats, setStats] = useState(testingMode ? { totalReferred: 3, consultationsBooked: 1 } : null);
-  const [loading, setLoading] = useState(!testingMode && isAuthenticated);
+  const [stats, setStats] = useState(null);
+  const [loading, setLoading] = useState(isAuthenticated);
 
   useEffect(() => {
-    if (testingMode || !isAuthenticated) return;
+    if (!isAuthenticated) return;
     let cancelled = false;
     getMyReferralSummary()
       .then((data) => {
@@ -38,9 +36,9 @@ function ProfilePageInner({ user, testingMode, isAuthenticated }) {
     return () => {
       cancelled = true;
     };
-  }, [testingMode, isAuthenticated]);
+  }, [isAuthenticated]);
 
-  if (!testingMode && !isAuthenticated) {
+  if (!isAuthenticated) {
     return (
       <div className="py-12 md:py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center">
@@ -54,7 +52,7 @@ function ProfilePageInner({ user, testingMode, isAuthenticated }) {
 
   // Read from the freshly-fetched summary, not the cached auth session — the
   // cached user object can predate this field or simply be stale.
-  const referralCode = testingMode ? 'FITOO2026' : stats?.referralCode;
+  const referralCode = stats?.referralCode;
   const referralLink = referralCode && typeof window !== 'undefined'
     ? `${window.location.origin}/register?ref=${referralCode}`
     : '';

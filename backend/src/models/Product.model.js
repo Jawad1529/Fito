@@ -33,14 +33,28 @@ const productSchema = new mongoose.Schema(
                 value: { type: String, required: true, trim: true },
             },
         ],
+        // Purchasable variations of this product (e.g. size/flavor), each with
+        // its own price/stock override. An empty array means the product is
+        // sold as a single SKU using the top-level price/stock above.
+        variants: [
+            {
+                _id: false,
+                name: { type: String, required: true, trim: true },
+                sku: { type: String, trim: true },
+                price: { type: Number, min: 0 },
+                stock: { type: Number, default: 0, min: 0 },
+            },
+        ],
         status: {
             type: String,
             enum: Object.values(PRODUCT_STATUS),
             default: PRODUCT_STATUS.DRAFT,
         },
-        // SEO fields below are generated, never entered by the admin. `seo.*`
-        // values are regenerated whenever the source fields change so meta tags
-        // can't drift away from the product content.
+        // `seo.metaTitle`/keywords/headline/imageAlt are always generated from
+        // the fields below. `seo.metaDescription` is the exception: an admin
+        // can type their own in the product form, and it's preserved across
+        // edits; leaving it blank falls back to the generated copy (same
+        // pattern as `readTime` in Blog.model.js).
         slug: { type: String, unique: true, sparse: true, index: true },
         seo: {
             metaTitle: String,
@@ -58,8 +72,16 @@ const productSchema = new mongoose.Schema(
 const SEO_SOURCE_FIELDS = ['name', 'category', 'price', 'stock', 'status', 'description'];
 
 productSchema.pre('save', function assignSeo() {
-    if (this.isNew || SEO_SOURCE_FIELDS.some((field) => this.isModified(field))) {
+    if (
+        this.isNew ||
+        SEO_SOURCE_FIELDS.some((field) => this.isModified(field)) ||
+        this.isModified('seo.metaDescription')
+    ) {
+        const customMetaDescription = this.seo?.metaDescription?.trim();
         this.seo = buildProductSeo(this);
+        // An admin-entered description overrides the generated one; a blank
+        // value means "auto-generate", so the freshly built one stands.
+        if (customMetaDescription) this.seo.metaDescription = customMetaDescription;
     }
     // Slug stays pinned to the original name so existing links keep resolving.
     if (!this.slug) this.slug = buildProductSlug(this);

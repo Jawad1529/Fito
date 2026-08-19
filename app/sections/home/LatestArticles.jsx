@@ -1,29 +1,24 @@
 'use client';
 
-// Still a client component because it reads testing mode and fetches, but all
-// the scroll-time animation work is gone.
+// Still a client component because it fetches on mount, but all the
+// scroll-time animation work is gone.
 import Image from 'next/image';
 import Link from 'next/link';
 import { H2, Text } from '../../components/atoms/Typography';
 import Icon from '../../components/atoms/Icon';
 import Spinner from '../../components/atoms/Spinner';
-import useTestingMode from '../../hooks/useTestingMode';
 import useApiResource from '../../hooks/useApiResource';
 import { getBlogs } from '../../services/blog.service';
 import imageUrl from '../../utils/imageUrl';
-import blogsData from '../../data/blogs.json';
 
 const LIMIT = 3;
 
 export default function LatestArticles() {
-  const { testingMode } = useTestingMode();
-
   const { data: apiPosts, loading } = useApiResource(() => getBlogs({ limit: LIMIT }), [], {
-    skip: testingMode,
     fallback: [],
   });
 
-  const articles = testingMode ? blogsData.slice(0, LIMIT) : apiPosts ?? [];
+  const articles = apiPosts ?? [];
 
   return (
     <section className="relative py-20 section-defer">

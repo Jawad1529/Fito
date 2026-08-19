@@ -74,7 +74,7 @@ function ProductFormPageInner({ id, testingMode }) {
                 if (cancelled) return;
                 setProduct(data);
                 setKeptImages(data.images ?? []);
-                form.setFieldsValue(data);
+                form.setFieldsValue({ ...data, metaDescription: data.seo?.metaDescription });
             })
             .catch(() => {
                 if (!cancelled) setNotFound(true);
@@ -158,7 +158,12 @@ function ProductFormPageInner({ id, testingMode }) {
                 form={form}
                 layout="vertical"
                 onFinish={handleFinish}
-                initialValues={{ discountPercent: 0, nutritionFacts: [], ...(testingMode && product ? product : {}) }}
+                initialValues={{
+                    discountPercent: 0,
+                    nutritionFacts: [],
+                    variants: [],
+                    ...(testingMode && product ? product : {}),
+                }}
             >
                 <Row gutter={24}>
                     <Col xs={24} lg={14}>
@@ -232,6 +237,63 @@ function ProductFormPageInner({ id, testingMode }) {
                             <Form.Item name="description" label="Description" rules={[{ required: true }]}>
                                 <Input.TextArea rows={4} />
                             </Form.Item>
+                        </Card>
+
+                        <Card
+                            title="SEO"
+                            extra={<span className="text-xs text-gray-400">Shown in search results and social previews</span>}
+                            className="mb-6"
+                        >
+                            <Form.Item
+                                name="metaDescription"
+                                label="Meta Description"
+                                tooltip="Leave blank to auto-generate one from the product details."
+                            >
+                                <Input.TextArea rows={3} maxLength={160} showCount placeholder="Auto-generated if left blank" />
+                            </Form.Item>
+                        </Card>
+
+                        <Card
+                            title="Variants"
+                            extra={<span className="text-xs text-gray-400">Optional — e.g. size or flavor options</span>}
+                            className="mb-6"
+                        >
+                            <Form.List name="variants">
+                                {(fields, { add, remove }) => (
+                                    <div className="flex flex-col gap-2">
+                                        {fields.map(({ key, name, ...restField }) => (
+                                            <div key={key} className="flex gap-2 items-start">
+                                                <Form.Item
+                                                    {...restField}
+                                                    name={[name, 'name']}
+                                                    rules={[{ required: true, message: 'Name required' }]}
+                                                    className="flex-1 mb-2"
+                                                >
+                                                    <Input placeholder="1kg - Chocolate" />
+                                                </Form.Item>
+                                                <Form.Item {...restField} name={[name, 'sku']} className="w-32 mb-2">
+                                                    <Input placeholder="SKU" />
+                                                </Form.Item>
+                                                <Form.Item {...restField} name={[name, 'price']} className="w-28 mb-2">
+                                                    <InputNumber min={0} step={0.01} className="w-full" placeholder="Price" />
+                                                </Form.Item>
+                                                <Form.Item {...restField} name={[name, 'stock']} className="w-24 mb-2">
+                                                    <InputNumber min={0} className="w-full" placeholder="Stock" />
+                                                </Form.Item>
+                                                <Button
+                                                    type="text"
+                                                    danger
+                                                    icon={<DeleteOutlined />}
+                                                    onClick={() => remove(name)}
+                                                />
+                                            </div>
+                                        ))}
+                                        <Button type="dashed" onClick={() => add({ stock: 0 })} icon={<PlusOutlined />} block>
+                                            Add Variant
+                                        </Button>
+                                    </div>
+                                )}
+                            </Form.List>
                         </Card>
                     </Col>
 

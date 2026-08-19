@@ -34,6 +34,28 @@ const parseNutritionFacts = (value) => {
         .filter((row) => row.key && row.value);
 };
 
+// `variants` is sent as a JSON string over multipart (or a plain array over
+// JSON requests); rows missing a name are dropped. `price`/`stock` are left
+// unset (falls back to the top-level product price/stock) when blank.
+const parseVariants = (value) => {
+    if (value === undefined) return undefined;
+    let parsed;
+    try {
+        parsed = typeof value === 'string' ? JSON.parse(value) : value;
+    } catch {
+        return [];
+    }
+    if (!Array.isArray(parsed)) return [];
+    return parsed
+        .map((row) => ({
+            name: String(row?.name ?? '').trim(),
+            sku: String(row?.sku ?? '').trim(),
+            price: parseNumber(row?.price, undefined),
+            stock: parseNumber(row?.stock, 0),
+        }))
+        .filter((row) => row.name);
+};
+
 // GET /api/admin/products?page=&limit=&search=&category=&status= — includes
 // drafts, unlike the public listing.
 export const listProducts = asyncHandler(async (req, res) => {
@@ -63,7 +85,8 @@ export const getProduct = asyncHandler(async (req, res) => {
 
 // POST /api/admin/products (multipart/form-data, field name: images)
 export const createProduct = asyncHandler(async (req, res) => {
-    const { name, category, price, discountPercent, stock, description, status, nutritionFacts } = req.body;
+    const { name, category, price, discountPercent, stock, description, status, nutritionFacts, variants, metaDescription } =
+        req.body;
 
     if (!name || !category || !description) {
         res.status(400);
@@ -98,6 +121,8 @@ export const createProduct = asyncHandler(async (req, res) => {
         status,
         images: (req.files ?? []).map(toImageUrl),
         nutritionFacts: parseNutritionFacts(nutritionFacts) ?? [],
+        variants: parseVariants(variants) ?? [],
+        seo: metaDescription ? { metaDescription } : undefined,
     });
 
     res.status(201).json({ product: toPublicProduct(product) });
@@ -107,8 +132,19 @@ export const createProduct = asyncHandler(async (req, res) => {
 // Newly uploaded files are appended to the gallery; `existingImages` lets the
 // panel drop previously uploaded ones without re-uploading the rest.
 export const updateProduct = asyncHandler(async (req, res) => {
-    const { name, category, price, discountPercent, stock, description, status, existingImages, nutritionFacts } =
-        req.body;
+    const {
+        name,
+        category,
+        price,
+        discountPercent,
+        stock,
+        description,
+        status,
+        existingImages,
+        nutritionFacts,
+        variants,
+        metaDescription,
+    } = req.body;
 
     const product = await Product.findById(req.params.id);
     if (!product) {
@@ -141,6 +177,12 @@ export const updateProduct = asyncHandler(async (req, res) => {
     if (stock !== undefined) product.stock = parseNumber(stock, product.stock);
     const parsedNutritionFacts = parseNutritionFacts(nutritionFacts);
     if (parsedNutritionFacts !== undefined) product.nutritionFacts = parsedNutritionFacts;
+    const parsedVariants = parseVariants(variants);
+    if (parsedVariants !== undefined) product.variants = parsedVariants;
+    if (metaDescription !== undefined) {
+        product.seo = product.seo || {};
+        product.seo.metaDescription = metaDescription;
+    }
 
     if (existingImages !== undefined) {
         // A single value arrives as a string, multiple as an array.

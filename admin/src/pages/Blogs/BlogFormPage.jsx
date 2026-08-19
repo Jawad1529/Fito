@@ -49,7 +49,7 @@ function BlogFormPageInner({ id, testingMode }) {
                 if (cancelled) return;
                 setBlog(data);
                 setCurrentImage(data.image);
-                form.setFieldsValue(data);
+                form.setFieldsValue({ ...data, metaDescription: data.seo?.metaDescription });
             })
             .catch(() => {
                 if (!cancelled) setNotFound(true);
@@ -174,6 +174,19 @@ function BlogFormPageInner({ id, testingMode }) {
 
                                 <Form.Item name="excerpt" label="Excerpt" rules={[{ required: true }]}>
                                     <Input.TextArea rows={3} />
+                                </Form.Item>
+
+                                <Form.Item
+                                    name="metaDescription"
+                                    label="Meta Description"
+                                    tooltip="Leave blank to auto-generate one from the post details."
+                                >
+                                    <Input.TextArea
+                                        rows={3}
+                                        maxLength={160}
+                                        showCount
+                                        placeholder="Auto-generated if left blank"
+                                    />
                                 </Form.Item>
                             </Card>
                         </Col>

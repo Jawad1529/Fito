@@ -19,10 +19,10 @@ const getServerSnapshot = () => null;
 //
 // Without this, `JSON.parse` ran on every single render and returned a brand
 // new object each time. That new identity invalidated the `useMemo` in
-// CartContext / AuthContext / TestingModeContext, so every context consumer
-// re-rendered on every render of any ancestor — the Navbar and every
-// ProductCard included. Caching by raw string makes the value referentially
-// stable until localStorage actually changes.
+// CartContext / AuthContext, so every context consumer re-rendered on every
+// render of any ancestor — the Navbar and every ProductCard included.
+// Caching by raw string makes the value referentially stable until
+// localStorage actually changes.
 const parseCache = new Map();
 
 const parse = (key, raw) => {

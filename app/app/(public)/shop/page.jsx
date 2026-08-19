@@ -8,15 +8,11 @@ import ProductCard from '../../../components/organisms/ProductCard';
 import ProductCardSkeleton from '../../../components/molecules/ProductCardSkeleton';
 import Icon from '../../../components/atoms/Icon';
 import Button from '../../../components/atoms/Button';
-import useTestingMode from '../../../hooks/useTestingMode';
 import useDebounce from '../../../hooks/useDebounce';
 import useApiResource from '../../../hooks/useApiResource';
 import useWishlist from '../../../hooks/useWishlist';
-import formatCategory from '../../../utils/formatCategory';
 import { getProducts } from '../../../services/product.service';
 import { getCategories } from '../../../services/category.service';
-import productsData from '../../../data/products.json';
-import { categories as mockCategories } from '../../../data/categories';
 
 const SORT_OPTIONS = [
   { value: 'default', label: 'Default' },
@@ -24,29 +20,6 @@ const SORT_OPTIONS = [
   { value: 'price-high', label: 'Price: High to Low' },
   { value: 'rating', label: 'Top Rated' },
 ];
-
-// Applied only in testing mode; with the API on, the backend does the work.
-const filterLocally = (products, { search, category, sort }) => {
-  let result = [...products];
-
-  if (search.trim()) {
-    const query = search.toLowerCase().trim();
-    result = result.filter(
-      (p) =>
-        p.name.toLowerCase().includes(query) ||
-        p.description.toLowerCase().includes(query) ||
-        formatCategory(p.category).toLowerCase().includes(query)
-    );
-  }
-  if (category !== 'all') {
-    result = result.filter((p) => p.category === category);
-  }
-  if (sort === 'price-low') result.sort((a, b) => a.price - b.price);
-  if (sort === 'price-high') result.sort((a, b) => b.price - a.price);
-  if (sort === 'rating') result.sort((a, b) => b.rating - a.rating);
-
-  return result;
-};
 
 export default function ShopPage() {
   return (
@@ -57,7 +30,6 @@ export default function ShopPage() {
 }
 
 function ShopPageInner() {
-  const { testingMode } = useTestingMode();
   const searchParams = useSearchParams();
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -70,7 +42,6 @@ function ShopPageInner() {
   const debouncedSearch = useDebounce(searchQuery, 350);
 
   const { data: apiCategories } = useApiResource(getCategories, [], {
-    skip: testingMode,
     fallback: [],
   });
 
@@ -82,27 +53,17 @@ function ShopPageInner() {
   } = useApiResource(
     () => getProducts({ category: selectedCategory, search: debouncedSearch, sort: sortBy }),
     [selectedCategory, debouncedSearch, sortBy],
-    { skip: testingMode, fallback: [] }
+    { fallback: [] }
   );
 
   const categories = useMemo(() => {
-    const source = testingMode ? mockCategories : apiCategories ?? [];
     return [
       { value: 'all', label: 'All Categories' },
-      ...source.map((c) => ({ value: c.slug, label: c.name })),
+      ...(apiCategories ?? []).map((c) => ({ value: c.slug, label: c.name })),
     ];
-  }, [testingMode, apiCategories]);
+  }, [apiCategories]);
 
-  const products = useMemo(() => {
-    if (testingMode) {
-      return filterLocally(productsData, {
-        search: searchQuery,
-        category: selectedCategory,
-        sort: sortBy,
-      });
-    }
-    return apiProducts ?? [];
-  }, [testingMode, apiProducts, searchQuery, selectedCategory, sortBy]);
+  const products = useMemo(() => apiProducts ?? [], [apiProducts]);
 
   const clearFilters = useCallback(() => {
     setSearchQuery('');

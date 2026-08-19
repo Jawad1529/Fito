@@ -2,7 +2,6 @@
 
 import { useMemo } from 'react';
 import useApiResource from './useApiResource';
-import useTestingMode from './useTestingMode';
 import { getConsultationPlans } from '../services/consultation.service';
 import { CONSULTATION_GOALS as STATIC_GOALS } from '../utils/consultationConfig';
 
@@ -13,15 +12,12 @@ import { CONSULTATION_GOALS as STATIC_GOALS } from '../utils/consultationConfig'
  * static 3 tiers this file's fallback ships with. Images stay owned by the
  * static goal config (see PlanSelection.jsx), since admins don't manage those.
  *
- * Falls back to the static plans in testing mode, before the fetch resolves,
- * or if a goal has no admin-managed plans yet, so the flow is never blocked
- * on the network or left with an empty plan list.
+ * Falls back to the static plans before the fetch resolves, or if a goal has
+ * no admin-managed plans yet, so the flow is never blocked on the network or
+ * left with an empty plan list.
  */
 export default function useConsultationPlans() {
-  const { testingMode } = useTestingMode();
-
   const { data: remotePlans } = useApiResource(getConsultationPlans, [], {
-    skip: testingMode,
     fallback: null,
   });
 

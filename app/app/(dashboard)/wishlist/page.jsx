@@ -9,17 +9,15 @@ import Icon from '@/components/atoms/Icon';
 import imageUrl from '@/utils/imageUrl';
 import formatCategory from '@/utils/formatCategory';
 import useAuth from '@/hooks/useAuth';
-import useTestingMode from '@/hooks/useTestingMode';
 import useWishlist from '@/hooks/useWishlist';
 import useCart from '@/hooks/useCart';
 
 export default function WishlistPage() {
   const { isAuthenticated } = useAuth();
-  const { testingMode } = useTestingMode();
   const { items, removeFromWishlist } = useWishlist();
   const { addToCart, isInCart } = useCart();
 
-  if (!testingMode && !isAuthenticated) {
+  if (!isAuthenticated) {
     return (
       <div className="max-w-xl mx-auto text-center py-16">
         <H2>Wishlist</H2>

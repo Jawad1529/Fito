@@ -5,26 +5,46 @@ import useLocalStorageState from '../hooks/useLocalStorageState';
 
 const CartContext = createContext(null);
 
+// A variant's identity in the cart — its sku when it has one, else its name.
+// `null` for a product with no variant selected, so it collapses back to the
+// old single-line-per-product behavior.
+const variantKeyOf = (variant) => (variant ? variant.sku?.trim() || variant.name : null);
+
+// The cart key a line item is grouped/matched by. Two different variants of
+// the same product get distinct lines; the same variant (or no variant) adds
+// onto the existing line.
+const lineIdOf = (productId, variantKey) => (variantKey ? `${productId}::${variantKey}` : String(productId));
+
+// Carts persisted before variants existed have no `lineId` — fall back to the
+// product id so those items stay addressable.
+const lineKeyOf = (item) => item.lineId ?? String(item.id);
+
 export function CartProvider({ children }) {
   const [items, setItems] = useLocalStorageState('Fitoo_cart', []);
 
   const addToCart = useCallback(
-    (product, quantity = 1) => {
-      const existing = items.find((item) => item.id === product.id);
+    (product, quantity = 1, variant = null) => {
+      const variantKey = variantKeyOf(variant);
+      const lineId = lineIdOf(product.id, variantKey);
+      const existing = items.find((item) => lineKeyOf(item) === lineId);
       const next = existing
         ? items.map((item) =>
-          item.id === product.id ? { ...item, quantity: item.quantity + quantity } : item
+          lineKeyOf(item) === lineId ? { ...item, quantity: item.quantity + quantity } : item
         )
         : [
           ...items,
           {
             id: product.id,
+            lineId,
             name: product.name,
-            // Charges the discounted amount automatically wherever a product
-            // has an active discount — see Product.model.js/toPublicProduct.
-            price: product.discountedPrice ?? product.price,
+            // A variant's own price overrides the product price when set;
+            // otherwise charges the discounted amount automatically wherever
+            // a product has an active discount — see toPublicProduct.
+            price: variant?.price ?? product.discountedPrice ?? product.price,
             image: product.image,
             quantity,
+            variantName: variant?.name,
+            variantSku: variant?.sku,
           },
         ];
       setItems(next);
@@ -33,19 +53,19 @@ export function CartProvider({ children }) {
   );
 
   const removeFromCart = useCallback(
-    (id) => {
-      setItems(items.filter((item) => item.id !== id));
+    (lineId) => {
+      setItems(items.filter((item) => lineKeyOf(item) !== lineId));
     },
     [items, setItems]
   );
 
   const updateQuantity = useCallback(
-    (id, quantity) => {
+    (lineId, quantity) => {
       if (quantity <= 0) {
-        setItems(items.filter((item) => item.id !== id));
+        setItems(items.filter((item) => lineKeyOf(item) !== lineId));
         return;
       }
-      setItems(items.map((item) => (item.id === id ? { ...item, quantity } : item)));
+      setItems(items.map((item) => (lineKeyOf(item) === lineId ? { ...item, quantity } : item)));
     },
     [items, setItems]
   );
@@ -54,7 +74,12 @@ export function CartProvider({ children }) {
     setItems([]);
   }, [setItems]);
 
-  const isInCart = useCallback((id) => items.some((item) => item.id === id), [items]);
+  // Pass a variant to check whether that specific variant's line is in the
+  // cart; omit it to check the plain (no-variant) line.
+  const isInCart = useCallback(
+    (id, variant = null) => items.some((item) => lineKeyOf(item) === lineIdOf(id, variantKeyOf(variant))),
+    [items]
+  );
 
   // Derived in one pass and memoized — this context sits above every page, so
   // it re-runs on any ancestor render otherwise.

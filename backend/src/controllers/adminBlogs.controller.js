@@ -50,7 +50,7 @@ export const getBlog = asyncHandler(async (req, res) => {
 
 // POST /api/admin/blogs (multipart/form-data, field name: image)
 export const createBlog = asyncHandler(async (req, res) => {
-    const { title, category, author, excerpt, readTime, status, date, content } = req.body;
+    const { title, category, author, excerpt, readTime, status, date, content, metaDescription } = req.body;
 
     if (!title || !category || !author || !excerpt) {
         res.status(400);
@@ -78,6 +78,7 @@ export const createBlog = asyncHandler(async (req, res) => {
         content: parseContent(content) ?? '',
         publishedAt: date ? new Date(date) : undefined,
         image: toImageUrl(req.file),
+        seo: metaDescription ? { metaDescription } : undefined,
     });
 
     res.status(201).json({ blog: toPublicBlog(blog) });
@@ -85,7 +86,7 @@ export const createBlog = asyncHandler(async (req, res) => {
 
 // PATCH /api/admin/blogs/:id (multipart/form-data)
 export const updateBlog = asyncHandler(async (req, res) => {
-    const { title, category, author, excerpt, readTime, status, date, content } = req.body;
+    const { title, category, author, excerpt, readTime, status, date, content, metaDescription } = req.body;
 
     const blog = await Blog.findById(req.params.id);
     if (!blog) {
@@ -115,6 +116,10 @@ export const updateBlog = asyncHandler(async (req, res) => {
     if (readTime !== undefined) blog.readTime = readTime;
     if (status !== undefined) blog.status = status;
     if (date) blog.publishedAt = new Date(date);
+    if (metaDescription !== undefined) {
+        blog.seo = blog.seo || {};
+        blog.seo.metaDescription = metaDescription;
+    }
 
     const parsedContent = parseContent(content);
     if (parsedContent !== undefined) blog.content = parsedContent;

@@ -8,7 +8,6 @@ import Tag from '@/components/atoms/Tag';
 import Button from '@/components/atoms/Button';
 import Spinner from '@/components/atoms/Spinner';
 import useAuth from '@/hooks/useAuth';
-import useTestingMode from '@/hooks/useTestingMode';
 import { getMyOrders } from '@/services/order.service';
 
 const STATUS_VARIANT = {
@@ -18,36 +17,20 @@ const STATUS_VARIANT = {
   cancelled: 'muted',
 };
 
-function loadLocalOrders() {
-  if (typeof window === 'undefined') return [];
-  try {
-    return JSON.parse(localStorage.getItem('Fitoo_orders') || '[]').reverse();
-  } catch {
-    return [];
-  }
-}
-
 export default function OrdersPage() {
-  const { testingMode } = useTestingMode();
   const { isAuthenticated } = useAuth();
-  // Remounts (resetting all local state) whenever testing mode or auth
-  // state changes, instead of syncing that reset through an effect.
-  return (
-    <OrdersPageInner
-      key={`${testingMode}-${isAuthenticated}`}
-      testingMode={testingMode}
-      isAuthenticated={isAuthenticated}
-    />
-  );
+  // Remounts (resetting all local state) whenever auth state changes,
+  // instead of syncing that reset through an effect.
+  return <OrdersPageInner key={isAuthenticated} isAuthenticated={isAuthenticated} />;
 }
 
-function OrdersPageInner({ testingMode, isAuthenticated }) {
-  const [orders, setOrders] = useState(testingMode ? loadLocalOrders() : []);
-  const [loading, setLoading] = useState(!testingMode && isAuthenticated);
+function OrdersPageInner({ isAuthenticated }) {
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(isAuthenticated);
   const [error, setError] = useState('');
 
   useEffect(() => {
-    if (testingMode || !isAuthenticated) return;
+    if (!isAuthenticated) return;
     let cancelled = false;
     getMyOrders()
       .then((data) => {
@@ -62,9 +45,9 @@ function OrdersPageInner({ testingMode, isAuthenticated }) {
     return () => {
       cancelled = true;
     };
-  }, [testingMode, isAuthenticated]);
+  }, [isAuthenticated]);
 
-  if (!testingMode && !isAuthenticated) {
+  if (!isAuthenticated) {
     return (
       <div className="max-w-xl mx-auto text-center py-16">
         <H2>My Orders</H2>

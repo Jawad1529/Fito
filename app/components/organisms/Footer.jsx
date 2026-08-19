@@ -8,10 +8,8 @@ import Button from '../atoms/Button';
 import Divider from '../atoms/Divider';
 import Logo from '../shared/Logo';
 import { Caption, Text } from '../atoms/Typography';
-import useTestingMode from '../../hooks/useTestingMode';
 import { getCategories } from '../../services/category.service';
 import { subscribeNewsletter } from '../../services/newsletter.service';
-import { categories as mockCategories } from '../../data/categories';
 
 const companyLinks = [
   { label: 'About Us', href: '/about' },
@@ -40,17 +38,9 @@ const socialLinks = [
 // Categories are admin-managed (see Category Management in the admin panel),
 // so the Shop column is built from the live list instead of a hardcoded one.
 function ShopFooterColumn() {
-  const { testingMode } = useTestingMode();
-  // Remounts (resetting local state) whenever testing mode is toggled,
-  // instead of syncing that reset through an effect.
-  return <ShopFooterColumnInner key={testingMode} testingMode={testingMode} />;
-}
-
-function ShopFooterColumnInner({ testingMode }) {
-  const [categories, setCategories] = useState(testingMode ? mockCategories : []);
+  const [categories, setCategories] = useState([]);
 
   useEffect(() => {
-    if (testingMode) return undefined;
     let cancelled = false;
     getCategories()
       .then((data) => {
@@ -62,7 +52,7 @@ function ShopFooterColumnInner({ testingMode }) {
     return () => {
       cancelled = true;
     };
-  }, [testingMode]);
+  }, []);
 
   const links = [
     { label: 'All Products', href: '/shop' },

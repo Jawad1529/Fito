@@ -7,9 +7,7 @@ import { Popover } from 'antd';
 import Icon from '../atoms/Icon';
 import Spinner from '../atoms/Spinner';
 import useDebounce from '../../hooks/useDebounce';
-import useTestingMode from '../../hooks/useTestingMode';
 import { getProducts } from '../../services/product.service';
-import productsData from '../../data/products.json';
 import imageUrl from '../../utils/imageUrl';
 
 const MAX_RESULTS = 6;
@@ -17,7 +15,6 @@ const MAX_RESULTS = 6;
 // Search icon that expands into a Popover holding the input and, once there's
 // a query, a dropdown of matching products underneath it.
 export default function SearchBar() {
-  const { testingMode } = useTestingMode();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
@@ -49,16 +46,8 @@ export default function SearchBar() {
 
     (async () => {
       try {
-        if (testingMode) {
-          const q = trimmed.toLowerCase();
-          const matches = productsData.filter(
-            (p) => p.name.toLowerCase().includes(q) || p.category.toLowerCase().includes(q)
-          );
-          if (!cancelled) setResults(matches.slice(0, MAX_RESULTS));
-        } else {
-          const products = await getProducts({ search: trimmed });
-          if (!cancelled) setResults((products ?? []).slice(0, MAX_RESULTS));
-        }
+        const products = await getProducts({ search: trimmed });
+        if (!cancelled) setResults((products ?? []).slice(0, MAX_RESULTS));
       } catch {
         if (!cancelled) setResults([]);
       } finally {
@@ -69,7 +58,7 @@ export default function SearchBar() {
     return () => {
       cancelled = true;
     };
-  }, [debouncedQuery, testingMode]);
+  }, [debouncedQuery]);
 
   const content = (
     <div className="w-72 max-w-[85vw]">

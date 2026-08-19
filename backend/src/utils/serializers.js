@@ -58,6 +58,7 @@ export const toPublicProduct = (product) => ({
     stock: product.stock,
     description: product.description,
     nutritionFacts: product.nutritionFacts ?? [],
+    variants: product.variants ?? [],
     image: product.images?.[0],
     images: product.images ?? [],
     rating: product.rating,

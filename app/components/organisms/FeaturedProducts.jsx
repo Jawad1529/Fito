@@ -4,11 +4,9 @@ import { useMemo } from 'react';
 import { H2, Text } from '../../components/atoms/Typography';
 import ProductCard from './ProductCard';
 import ProductCardSkeleton from '../molecules/ProductCardSkeleton';
-import useTestingMode from '../../hooks/useTestingMode';
 import useApiResource from '../../hooks/useApiResource';
 import useWishlist from '../../hooks/useWishlist';
 import { getProducts } from '../../services/product.service';
-import productsData from '../../data/products.json';
 
 export default function FeaturedProducts({
   title = 'Featured Supplements',
@@ -16,18 +14,15 @@ export default function FeaturedProducts({
   limit = 8,
   excludeId,
 }) {
-  const { testingMode } = useTestingMode();
   const { isWishlisted, toggleWishlist } = useWishlist();
 
   const { data: apiProducts, loading } = useApiResource(() => getProducts({ sort: 'rating' }), [], {
-    skip: testingMode,
     fallback: [],
   });
 
   const products = useMemo(() => {
-    const source = testingMode ? productsData : apiProducts ?? [];
-    return source.filter((p) => p.id !== excludeId).slice(0, limit);
-  }, [testingMode, apiProducts, excludeId, limit]);
+    return (apiProducts ?? []).filter((p) => p.id !== excludeId).slice(0, limit);
+  }, [apiProducts, excludeId, limit]);
 
   return (
     <section className="relative py-20 section-defer">
