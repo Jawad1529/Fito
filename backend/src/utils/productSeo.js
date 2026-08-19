@@ -17,12 +17,16 @@ const buildProductSeo = (product) => {
     const category = String(product.category ?? '').trim();
     const description = String(product.description ?? '').trim();
     const price = Number(product.price ?? 0);
-    const inStock = Number(product.stock ?? 0) > 0 && product.status !== PRODUCT_STATUS.OUT_OF_STOCK;
+    const inStock =
+        Number(product.stock ?? 0) > 0 &&
+        product.status !== PRODUCT_STATUS.OUT_OF_STOCK &&
+        product.status !== PRODUCT_STATUS.COMING_SOON;
+    const comingSoon = product.status === PRODUCT_STATUS.COMING_SOON;
 
     const metaTitle = composeTitle(name, category);
 
     const metaDescription = clamp(
-        `${firstSentence(description)} ${inStock ? 'Buy' : 'Shop'} ${name} online at ${BRAND} for PKR ${price.toFixed(0)}.`,
+        `${firstSentence(description)} ${comingSoon ? 'Coming soon —' : inStock ? 'Buy' : 'Shop'} ${name} online at ${BRAND} for PKR ${price.toFixed(0)}.`,
         DESCRIPTION_LIMIT
     );
 

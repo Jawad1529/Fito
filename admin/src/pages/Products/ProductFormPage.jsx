@@ -14,6 +14,7 @@ import {
     Result,
     message,
 } from 'antd';
+import ImgCrop from 'antd-img-crop';
 import { PlusOutlined, DeleteOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import PageHeading from '../../components/atoms/PageHeading';
 import ProductFormSkeleton from './ProductFormSkeleton';
@@ -228,6 +229,7 @@ function ProductFormPageInner({ id, testingMode }) {
                                                 { label: 'Published', value: 'published' },
                                                 { label: 'Draft', value: 'draft' },
                                                 { label: 'Out of Stock', value: 'out_of_stock' },
+                                                { label: 'Coming Soon', value: 'coming_soon' },
                                             ]}
                                         />
                                     </Form.Item>
@@ -242,7 +244,7 @@ function ProductFormPageInner({ id, testingMode }) {
                         <Card
                             title="SEO"
                             extra={<span className="text-xs text-gray-400">Shown in search results and social previews</span>}
-                            className="mb-6"
+                            className="my-6!"
                         >
                             <Form.Item
                                 name="metaDescription"
@@ -330,22 +332,31 @@ function ProductFormPageInner({ id, testingMode }) {
                                         </div>
                                     )}
 
-                                    <Form.Item label="Add Images (max 6)">
-                                        <Upload
-                                            listType="picture-card"
-                                            fileList={files}
-                                            beforeUpload={() => false}
-                                            onChange={({ fileList }) => setFiles(fileList.slice(0, 6))}
-                                            accept="image/*"
-                                            multiple
-                                        >
-                                            {files.length >= 6 ? null : (
-                                                <div>
-                                                    <PlusOutlined />
-                                                    <div className="mt-1 text-xs">Upload</div>
-                                                </div>
-                                            )}
-                                        </Upload>
+                                    <Form.Item
+                                        label="Add Images (max 6)"
+                                        tooltip="Crop to a square (1:1) — this is exactly how it will appear on the storefront."
+                                    >
+                                        <ImgCrop aspect={1} rotationSlider quality={1}>
+                                            <Upload
+                                                listType="picture-card"
+                                                fileList={files}
+                                                // No `beforeUpload={() => false}` here: returning `false` makes
+                                                // AntD discard the cropped file and fall back to the original,
+                                                // uncropped one. customRequest no-ops the network call instead,
+                                                // so the cropped file still flows into fileList untouched.
+                                                customRequest={({ onSuccess }) => onSuccess?.('ok')}
+                                                onChange={({ fileList }) => setFiles(fileList.slice(0, 6))}
+                                                accept="image/*"
+                                                multiple
+                                            >
+                                                {files.length >= 6 ? null : (
+                                                    <div>
+                                                        <PlusOutlined />
+                                                        <div className="mt-1 text-xs">Upload</div>
+                                                    </div>
+                                                )}
+                                            </Upload>
+                                        </ImgCrop>
                                     </Form.Item>
                                 </>
                             ) : (

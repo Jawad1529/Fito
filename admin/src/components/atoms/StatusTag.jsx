@@ -10,6 +10,7 @@ const COLOR_MAP = {
     published: 'green',
     draft: 'default',
     out_of_stock: 'red',
+    coming_soon: 'blue',
     delivered: 'green',
     processing: 'blue',
     shipped: 'cyan',

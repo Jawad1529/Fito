@@ -96,4 +96,16 @@ export const products = [
         description: 'Advanced creatine formula with HMB for muscle preservation.',
         status: 'published',
     },
+    {
+        id: 9,
+        name: 'Pre-Workout Nitro Blast',
+        category: 'pre-workout',
+        price: 36.99,
+        stock: 0,
+        rating: 0,
+        reviews: 0,
+        image: 'https://img.magnific.com/free-photo/protein-gym_23-2151980040.jpg?semt=ais_hybrid&w=740&q=80',
+        description: 'Next-gen pre-workout launching soon — explosive energy and focus.',
+        status: 'coming_soon',
+    },
 ];

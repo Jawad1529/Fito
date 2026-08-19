@@ -4,6 +4,7 @@ export const PRODUCT_STATUS = Object.freeze({
     PUBLISHED: 'published',
     DRAFT: 'draft',
     OUT_OF_STOCK: 'out_of_stock',
+    COMING_SOON: 'coming_soon',
 });
 
 export const BLOG_STATUS = Object.freeze({

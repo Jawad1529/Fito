@@ -56,6 +56,11 @@ function ProductCard({ product, isWishlisted = false, onToggleWishlist }) {
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
           className="object-cover transition-transform duration-500 md:group-hover:scale-105"
         />
+        {product.status === 'coming_soon' && (
+          <span className="absolute top-3 left-3 z-10 rounded-full glass-strong border border-border-light px-3 py-1 text-xs font-semibold text-primary">
+            Coming Soon
+          </span>
+        )}
       </div>
 
       <div className="flex flex-col flex-1">

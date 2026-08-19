@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Form, Input, Select, Button, Image, Upload, Card, Row, Col, Result, message } from 'antd';
+import ImgCrop from 'antd-img-crop';
 import { PlusOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import PageHeading from '../../components/atoms/PageHeading';
 import RichTextEditor from '../../components/molecules/RichTextEditor';
@@ -207,23 +208,30 @@ function BlogFormPageInner({ id, testingMode }) {
                                                 />
                                             </div>
                                         )}
-                                        <Form.Item label="Upload">
-                                            <Upload
-                                                listType="picture-card"
-                                                fileList={file ? [file] : []}
-                                                beforeUpload={() => false}
-                                                onChange={({ fileList }) => setFile(fileList[fileList.length - 1] ?? null)}
-                                                onRemove={() => setFile(null)}
-                                                accept="image/*"
-                                                maxCount={1}
-                                            >
-                                                {file ? null : (
-                                                    <div>
-                                                        <PlusOutlined />
-                                                        <div className="mt-1 text-xs">Upload</div>
-                                                    </div>
-                                                )}
-                                            </Upload>
+                                        <Form.Item
+                                            label="Upload"
+                                            tooltip="Crop to 16:10 — this is exactly how it will appear on the blog."
+                                        >
+                                            <ImgCrop aspect={16 / 10} rotationSlider quality={1}>
+                                                <Upload
+                                                    listType="picture-card"
+                                                    fileList={file ? [file] : []}
+                                                    // See ProductFormPage: beforeUpload={() => false} would make
+                                                    // AntD drop the cropped file and keep the original instead.
+                                                    customRequest={({ onSuccess }) => onSuccess?.('ok')}
+                                                    onChange={({ fileList }) => setFile(fileList[fileList.length - 1] ?? null)}
+                                                    onRemove={() => setFile(null)}
+                                                    accept="image/*"
+                                                    maxCount={1}
+                                                >
+                                                    {file ? null : (
+                                                        <div>
+                                                            <PlusOutlined />
+                                                            <div className="mt-1 text-xs">Upload</div>
+                                                        </div>
+                                                    )}
+                                                </Upload>
+                                            </ImgCrop>
                                         </Form.Item>
                                     </>
                                 ) : (

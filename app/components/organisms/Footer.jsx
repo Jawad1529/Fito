@@ -56,7 +56,7 @@ function ShopFooterColumn() {
 
   const links = [
     { label: 'All Products', href: '/shop' },
-    ...categories.map((c) => ({ label: c.name, href: `/shop?category=${encodeURIComponent(c.slug)}` })),
+    ...categories.slice(0, 6).map((c) => ({ label: c.name, href: `/shop?category=${encodeURIComponent(c.slug)}` })),
   ];
 
   return <FooterColumn title="Shop" links={links} />;

@@ -18,6 +18,7 @@ function ProductCardActions({ product, isWishlisted = false, onToggleWishlist })
     const inCart = isInCart(product.id);
     const hasDiscount = product.discountPercent > 0;
     const chargedPrice = product.discountedPrice ?? product.price;
+    const comingSoon = product.status === 'coming_soon';
 
     return (
         <>
@@ -43,7 +44,11 @@ function ProductCardActions({ product, isWishlisted = false, onToggleWishlist })
                         </span>
                     )}
                 </div>
-                {hasVariants ? (
+                {comingSoon ? (
+                    <Button variant="outline" size="sm" disabled className="rounded-full px-4 py-1.5 text-xs">
+                        Coming Soon
+                    </Button>
+                ) : hasVariants ? (
                     <Link
                         href={`/product/${product.slug || product.id}`}
                         className="relative z-10 rounded-full px-4 py-1.5 text-xs font-semibold border border-border text-text hover:bg-overlay-strong transition-colors"

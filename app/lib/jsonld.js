@@ -7,6 +7,7 @@ import imageUrl from '@/utils/imageUrl';
 const AVAILABILITY = {
   inStock: 'https://schema.org/InStock',
   outOfStock: 'https://schema.org/OutOfStock',
+  preOrder: 'https://schema.org/PreOrder',
 };
 
 export const productJsonLd = (product) => {
@@ -32,7 +33,12 @@ export const productJsonLd = (product) => {
       url,
       price: Number(product.price ?? 0).toFixed(2),
       priceCurrency: CURRENCY,
-      availability: product.stock > 0 ? AVAILABILITY.inStock : AVAILABILITY.outOfStock,
+      availability:
+        product.status === 'coming_soon'
+          ? AVAILABILITY.preOrder
+          : product.stock > 0
+            ? AVAILABILITY.inStock
+            : AVAILABILITY.outOfStock,
       itemCondition: 'https://schema.org/NewCondition',
       seller: { '@type': 'Organization', name: SITE_NAME },
     },

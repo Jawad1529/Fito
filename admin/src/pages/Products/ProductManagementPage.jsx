@@ -123,6 +123,7 @@ function ProductManagementPageInner({ testingMode }) {
                 { text: 'Published', value: 'published' },
                 { text: 'Draft', value: 'draft' },
                 { text: 'Out of Stock', value: 'out_of_stock' },
+                { text: 'Coming Soon', value: 'coming_soon' },
             ],
             filteredValue: testingMode ? undefined : [serverQuery.filters.status].filter(Boolean),
             onFilter: testingMode ? (value, record) => record.status === value : undefined,

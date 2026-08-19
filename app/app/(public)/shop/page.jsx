@@ -2,17 +2,20 @@
 
 import { Suspense, useCallback, useMemo, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
+import Image from 'next/image';
 import { Select } from 'antd';
 import { H2, Text } from '../../../components/atoms/Typography';
 import ProductCard from '../../../components/organisms/ProductCard';
 import ProductCardSkeleton from '../../../components/molecules/ProductCardSkeleton';
 import Icon from '../../../components/atoms/Icon';
+import Tag from '../../../components/atoms/Tag';
 import Button from '../../../components/atoms/Button';
 import useDebounce from '../../../hooks/useDebounce';
 import useApiResource from '../../../hooks/useApiResource';
 import useWishlist from '../../../hooks/useWishlist';
 import { getProducts } from '../../../services/product.service';
 import { getCategories } from '../../../services/category.service';
+import comingSoonImage from '../../../assets/images/coming-soon.webp';
 
 const SORT_OPTIONS = [
   { value: 'default', label: 'Default' },
@@ -24,9 +27,17 @@ const SORT_OPTIONS = [
 export default function ShopPage() {
   return (
     <Suspense fallback={null}>
-      <ShopPageInner />
+      <ShopPageRoot />
     </Suspense>
   );
+}
+
+// Splitting this out lets ShopPageInner be remounted (via `key`) whenever the
+// URL's category changes — e.g. a footer/nav link clicked while already on
+// /shop — so its filter state re-seeds from the new URL instead of going stale.
+function ShopPageRoot() {
+  const searchParams = useSearchParams();
+  return <ShopPageInner key={searchParams.get('category') || 'all'} />;
 }
 
 function ShopPageInner() {
@@ -174,6 +185,74 @@ function ShopPageInner() {
                 onToggleWishlist={toggleWishlist}
               />
             ))}
+          </div>
+        ) : selectedCategory !== 'all' && !debouncedSearch.trim() ? (
+          <div
+            className="relative rounded-3xl border border-primary/15 overflow-hidden"
+            style={{
+              background: 'linear-gradient(135deg, var(--surface) 0%, color-mix(in srgb, var(--primary) 14%, var(--surface)) 100%)',
+            }}
+          >
+            {/* Grid texture + faint corner glows — a warm brand tint, not flat gray. */}
+            <div className="absolute inset-0 bg-grid-pattern opacity-[0.05] decor" />
+            <div
+              className="absolute inset-0 decor"
+              style={{
+                backgroundImage: `
+                  radial-gradient(
+                    45% 55% at 100% 0%,
+                    color-mix(in srgb, var(--primary) 14%, transparent) 0%,
+                    transparent 100%
+                  ),
+                  radial-gradient(
+                    45% 55% at 0% 100%,
+                    color-mix(in srgb, var(--primary) 7%, transparent) 0%,
+                    transparent 100%
+                  )
+                `,
+              }}
+            />
+
+            <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 items-center gap-4 md:gap-8 px-6 py-10 sm:px-10 sm:py-14 md:px-12">
+              {/* Product shot on a soft spotlight glow */}
+              <div className="relative flex items-center justify-center order-1">
+                <div className="absolute w-56 h-56 sm:w-72 sm:h-72 rounded-full bg-primary/15 blur-3xl decor" />
+                <Image
+                  src={comingSoonImage}
+                  alt="Coming soon"
+                  width={520}
+                  height={520}
+                  className="relative w-full max-w-[240px] sm:max-w-xs drop-shadow-2xl"
+                  priority
+                />
+              </div>
+
+              {/* Copy + CTA */}
+              <div className="order-2 text-center md:text-left">
+                <Tag variant="outline" className="mb-4">
+                  <Icon name="sparkle" className="w-3.5 h-3.5" />
+                  Restocking Soon
+                </Tag>
+
+                <h2 className="text-4xl sm:text-5xl font-bold leading-tight bg-clip-text text-transparent bg-gradient-text">
+                  Coming Soon
+                </h2>
+                <Text muted className="mt-3 text-base sm:text-lg max-w-sm mx-auto md:mx-0">
+                  Stay tuned to Fitoo
+                </Text>
+
+                <Button
+                  variant="primary"
+                  size="lg"
+                  onClick={clearFilters}
+                  icon={<Icon name="arrowRight" className="w-4 h-4" />}
+                  iconPosition="right"
+                  className="mt-8"
+                >
+                  Browse All Products
+                </Button>
+              </div>
+            </div>
           </div>
         ) : (
           <div className="text-center py-16">

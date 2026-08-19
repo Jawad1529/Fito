@@ -76,9 +76,10 @@ export default function ProductTemplate({ id, initialProduct = null }) {
 
     const inCart = isInCart(product.id, selectedVariant);
     const needsVariant = hasVariants && !selectedVariant;
+    const comingSoon = product.status === 'coming_soon';
 
     const handleAddToCart = () => {
-        if (!inCart && !needsVariant) addToCart(product, quantity, selectedVariant);
+        if (!inCart && !needsVariant && !comingSoon) addToCart(product, quantity, selectedVariant);
     };
 
     // Keeps the rating summary in sync after a review is written or removed.
@@ -186,10 +187,15 @@ export default function ProductTemplate({ id, initialProduct = null }) {
                                 variant="primary"
                                 size="lg"
                                 onClick={handleAddToCart}
-                                disabled={inCart || needsVariant}
+                                disabled={inCart || needsVariant || comingSoon}
                                 className="flex-1 min-w-[150px]"
                             >
-                                {inCart ? (
+                                {comingSoon ? (
+                                    <>
+                                        <Icon name="cart" className="w-5 h-5 mr-2" />
+                                        Coming Soon
+                                    </>
+                                ) : inCart ? (
                                     <>
                                         <Icon name="check" className="w-5 h-5 mr-2" />
                                         In Cart
@@ -226,7 +232,9 @@ export default function ProductTemplate({ id, initialProduct = null }) {
                         )}
 
                         <div className="text-sm text-gray-400 mt-2">
-                            {effectiveStock > 0 ? (
+                            {comingSoon ? (
+                                <span className="text-yellow-400">Coming Soon</span>
+                            ) : effectiveStock > 0 ? (
                                 <span className="text-green-400">In Stock</span>
                             ) : (
                                 <span className="text-red-400">Out of Stock</span>
