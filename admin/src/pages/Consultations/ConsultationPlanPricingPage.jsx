@@ -16,8 +16,6 @@ import {
 
 const apiError = (err, fallback) => err?.response?.data?.message || fallback;
 
-const MAX_FEATURES = 6;
-
 const emptyPlan = () => ({
     key: `new-${Date.now()}-${Math.random().toString(36).slice(2)}`,
     isNew: true,
@@ -104,7 +102,7 @@ function ConsultationPlanPricingPageInner({ testingMode }) {
 
     const addFeature = (key) => {
         setPlans((prev) =>
-            prev.map((p) => (p.key === key && p.features.length < MAX_FEATURES ? { ...p, features: [...p.features, ''] } : p))
+            prev.map((p) => (p.key === key ? { ...p, features: [...p.features, ''] } : p))
         );
     };
 
@@ -279,11 +277,9 @@ function ConsultationPlanPricingPageInner({ testingMode }) {
                                         />
                                     </div>
                                 ))}
-                                {plan.features.length < MAX_FEATURES && (
-                                    <Button type="dashed" size="small" icon={<PlusOutlined />} onClick={() => addFeature(plan.key)}>
-                                        Add point
-                                    </Button>
-                                )}
+                                <Button type="dashed" size="small" icon={<PlusOutlined />} onClick={() => addFeature(plan.key)}>
+                                    Add point
+                                </Button>
                             </Card>
                         ))}
                     </div>
