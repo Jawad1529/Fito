@@ -3,7 +3,6 @@
 import { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
 import Image from 'next/image';
-import Link from 'next/link';
 import Icon from '@/components/atoms/Icon';
 import Tag from '@/components/atoms/Tag';
 import SocialLinks from '@/components/atoms/SocialLinks';
@@ -49,25 +48,6 @@ function TargetIcon({ className }) {
       <circle cx="12" cy="12" r="8" stroke="currentColor" strokeWidth="1.5" />
       <circle cx="12" cy="12" r="4.5" stroke="currentColor" strokeWidth="1.5" />
       <circle cx="12" cy="12" r="1" fill="currentColor" />
-    </svg>
-  );
-}
-
-function LinkedinIcon({ className }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
-      <rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" strokeWidth="1.5" />
-      <path d="M7.5 10.5v6M7.5 7.8v.01M11 16.5v-3.6c0-1.2.9-2.1 2-2.1s2 .9 2 2.1v3.6M11 10.5v6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function InstagramIcon({ className }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
-      <rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" strokeWidth="1.5" />
-      <circle cx="12" cy="12" r="3.5" stroke="currentColor" strokeWidth="1.5" />
-      <circle cx="17.2" cy="6.8" r="1" fill="currentColor" />
     </svg>
   );
 }
@@ -196,12 +176,6 @@ export default function AboutContent() {
             ))}
           </div>
 
-          <Link
-            href="/quality"
-            className="mt-7 inline-flex items-center gap-1.5 text-sm text-primary font-medium hover:text-primary-hover transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 rounded"
-          >
-            See our certifications and lab reports →
-          </Link>
         </Row>
 
         {/* Team — two founders and the lead nutritionist */}
@@ -279,27 +253,6 @@ export default function AboutContent() {
             ))}
           </div>
 
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={founderInView ? { opacity: 1 } : {}}
-            transition={{ duration: 0.6, delay: 0.7 }}
-            className="mt-8 flex items-center justify-center gap-4"
-          >
-            <a
-              href="#"
-              aria-label="Follow us on LinkedIn"
-              className="text-text-muted hover:text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 rounded"
-            >
-              <LinkedinIcon className="w-4 h-4" />
-            </a>
-            <a
-              href="#"
-              aria-label="Follow us on Instagram"
-              className="text-text-muted hover:text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 rounded"
-            >
-              <InstagramIcon className="w-4 h-4" />
-            </a>
-          </motion.div>
         </div>
 
         {/* Values grid */}
