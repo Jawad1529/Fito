@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Form, message } from 'antd';
-import { MailOutlined, LockOutlined, FacebookOutlined } from '@ant-design/icons';
+import { MailOutlined, LockOutlined } from '@ant-design/icons';
 import { motion } from 'framer-motion';
 
 import Input from '@/components/atoms/Input';
@@ -91,15 +91,7 @@ export default function LoginPage() {
               router.push('/');
             }}
           />
-          <Button
-            type="button"
-            variant="outline"
-            fullWidth
-            icon={<FacebookOutlined />}
-            onClick={() => message.info('Facebook login coming soon')}
-          >
-            Facebook
-          </Button>
+
         </div>
 
         <div className="text-center mt-6 text-text-muted">
