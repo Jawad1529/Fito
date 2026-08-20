@@ -198,6 +198,10 @@ export default function Footer() {
             ))}
           </div>
         </div>
+
+        <p className="mt-6 text-center text-xs text-text-muted">
+          Powered by Diversify Digital
+        </p>
       </div>
     </footer>
   );
